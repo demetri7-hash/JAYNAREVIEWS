@@ -4,33 +4,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-// Create a service role client for database operations with schema refresh
+// Create a service role client for database operations
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
-  },
-  db: {
-    schema: 'public'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'jayna-gyro-app'
-    }
   }
 })
 
-// Create a client for browser operations with schema refresh
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  db: {
-    schema: 'public'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'jayna-gyro-app'
-    }
-  }
-})
+// Create a client for browser operations
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export interface Employee {
   id: string

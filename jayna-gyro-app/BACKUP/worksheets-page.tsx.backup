@@ -232,7 +232,7 @@ function WorksheetsContent() {
           <Card 
             key={worksheet.id} 
             className="p-4 hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => alert(`Worksheet details: ${worksheet.employee_name} - ${worksheet.shift_type} (${worksheet.completion_percentage}% complete)`)}
+            onClick={() => router.push(`/worksheets/${worksheet.id}`)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">

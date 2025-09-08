@@ -229,14 +229,7 @@ export default function CloseReviewPage() {
                 {t('backToMain')}
               </Button>
               <Button
-                onClick={() => {
-                  // Navigate to correct opening checklist based on department
-                  if (department === 'FOH') {
-                    router.push('/foh/am')
-                  } else {
-                    router.push('/boh/opening-line')
-                  }
-                }}
+                onClick={() => router.push(`/${department.toLowerCase()}/opening`)}
               >
                 {t('continueToChecklist')}
               </Button>
@@ -428,14 +421,7 @@ export default function CloseReviewPage() {
             {t('backToMain')}
           </Button>
           <Button
-            onClick={() => {
-              // Navigate to correct opening checklist based on department
-              if (department === 'FOH') {
-                router.push('/foh/am')
-              } else {
-                router.push('/boh/opening-line')
-              }
-            }}
+            onClick={() => router.push(`/${department.toLowerCase()}/opening`)}
             className="bg-blue-600 hover:bg-blue-700"
           >
             {t('continueToChecklist')}

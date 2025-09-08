@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import EnvChecker from "@/components/EnvChecker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <LanguageProvider>
             {children}
+            <EnvChecker />
           </LanguageProvider>
         </ErrorBoundary>
       </body>

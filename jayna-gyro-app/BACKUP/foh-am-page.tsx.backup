@@ -30,25 +30,16 @@ export default function FOHAMWorksheet() {
   const [currentCategory, setCurrentCategory] = useState(0);
   const [startTime] = useState(new Date());
   const [showReviewCheck, setShowReviewCheck] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  // Ensure component is mounted on client-side
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Load FOH AM Opening Checklist based on reference files
   useEffect(() => {
-    if (!mounted) return;
+    const employee = localStorage.getItem('current-employee');
+    if (employee) {
+      setCurrentEmployee(JSON.parse(employee));
+    }
 
-    try {
-      const employee = localStorage.getItem('current-employee');
-      if (employee) {
-        setCurrentEmployee(JSON.parse(employee));
-      }
-
-      // This data is extracted from "FOH OPENING CHECKLIST.md"
-      const fohAMItems: WorksheetItemData[] = [
+    // This data is extracted from "FOH OPENING CHECKLIST.md"
+    const fohAMItems: WorksheetItemData[] = [
       // Dining Room & Patio Setup
       { id: '1', text: 'Remove chairs and re-wipe all tables', category: 'Dining Room & Patio Setup', required: true, requiresPhoto: false, requiresNote: false, completed: false },
       { id: '2', text: 'Wipe table sides, legs, chairs, and banquette sofas', category: 'Dining Room & Patio Setup', required: true, requiresPhoto: false, requiresNote: false, completed: false },
@@ -89,24 +80,8 @@ export default function FOHAMWorksheet() {
       { id: '31', text: 'One towel must be hanging half in/half out (health code requirement)', category: 'Expo Station & Sauce Prep', required: true, requiresPhoto: true, requiresNote: false, completed: false }
     ];
 
-      setItems(fohAMItems);
-    } catch (error) {
-      console.error('Error loading FOH AM worksheet:', error);
-      // Fallback to empty items array
-      setItems([]);
-    }
-  }, [mounted]);
-
-  // Show loading state while mounting
-  if (!mounted) {
-    return (
-      <Layout title="Loading...">
-        <div className="flex items-center justify-center min-h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      </Layout>
-    );
-  }
+    setItems(fohAMItems);
+  }, []);
 
   // Show review check first
   if (showReviewCheck) {
@@ -291,24 +266,18 @@ export default function FOHAMWorksheet() {
         ) : (
           <Button 
             onClick={() => {
-              try {
-                // Save worksheet and redirect
-                const worksheetData = {
-                  employee: currentEmployee,
-                  shift_type: 'AM',
-                  department: 'FOH',
-                  language_used: language,
-                  items: items,
-                  completion_percentage: completionPercentage,
-                  submitted_at: new Date().toISOString()
-                };
-                localStorage.setItem('completed-worksheet', JSON.stringify(worksheetData));
-                router.push('/foh/am/complete');
-              } catch (error) {
-                console.error('Error saving worksheet:', error);
-                // Still allow navigation even if save fails
-                router.push('/foh/am/complete');
-              }
+              // Save worksheet and redirect
+              const worksheetData = {
+                employee: currentEmployee,
+                shift_type: 'AM',
+                department: 'FOH',
+                language_used: language,
+                items: items,
+                completion_percentage: completionPercentage,
+                submitted_at: new Date().toISOString()
+              };
+              localStorage.setItem('completed-worksheet', JSON.stringify(worksheetData));
+              router.push('/foh/am/complete');
             }}
             className="flex-1 bg-green-600 hover:bg-green-700"
             disabled={completionPercentage < 100}

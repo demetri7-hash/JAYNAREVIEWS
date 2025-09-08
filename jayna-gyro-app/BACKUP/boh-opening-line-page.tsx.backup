@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Card from '@/components/ui/Card';
@@ -30,69 +30,13 @@ export default function BOHOpeningLineWorksheet() {
   const [currentCategory, setCurrentCategory] = useState(0);
   const [startTime] = useState(new Date());
   const [showReviewCheck, setShowReviewCheck] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  // Ensure component is mounted on client-side
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const getTranslatedText = useCallback((id: string, englishText: string) => {
-    const translations: any = {
-      es: {
-        '1': 'Encender todo el equipo de línea (parrillas, freidoras, calentadores)',
-        '2': 'Verificar niveles y calidad del aceite en freidoras',
-        '3': 'Precalentar todas las superficies de cocción a temperaturas adecuadas',
-        '4': 'Probar sondas de temperatura y termómetros',
-        '5': 'Verificar temperaturas del refrigerador y congelador',
-        '6': 'Verificar que todas las unidades refrigeradas estén a temperatura adecuada (debajo de 41°F)',
-        '7': 'Verificar fechas de vencimiento en todos los artículos preparados',
-        '8': 'Rotar inventario usando método FIFO (Primero en Entrar, Primero en Salir)',
-        '9': 'Configurar tablas de cortar con código de colores adecuado',
-        '10': 'Llenar y posicionar todos los contenedores de salsa',
-        '11': 'Abastecer línea con ingredientes frescos de preparación',
-        '12': 'Verificar tamaños de porciones y contenedores',
-        '13': 'Sanitizar todas las superficies de trabajo y tablas de cortar',
-        '14': 'Configurar estaciones de lavado de manos con jabón y toallas',
-        '15': 'Verificar concentración de solución sanitizante (200-400 ppm)',
-        '16': 'Limpiar y sanitizar todos los utensilios y herramientas',
-        '17': 'Revisar especiales diarios y requisitos de preparación',
-        '18': 'Confirmar que la configuración de línea está completa y lista para servicio'
-      },
-      tr: {
-        '1': 'Tüm hat ekipmanlarını açın (ızgara, fritöz, ısıtıcılar)',
-        '2': 'Fritözlerde yağ seviyelerini ve kalitesini kontrol edin',
-        '3': 'Tüm pişirme yüzeylerini uygun sıcaklıklara ısıtın',
-        '4': 'Sıcaklık problarını ve termometreleri test edin',
-        '5': 'Buzdolabı ve dondurucu sıcaklıklarını kontrol edin',
-        '6': 'Tüm soğutulmuş ünitelerin uygun sıcaklıkta olduğunu kontrol edin (41°F altında)',
-        '7': 'Tüm hazır ürünlerin son kullanma tarihlerini kontrol edin',
-        '8': 'FIFO yöntemini kullanarak envanter rotasyonu yapın',
-        '9': 'Renk kodlu kesme tahtalarını kurun',
-        '10': 'Tüm sos kaplarını doldurun ve konumlandırın',
-        '11': 'Hattı taze hazırlık malzemeleri ile stoklayın',
-        '12': 'Porsiyon boyutlarını ve kapları kontrol edin',
-        '13': 'Tüm çalışma yüzeylerini ve kesme tahtalarını dezenfekte edin',
-        '14': 'El yıkama istasyonlarını sabun ve havlularla kurun',
-        '15': 'Dezenfektan solüsyon konsantrasyonunu kontrol edin (200-400 ppm)',
-        '16': 'Tüm araç ve gereçleri temizleyin ve dezenfekte edin',
-        '17': 'Günlük özel menüleri ve hazırlık gereksinimlerini gözden geçirin',
-        '18': 'Hat kurulumunun tamamlandığını ve servise hazır olduğunu onaylayın'
-      }
-    };
-    
-    return translations[language]?.[id] || englishText;
-  }, [language]);
 
   // Load BOH Opening Line Checklist
   useEffect(() => {
-    if (!mounted) return;
-
-    try {
-      const employee = localStorage.getItem('current-employee');
-      if (employee) {
-        setCurrentEmployee(JSON.parse(employee));
-      }
+    const employee = localStorage.getItem('current-employee');
+    if (employee) {
+      setCurrentEmployee(JSON.parse(employee));
+    }
 
     // This data is extracted from the BOH_Opening_Line checklist items
     const bohOpeningLineItems: WorksheetItemData[] = [
@@ -125,28 +69,59 @@ export default function BOHOpeningLineWorksheet() {
       { id: '18', text: 'Confirm line setup is complete and ready for service', category: 'Final Checks', required: true, requiresPhoto: true, requiresNote: false, completed: false }
     ];
 
-      // Add multilingual support
-      const translatedItems = bohOpeningLineItems.map(item => ({
-        ...item,
-        text: getTranslatedText(item.id, item.text)
-      }));
+    // Add multilingual support
+    const translatedItems = bohOpeningLineItems.map(item => ({
+      ...item,
+      text: getTranslatedText(item.id, item.text)
+    }));
 
-      setItems(translatedItems);
-    } catch (error) {
-      console.error('Error loading BOH opening worksheet:', error);
-      setItems([]);
+    setItems(translatedItems);
+  }, [language]);
+
+  const getTranslatedText = (id: string, englishText: string) => {
+    const translations: any = {
+      es: {
+        '1': 'Encender todo el equipo de línea (parrillas, freidoras, calentadores)',
+        '2': 'Verificar niveles y calidad del aceite en freidoras',
+        '3': 'Precalentar todas las superficies de cocción a temperaturas adecuadas',
+        '4': 'Probar sondas de temperatura y termómetros',
+        '5': 'Verificar temperaturas del refrigerador y congelador',
+        '6': 'Verificar que todas las unidades refrigeradas estén a temperatura adecuada (debajo de 41°F)',
+        '7': 'Verificar fechas de vencimiento en todos los artículos preparados',
+        '8': 'Rotar inventario usando método FIFO (Primero en Entrar, Primero en Salir)',
+        '9': 'Configurar tablas de cortar con código de colores adecuado',
+        '10': 'Llenar y posicionar todos los contenedores de salsa',
+        '11': 'Abastecer línea con ingredientes frescos de preparación',
+        '12': 'Verificar tamaños de porciones y contenedores',
+        '13': 'Sanitizar todas las superficies de trabajo y tablas de cortar',
+        '14': 'Configurar estaciones de lavado de manos con jabón y toallas',
+        '15': 'Verificar concentración de solución sanitizante (200-400 ppm)',
+        '16': 'Limpiar y sanitizar todos los utensilios y herramientas',
+        '17': 'Revisar especiales diarios y requisitos de preparación',
+        '18': 'Confirmar que la configuración de línea está completa y lista para servicio'
+      },
+      tr: {
+        '1': 'Tüm hat ekipmanlarını açın (ızgara, fritöz, ısıtıcılar)',
+        '2': 'Fritözlerde yağ seviyelerini ve kalitesini kontrol edin',
+        '3': 'Tüm pişirme yüzeylerini uygun sıcaklıklara ısıtın',
+        '4': 'Sıcaklık problarını ve termometreleri test edin',
+        '5': 'Soğuk hava deposu ve dondurucu sıcaklıklarını kontrol edin',
+        '6': 'Tüm soğutulmuş birimlerin uygun sıcaklıkta olduğunu doğrulayın (41°F altında)',
+        '7': 'Tüm hazırlanmış ürünlerde son kullanma tarihlerini kontrol edin',
+        '8': 'FIFO (İlk Giren, İlk Çıkar) yöntemini kullanarak stoku döndürün',
+        '9': 'Uygun renk kodlamasıyla kesme tahtalarını hazırlayın',
+        '10': 'Tüm sos kaplarını doldurun ve konumlandırın',
+        '11': 'Hattı hazırlıktan gelen taze malzemelerle stokla',
+        '12': 'Porsiyon boyutlarını ve kapları kontrol edin',
+        '13': 'Tüm çalışma yüzeylerini ve kesme tahtalarını dezenfekte edin',
+        '14': 'El yıkama istasyonlarını sabun ve havlularla hazırlayın',
+        '15': 'Dezenfektan çözelti konsantrasyonunu kontrol edin (200-400 ppm)',
+        '16': 'Tüm mutfak eşyalarını ve aletleri temizleyin ve dezenfekte edin',
+        '17': 'Günlük özel menüleri ve hazırlık gereksinimlerini gözden geçirin',
+        '18': 'Hat kurulumunun tamamlandığını ve servise hazır olduğunu onaylayın'
+      }
     }
-  }, [mounted, language, getTranslatedText]);
-
-  // Show loading state while mounting
-  if (!mounted) {
-    return (
-      <Layout title="Loading...">
-        <div className="flex items-center justify-center min-h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      </Layout>
-    );
+    return translations[language]?.[id] || englishText;
   }
 
   // Show review check first
@@ -199,34 +174,27 @@ export default function BOHOpeningLineWorksheet() {
   };
 
   const handleComplete = () => {
-    try {
-      const worksheetData = {
-        employee_name: currentEmployee?.name || 'Unknown',
-        employee_id: currentEmployee?.id,
-        shift_type: 'BOH Opening Line',
-        department: 'BOH',
-        language_used: language,
-        completion_percentage: completionPercentage,
-        time_started: startTime.toISOString(),
-        time_completed: new Date().toISOString(),
-        worksheet_data: {
-          items: items,
-          categories: categories,
-          total_items: items.length,
-          completed_items: totalCompleted
-        },
-        photos: items.filter(item => item.photoUrl).map(item => item.photoUrl),
-        issues_flagged: items.filter(item => !item.completed && item.required).map(item => item.text)
-      };
+    const worksheetData = {
+      employee_name: currentEmployee?.name || 'Unknown',
+      employee_id: currentEmployee?.id,
+      shift_type: 'BOH Opening Line',
+      department: 'BOH',
+      language_used: language,
+      completion_percentage: completionPercentage,
+      time_started: startTime.toISOString(),
+      time_completed: new Date().toISOString(),
+      worksheet_data: {
+        items: items,
+        categories: categories,
+        total_items: items.length,
+        completed_items: totalCompleted
+      },
+      photos: items.filter(item => item.photoUrl).map(item => item.photoUrl),
+      issues_flagged: items.filter(item => !item.completed && item.required).map(item => item.text)
+    };
 
-      localStorage.setItem('completed-worksheet', JSON.stringify(worksheetData));
-      console.log('BOH Opening Line Worksheet completed:', worksheetData);
-      router.push('/boh/opening-line/complete');
-    } catch (error) {
-      console.error('Error saving BOH worksheet:', error);
-      // Still allow navigation even if save fails
-      router.push('/boh/opening-line/complete');
-    }
+    console.log('BOH Opening Line Worksheet completed:', worksheetData);
+    router.push('/boh/opening-line/complete');
   };
 
   return (

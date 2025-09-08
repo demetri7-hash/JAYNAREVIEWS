@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { Button } from '@/components/ui/Button'
+import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import { 
   Users, 
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 export default function HomePage() {
-  const { translations, currentLanguage } = useLanguage()
+  const { language } = useLanguage()
 
   const modules = [
     {

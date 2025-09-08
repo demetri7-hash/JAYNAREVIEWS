@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import ReviewCheck from '@/components/ReviewCheck';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Camera, Upload, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export default function FOHAMWorksheet() {
   const [items, setItems] = useState<WorksheetItemData[]>([]);
   const [currentCategory, setCurrentCategory] = useState(0);
   const [startTime] = useState(new Date());
+  const [showReviewCheck, setShowReviewCheck] = useState(true);
 
   // Load FOH AM Opening Checklist based on reference files
   useEffect(() => {
@@ -80,6 +82,17 @@ export default function FOHAMWorksheet() {
 
     setItems(fohAMItems);
   }, []);
+
+  // Show review check first
+  if (showReviewCheck) {
+    return (
+      <ReviewCheck
+        department="FOH"
+        shiftType="AM"
+        onContinue={() => setShowReviewCheck(false)}
+      />
+    )
+  }
 
   const categories = [...new Set(items.map(item => item.category))];
   const currentCategoryItems = items.filter(item => item.category === categories[currentCategory]);

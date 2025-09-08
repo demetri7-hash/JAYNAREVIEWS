@@ -109,6 +109,26 @@ CREATE TABLE IF NOT EXISTS missing_items_reports (
     resolved_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Create close_reviews table for shift handoffs
+CREATE TABLE IF NOT EXISTS close_reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    department TEXT CHECK (department IN ('FOH', 'BOH')) NOT NULL,
+    shift_type TEXT NOT NULL,
+    review_date DATE DEFAULT CURRENT_DATE,
+    reviewer_id UUID REFERENCES employees(id),
+    reviewer_name TEXT NOT NULL,
+    close_quality_rating INTEGER CHECK (close_quality_rating >= 1 AND close_quality_rating <= 5),
+    issues_found TEXT[] DEFAULT ARRAY[]::TEXT[],
+    photos TEXT[] DEFAULT ARRAY[]::TEXT[],
+    needs_followup BOOLEAN DEFAULT false,
+    followup_notes TEXT,
+    inventory_counts JSONB,
+    storage_condition_rating INTEGER CHECK (storage_condition_rating >= 1 AND storage_condition_rating <= 5),
+    equipment_status JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    reviewed_at TIMESTAMP WITH TIME ZONE
+);
+
 -- Enable Row Level Security on all tables
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE worksheets ENABLE ROW LEVEL SECURITY;
@@ -117,6 +137,7 @@ ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE worksheet_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE missing_items_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE close_reviews ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for public access (since this is an internal employee app)
 CREATE POLICY "Enable all operations for authenticated users" ON employees FOR ALL USING (true);
@@ -126,6 +147,7 @@ CREATE POLICY "Enable all operations for authenticated users" ON inventory_items
 CREATE POLICY "Enable all operations for authenticated users" ON orders FOR ALL USING (true);
 CREATE POLICY "Enable all operations for authenticated users" ON worksheet_templates FOR ALL USING (true);
 CREATE POLICY "Enable all operations for authenticated users" ON missing_items_reports FOR ALL USING (true);
+CREATE POLICY "Enable all operations for authenticated users" ON close_reviews FOR ALL USING (true);
 
 -- Insert sample employees (based on reference files)
 INSERT INTO employees (name, department, languages_spoken, roles, shifts) VALUES

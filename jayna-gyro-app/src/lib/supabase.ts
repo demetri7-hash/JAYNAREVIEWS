@@ -103,6 +103,25 @@ export interface MissingItemReport {
   resolved_at?: string
 }
 
+export interface CloseReview {
+  id: string
+  department: 'FOH' | 'BOH'
+  shift_type: string
+  review_date: string
+  reviewer_id: string
+  reviewer_name: string
+  close_quality_rating: number // 1-5 scale
+  issues_found: string[]
+  photos: string[]
+  needs_followup: boolean
+  followup_notes?: string
+  inventory_counts?: any // JSON object with counts
+  storage_condition_rating?: number // 1-5 scale for BOH prep review
+  equipment_status?: any // JSON object with equipment states
+  created_at: string
+  reviewed_at?: string
+}
+
 // Database service functions
 export const db = {
   // Employees
@@ -270,5 +289,59 @@ export const db = {
     
     if (error) throw error
     return data || []
+  },
+
+  // Close Reviews
+  async createCloseReview(review: Partial<CloseReview>): Promise<CloseReview> {
+    const { data, error } = await supabase
+      .from('close_reviews')
+      .insert(review)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async getCloseReviews(department?: 'FOH' | 'BOH', limit = 20): Promise<CloseReview[]> {
+    let query = supabase
+      .from('close_reviews')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit)
+    
+    if (department) {
+      query = query.eq('department', department)
+    }
+    
+    const { data, error } = await query
+    if (error) throw error
+    return data || []
+  },
+
+  async getLatestCloseReview(department: 'FOH' | 'BOH', shift_type: string): Promise<CloseReview | null> {
+    const { data, error } = await supabase
+      .from('close_reviews')
+      .select('*')
+      .eq('department', department)
+      .eq('shift_type', shift_type)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (error && error.code !== 'PGRST116') throw error
+    return data || null
+  },
+
+  async updateCloseReview(id: string, updates: Partial<CloseReview>): Promise<CloseReview> {
+    const { data, error } = await supabase
+      .from('close_reviews')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
   }
 }

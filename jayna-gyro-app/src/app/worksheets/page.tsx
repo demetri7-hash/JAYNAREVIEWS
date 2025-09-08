@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Card from '@/components/ui/Card';
@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { t } from '@/lib/translations';
 import { Filter, Calendar, User, CheckCircle, Clock, AlertCircle, Download } from 'lucide-react';
 
-export default function WorksheetsPage() {
+function WorksheetsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { language } = useLanguage();
@@ -285,5 +285,19 @@ export default function WorksheetsPage() {
         </Card>
       )}
     </Layout>
+  );
+}
+
+export default function WorksheetsPage() {
+  return (
+    <Suspense fallback={
+      <Layout title="Worksheets" showBackButton onBack={() => {}}>
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    }>
+      <WorksheetsContent />
+    </Suspense>
   );
 }

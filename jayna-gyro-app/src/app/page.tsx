@@ -3,10 +3,13 @@
 import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
 import { 
-  Users, 
   ChefHat, 
+  Users, 
   ShoppingCart, 
-  ClipboardList 
+  ClipboardList, 
+  BarChart3,
+  Settings,
+  Star
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -27,6 +30,10 @@ export default function HomePage() {
         orderingDescription: 'Manage stock levels and place orders',
         worksheets: 'Worksheets & Analytics',
         worksheetsDescription: 'View completed worksheets and reports',
+        reviews: 'Reviews',
+        reviewsDescription: 'View and create shift reviews',
+        manager: 'Manager Tools',
+        managerDescription: 'Edit checklists and manage operations',
         todayOverview: "Today's Overview",
         completedWorksheets: 'Completed Today',
         activeEmployees: 'Active Employees',
@@ -45,6 +52,10 @@ export default function HomePage() {
         orderingDescription: 'Gestionar niveles de stock y hacer pedidos',
         worksheets: 'Hojas y Análisis',
         worksheetsDescription: 'Ver hojas completadas y reportes',
+        reviews: 'Revisiones',
+        reviewsDescription: 'Ver y crear revisiones de turno',
+        manager: 'Herramientas de Gerente',
+        managerDescription: 'Editar listas de verificación y gestionar operaciones',
         todayOverview: 'Resumen de Hoy',
         completedWorksheets: 'Completadas Hoy',
         activeEmployees: 'Empleados Activos',
@@ -63,6 +74,10 @@ export default function HomePage() {
         orderingDescription: 'Stok seviyelerini yönet ve sipariş ver',
         worksheets: 'Çalışma Sayfaları ve Analiz',
         worksheetsDescription: 'Tamamlanan sayfaları ve raporları görüntüle',
+        reviews: 'İncelemeler',
+        reviewsDescription: 'Vardiya incelemelerini görüntüle ve oluştur',
+        manager: 'Yönetici Araçları',
+        managerDescription: 'Kontrol listelerini düzenle ve operasyonları yönet',
         todayOverview: 'Bugünün Özeti',
         completedWorksheets: 'Bugün Tamamlanan',
         activeEmployees: 'Aktif Çalışanlar',
@@ -101,6 +116,20 @@ export default function HomePage() {
       href: '/worksheets',
       icon: ClipboardList,
       color: 'bg-orange-500 hover:bg-orange-600'
+    },
+    {
+      title: t('reviews'),
+      description: t('reviewsDescription'),
+      href: '/review/close',
+      icon: Star,
+      color: 'bg-yellow-500 hover:bg-yellow-600'
+    },
+    {
+      title: t('manager'),
+      description: t('managerDescription'),
+      href: '/manager',
+      icon: Settings,
+      color: 'bg-gray-600 hover:bg-gray-700'
     }
   ]
 
@@ -135,7 +164,7 @@ export default function HomePage() {
         </div>
 
         {/* Module Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
           {modules.map((module) => {
             const Icon = module.icon
             return (

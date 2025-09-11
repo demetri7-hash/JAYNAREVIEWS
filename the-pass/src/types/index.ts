@@ -23,16 +23,17 @@ export interface Worksheet {
   date?: string
   started_at?: string
   completed_at?: string
-  checklist_data: any // JSONB field
-  checklist_items?: ChecklistItem[] // Parsed checklist items
-  photo_urls?: string[]
-  notes?: string
+  checklist_data: any[] // JSONB array field
+  photo_urls?: string[] | null
+  notes?: string | null
   status: 'in_progress' | 'completed' | 'abandoned'
-  message_id?: string
-  channel_id?: string
+  message_id?: string | null
+  channel_id?: string | null
   completion_percentage?: number
-  assigned_to?: string
+  assigned_to?: string | null
   priority?: 'low' | 'medium' | 'high'
+  estimated_duration?: number | null
+  actual_duration?: number | null
   created_at: string
   updated_at: string
 }
@@ -216,8 +217,8 @@ export interface Database {
       }
       worksheets: {
         Row: Worksheet
-        Insert: Omit<Worksheet, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Worksheet, 'id' | 'created_at' | 'updated_at'>>
+        Insert: Omit<Worksheet, 'id' | 'created_at' | 'updated_at' | 'date' | 'started_at' | 'completed_at'>
+        Update: Partial<Omit<Worksheet, 'id' | 'created_at'>>
       }
       channels: {
         Row: Channel

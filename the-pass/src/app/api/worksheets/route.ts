@@ -6,19 +6,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     const { 
-      employee_id = 'temp-' + Date.now(),
+      employee_id,
       department,
       shift_type,
-      checklist_data,
-      photo_urls = [],
+      checklist_data = [],
+      photo_urls = null,
+      notes = null,
       completion_percentage = 0,
+      priority = 'medium',
       status = 'in_progress'
     } = body
 
     // Validate required fields
-    if (!department || !shift_type) {
+    if (!employee_id || !department || !shift_type) {
       return NextResponse.json(
-        { error: 'Missing required fields: department, shift_type' },
+        { error: 'Missing required fields: employee_id, department, shift_type' },
         { status: 400 }
       )
     }
@@ -30,9 +32,11 @@ export async function POST(request: NextRequest) {
         employee_id,
         department,
         shift_type,
-        checklist_data: checklist_data || {},
+        checklist_data,
         photo_urls,
+        notes,
         completion_percentage,
+        priority,
         status
       })
       .select()

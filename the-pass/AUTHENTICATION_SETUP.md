@@ -52,20 +52,41 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### 2. Google OAuth Setup
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing one
-3. Enable Google+ API
+3. Enable Google+ API or Google Identity API
 4. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client IDs"
 5. Set application type to "Web application"
-6. Add authorized redirect URIs:
+6. Add authorized redirect URIs (THIS IS CRITICAL):
    - `http://localhost:3000/api/auth/callback/google` (development)
-   - `https://your-vercel-domain.vercel.app/api/auth/callback/google` (production)
+   - `https://your-actual-vercel-domain.vercel.app/api/auth/callback/google` (production)
+   
+   **⚠️ IMPORTANT**: Replace `your-actual-vercel-domain` with your real Vercel deployment URL!
+   
+   Example: If your app is deployed at `https://the-pass-123abc.vercel.app`, then add:
+   - `https://the-pass-123abc.vercel.app/api/auth/callback/google`
+
 7. Copy Client ID and Client Secret to your environment variables
 
-### 3. Production Environment Variables (Vercel)
+### 3. Fix redirect_uri_mismatch Error
+If you're getting "Error 400: redirect_uri_mismatch":
+
+1. **Find your Vercel deployment URL** from your Vercel dashboard
+2. **Go to Google Cloud Console** → Your Project → Credentials → Your OAuth Client
+3. **Add the correct redirect URI**:
+   ```
+   https://YOUR-VERCEL-URL.vercel.app/api/auth/callback/google
+   ```
+4. **Save the changes** (may take a few minutes to propagate)
+5. **Update your Vercel environment variables**:
+   ```bash
+   NEXTAUTH_URL=https://YOUR-VERCEL-URL.vercel.app
+   ```
+
+### 4. Production Environment Variables (Vercel)
 In your Vercel dashboard, add these environment variables:
 
 ```bash
 # Authentication (REQUIRED)
-NEXTAUTH_URL=https://your-vercel-domain.vercel.app
+NEXTAUTH_URL=https://your-actual-vercel-domain.vercel.app
 NEXTAUTH_SECRET=your-generated-secret-key
 
 # Google OAuth (REQUIRED - from Google Cloud Console)
@@ -78,10 +99,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-⚠️ **Important**: 
-- Replace `your-vercel-domain.vercel.app` with your actual Vercel domain
-- Generate a secure NEXTAUTH_SECRET using: `openssl rand -base64 32`
-- Use the Google OAuth credentials from your Google Cloud Console
+⚠️ **Critical Steps**:
+1. Replace `your-actual-vercel-domain.vercel.app` with your real Vercel URL
+2. Generate a secure NEXTAUTH_SECRET using: `openssl rand -base64 32`
+3. Make sure the Google OAuth redirect URI exactly matches your Vercel URL
 
 ### 4. Database Setup
 Run the schema setup endpoint to create the authentication tables:
@@ -136,6 +157,47 @@ NEXTAUTH_URL=https://your-vercel-domain.vercel.app
 ```
 
 Generate a secure secret with: `openssl rand -base64 32`
+
+## Fixing redirect_uri_mismatch Error (Error 400)
+
+This is the most common issue during setup. Here's how to fix it:
+
+### Step 1: Find Your Vercel URL
+1. Go to your Vercel dashboard
+2. Find your deployed app (it will look like: `https://your-app-name-abc123.vercel.app`)
+3. Copy this exact URL
+
+### Step 2: Update Google OAuth Configuration
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to: **APIs & Services** → **Credentials**
+3. Click on your OAuth 2.0 Client ID
+4. In the "Authorized redirect URIs" section, add:
+   ```
+   https://your-exact-vercel-url.vercel.app/api/auth/callback/google
+   ```
+   
+   **Example**: If your Vercel URL is `https://the-pass-abc123.vercel.app`, add:
+   ```
+   https://the-pass-abc123.vercel.app/api/auth/callback/google
+   ```
+
+### Step 3: Update Vercel Environment Variables
+1. Go to your Vercel dashboard
+2. Go to your project → Settings → Environment Variables
+3. Update or add:
+   ```bash
+   NEXTAUTH_URL=https://your-exact-vercel-url.vercel.app
+   ```
+
+### Step 4: Redeploy
+1. After making these changes, redeploy your Vercel app
+2. The changes may take a few minutes to propagate
+
+### Common Mistakes to Avoid:
+- ❌ Using `localhost` URLs in production
+- ❌ Forgetting the `/api/auth/callback/google` path
+- ❌ Mismatched domains between Google OAuth and NEXTAUTH_URL
+- ❌ Using HTTP instead of HTTPS for production URLs
 
 ## Key Features
 

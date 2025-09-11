@@ -38,7 +38,7 @@ export function useWorkflow() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          employee_name: user.name,
+          employee_name: user.name, // This will be converted to employee_id in API
           department: params.department,
           shift_type: params.shift_type,
           workflow_type: params.workflow_type

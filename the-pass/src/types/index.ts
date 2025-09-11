@@ -17,13 +17,13 @@ export interface Employee {
 
 export interface Worksheet {
   id: string
-  employee_id: string
+  employee_id: string  // UUID foreign key to employees
   department: 'FOH' | 'BOH'
   shift_type: string
   date?: string
   started_at?: string
-  completed_at?: string
-  checklist_data: any[] // JSONB array field
+  completed_at?: string | null
+  checklist_data: any[] // JSONB array (not object!)
   photo_urls?: string[] | null
   notes?: string | null
   status: 'in_progress' | 'completed' | 'abandoned'
@@ -39,18 +39,16 @@ export interface Worksheet {
 }
 
 export interface ChecklistItem {
-  id: string
-  worksheet_id: string
-  description: string
-  category: string
+  id: number
+  name: string
+  task_description: string
   required: boolean
-  completed: boolean
-  completed_at?: string
-  photo_required: boolean
-  photo_url?: string
+  photo_urls?: string[]
+  critical: boolean
+  min_rating?: number
+  completed?: boolean
+  rating?: number
   notes?: string
-  order_index: number
-  language: Language
 }
 
 export interface CloseReview {
@@ -286,7 +284,7 @@ export interface Database {
           prep_time?: number
           serving_size?: number
           category?: string
-          photos?: string[]
+          photo_urls?: string[]
           is_active?: boolean
           created_at: string
           updated_at: string
@@ -299,7 +297,7 @@ export interface Database {
           prep_time?: number
           serving_size?: number
           category?: string
-          photos?: string[]
+          photo_urls?: string[]
           is_active?: boolean
         }
         Update: Partial<{
@@ -310,7 +308,7 @@ export interface Database {
           prep_time?: number
           serving_size?: number
           category?: string
-          photos?: string[]
+          photo_urls?: string[]
           is_active?: boolean
         }>
       }

@@ -95,7 +95,7 @@ export async function GET() {
         { employee_id: 'test', department: 'FOH' },
         { employee_id: 'test', department: 'FOH', shift_type: 'Morning' },
         { employee_id: 'test', department: 'FOH', shift_type: 'Morning', checklist_data: {} },
-        { employee_id: 'test', department: 'FOH', shift_type: 'Morning', worksheet_data: {} }
+        { employee_id: 'test', department: 'FOH', shift_type: 'Morning', checklist_data: [] }
       ]
 
       results.table_structures.worksheets_tests = []

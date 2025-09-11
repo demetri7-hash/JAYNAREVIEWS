@@ -319,7 +319,7 @@ export class DatabaseService {
         
     // Create messages for each checklist item
     if (threadMessage) {
-      for (const item of worksheet.checklist_items || []) {
+      for (const item of worksheet.checklist_data || []) {
         await this.createChecklistItemMessage(
           channel.id,
           worksheet.employee_id,
@@ -360,10 +360,10 @@ export class DatabaseService {
   }
 
   private calculateCompletionPercentage(worksheet: Worksheet): number {
-    if (!worksheet.checklist_items || worksheet.checklist_items.length === 0) return 0
+    if (!worksheet.checklist_data || worksheet.checklist_data.length === 0) return 0
     
-    const completed = worksheet.checklist_items.filter(item => item.completed).length
-    return Math.round((completed / worksheet.checklist_items.length) * 100)
+    const completed = worksheet.checklist_data.filter(item => item.completed).length
+    return Math.round((completed / worksheet.checklist_data.length) * 100)
   }
 
   // Analytics and Stats

@@ -28,32 +28,38 @@ export default function UserLogin({ onUserCreated }: UserLoginProps) {
     setError('')
 
     try {
-      // For now, create a client-side user object without database insertion
-      // This allows testing while we resolve RLS issues
-      const mockEmployee = {
-        id: `user-${Date.now()}`,
-        name: name.trim(),
-        email: email.trim(),
-        department,
-        role,
-        is_active: true,
-        status: 'online',
-        language: 'en',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+      // Create employee in database
+      const response = await fetch('/api/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          department,
+          role
+        })
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        setError(result.error || 'Failed to create user')
+        return
       }
 
-      // Create a user object for the app
+      // Create user object for the app context
       const user = {
-        id: mockEmployee.id,
-        name: mockEmployee.name,
-        email: mockEmployee.email,
-        department: mockEmployee.department,
-        role: mockEmployee.role,
+        id: result.employee.id,
+        name: result.employee.name,
+        email: result.employee.email,
+        department: result.employee.department,
+        role: result.employee.role,
         language: 'en' as const
       }
 
-      // Set user in context (this will also store in localStorage)
+      // Set user in context
       setUser(user)
       
       onUserCreated(user)
@@ -65,17 +71,23 @@ export default function UserLogin({ onUserCreated }: UserLoginProps) {
     }
   }
 
-  const handleDemoLogin = () => {
-    const demoUser = {
-      id: 'demo-' + Date.now(),
-      name: 'Demo User',
-      email: 'demo@jaynagyro.com',
-      department: 'BOTH' as const,
-      role: 'manager',
-      language: 'en' as const
+  const handleDemoLogin = async () => {
+    try {
+      // Use the existing Maria Garcia employee
+      const demoUser = {
+        id: 'ac4b1f90-4fd0-4a21-8431-66229a7d6df3', // Maria's actual ID
+        name: 'Maria Garcia',
+        email: 'maria@jaynagyro.com',
+        department: 'FOH' as const,
+        role: 'employee',
+        language: 'en' as const
+      }
+      setUser(demoUser)
+      onUserCreated(demoUser)
+    } catch (err: any) {
+      console.error('Error with demo login:', err)
+      setError('Demo login failed')
     }
-    setUser(demoUser)
-    onUserCreated(demoUser)
   }
 
   return (

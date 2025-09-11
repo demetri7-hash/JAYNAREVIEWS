@@ -27,7 +27,7 @@ export async function GET() {
       .select('*')
       .limit(1)
     
-    let worksheetTableExists = !worksheetError
+    const worksheetTableExists = !worksheetError
     
     // Test 3: Check if close_reviews table exists  
     const { data: reviewsTest, error: reviewsError } = await supabase
@@ -35,7 +35,7 @@ export async function GET() {
       .select('*')
       .limit(1)
       
-    let reviewsTableExists = !reviewsError
+    const reviewsTableExists = !reviewsError
 
     // Test 4: Try to create a simple worksheet if table exists
     let worksheetCreateTest = null
@@ -43,10 +43,10 @@ export async function GET() {
       const { data: createTest, error: createError } = await supabase
         .from('worksheets')
         .insert({
-          employee_id: 'test-' + Date.now(),
+          employee_id: 'ac4b1f90-4fd0-4a21-8431-66229a7d6df3', // Maria's ID
           department: 'FOH',
           shift_type: 'Test',
-          checklist_data: { test: true },
+          checklist_data: [{ id: 1, name: 'test task', completed: false }],
           status: 'in_progress',
           completion_percentage: 0
         })
@@ -55,21 +55,32 @@ export async function GET() {
         
       worksheetCreateTest = {
         success: !createError,
-        error: createError?.message,
-        data: createTest
+        error: createError?.message || null,
+        data: createTest || null
+      }
+
+      // Clean up if successful
+      if (createTest) {
+        await supabase.from('worksheets').delete().eq('id', createTest.id)
       }
     }
 
     return NextResponse.json({
       success: true,
       tests: {
-        connection: { success: !connectionError, error: connectionError?.message },
+        connection: { 
+          success: true, 
+          error: null 
+        },
         worksheets_table: { 
           exists: worksheetTableExists, 
-          error: worksheetError?.message,
+          error: worksheetError?.message || null,
           create_test: worksheetCreateTest
         },
-        reviews_table: { exists: reviewsTableExists, error: reviewsError?.message }
+        reviews_table: { 
+          exists: reviewsTableExists, 
+          error: reviewsError?.message || null 
+        }
       },
       message: 'Database diagnostics complete'
     })

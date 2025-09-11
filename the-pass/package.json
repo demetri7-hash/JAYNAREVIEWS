@@ -1,6 +1,6 @@
 {
   "name": "the-pass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Slack-style collaborative workspace for Jayna Gyro operations",
   "private": true,
   "scripts": {

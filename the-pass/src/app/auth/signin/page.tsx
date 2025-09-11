@@ -1,6 +1,6 @@
 'use client'
 
-import { signIn, getSession } from 'next-auth/react'
+import { signIn, signOut, getSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -92,6 +92,15 @@ export default function SignIn() {
             <p className="text-xs text-gray-500">
               New users will be created with employee access and require manager approval
             </p>
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              className="text-xs text-gray-400 hover:text-gray-600 underline"
+            >
+              Clear session / Sign out
+            </button>
           </div>
         </div>
       </div>

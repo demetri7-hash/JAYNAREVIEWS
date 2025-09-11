@@ -5,21 +5,22 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string
-      role: string
-      department: string
-      is_active: boolean
-      permissions: string[]
       employee?: {
         id: string
         name: string
         email: string
         role: string
         department: string
-        shift_preference: string
-        permissions: string[]
         is_active: boolean
         created_at: string
         updated_at: string
+        last_seen?: string
+        status?: string
+        phone?: string
+        display_name?: string
+        timezone?: string
+        avatar_url?: string
+        language?: string
       }
     } & DefaultSession['user']
   }
@@ -28,18 +29,22 @@ declare module 'next-auth' {
     role?: string
     department?: string
     is_active?: boolean
-    permissions?: string[]
     employee?: {
       id: string
       name: string
       email: string
       role: string
       department: string
-      shift_preference: string
-      permissions: string[]
       is_active: boolean
       created_at: string
       updated_at: string
+      last_seen?: string
+      status?: string
+      phone?: string
+      display_name?: string
+      timezone?: string
+      avatar_url?: string
+      language?: string
     }
   }
 }
@@ -49,18 +54,22 @@ declare module 'next-auth/jwt' {
     role?: string
     department?: string
     is_active?: boolean
-    permissions?: string[]
     employee?: {
       id: string
       name: string
       email: string
       role: string
       department: string
-      shift_preference: string
-      permissions: string[]
       is_active: boolean
       created_at: string
       updated_at: string
+      last_seen?: string
+      status?: string
+      phone?: string
+      display_name?: string
+      timezone?: string
+      avatar_url?: string
+      language?: string
     }
   }
 }

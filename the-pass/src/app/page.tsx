@@ -16,17 +16,29 @@ export default function Dashboard() {
   const router = useRouter()
 
   useEffect(() => {
+    console.log('=== PAGE USEEFFECT DEBUG ===')
+    console.log('Status:', status)
+    console.log('Session:', session)
+    console.log('Session user:', session?.user)
+    console.log('Session user employee:', session?.user?.employee)
+    console.log('Employee is_active:', session?.user?.employee?.is_active)
+    console.log('=== END DEBUG ===')
+    
     if (status === 'loading') return
     
     if (!session) {
+      console.log('No session, redirecting to signin')
       router.push('/auth/signin')
       return
     }
 
     // Check if user account is activated
     if (session.user?.employee && !session.user.employee.is_active) {
+      console.log('User has employee record but is not active')
       return // Show pending approval message
     }
+    
+    console.log('User is authenticated and active')
   }, [session, status, router])
 
   const startWorkflow = async (workflowType: string) => {

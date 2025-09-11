@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import type { Database, Channel, Message, Worksheet, Employee, CloseReview, User, RealtimeEvent } from '@/types'
+import type { Channel, Message, Worksheet, Employee, CloseReview, User, RealtimeEvent } from '@/types'
 
 // Environment Variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -16,10 +16,10 @@ if (!supabaseAnonKey) {
 }
 
 // Create clients with explicit typing
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export const supabaseAdmin = supabaseServiceKey 
-  ? createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
@@ -29,9 +29,9 @@ export const supabaseAdmin = supabaseServiceKey
 
 // Enhanced Database Service Class
 export class DatabaseService {
-  private client: SupabaseClient<Database>
+  private client: SupabaseClient
   
-  constructor(client: SupabaseClient<Database>) {
+  constructor(client: SupabaseClient) {
     this.client = client
   }
 

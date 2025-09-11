@@ -47,8 +47,6 @@ export const authOptions: NextAuthOptions = {
                 email: user.email || '',
                 role: 'employee',
                 department: 'unassigned',
-                shift_preference: 'any',
-                permissions: ['view_own_worksheets'],
                 is_active: false, // Requires manager approval
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()

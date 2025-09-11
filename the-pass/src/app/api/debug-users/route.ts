@@ -47,36 +47,68 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'activate_manager') {
-      // Activate user and make them a manager
-      const { data, error } = await supabase
+      // First, check if the user exists
+      const { data: existingUser, error: checkError } = await supabase
         .from('employees')
-        .update({
-          role: 'manager',
-          is_active: true,
-          permissions: [
-            'view_all_worksheets',
-            'manage_employees',
-            'view_audit_logs',
-            'create_workflows',
-            'manage_roles'
-          ],
-          updated_at: new Date().toISOString()
-        })
+        .select('*')
         .eq('email', email)
-        .select()
+        .single()
 
-      if (error) {
+      if (checkError || !existingUser) {
+        // User doesn't exist, create them
+        const { data: newUser, error: createError } = await supabase
+          .from('employees')
+          .insert({
+            name: email.split('@')[0], // Use part before @ as name
+            email: email,
+            role: 'manager',
+            department: 'BOTH',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          return NextResponse.json({ 
+            error: 'Failed to create manager account', 
+            details: createError.message 
+          }, { status: 500 })
+        }
+
         return NextResponse.json({ 
-          error: 'Failed to activate manager', 
-          details: error.message 
-        }, { status: 500 })
-      }
+          success: true, 
+          message: `Successfully created and activated ${email} as manager`,
+          user: newUser,
+          action: 'created'
+        })
+      } else {
+        // User exists, just update role and activation
+        const { data, error } = await supabase
+          .from('employees')
+          .update({
+            role: 'manager',
+            is_active: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('email', email)
+          .select()
 
-      return NextResponse.json({ 
-        success: true, 
-        message: `Successfully activated ${email} as manager`,
-        user: data?.[0]
-      })
+        if (error) {
+          return NextResponse.json({ 
+            error: 'Failed to activate manager', 
+            details: error.message 
+          }, { status: 500 })
+        }
+
+        return NextResponse.json({ 
+          success: true, 
+          message: `Successfully activated ${email} as manager`,
+          user: data?.[0],
+          action: 'updated'
+        })
+      }
     }
 
     return NextResponse.json({ 

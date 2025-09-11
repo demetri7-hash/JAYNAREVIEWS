@@ -56,7 +56,7 @@ export default function UserManagement() {
     }
 
     // Check if user has manager permissions
-    if (session.user?.role !== 'manager' && session.user?.role !== 'admin') {
+    if (session.user?.employee?.role !== 'manager' && session.user?.employee?.role !== 'admin') {
       router.push('/')
       return
     }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { UserProvider } from '@/contexts/UserContext'
+import { Providers } from '@/components/Providers'
 
 export const metadata: Metadata = {
   title: 'The Pass - Jayna Gyro Collaborative Workspace',
@@ -16,11 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-pass-dark text-pass-text">
-        <UserProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
-        </UserProvider>
+        <Providers>
+          <UserProvider>
+            <LanguageProvider>
+              {children}
+            </LanguageProvider>
+          </UserProvider>
+        </Providers>
       </body>
     </html>
   )

@@ -167,9 +167,12 @@ export interface User {
   id: string
   email: string
   name: string
+  avatar?: string
   avatar_url?: string
+  role?: string
   department?: 'FOH' | 'BOH' | 'MANAGER'
   position?: string
+  isActive?: boolean
   language_preference: Language
   notification_settings: NotificationSettings
   status: 'online' | 'away' | 'busy' | 'offline'

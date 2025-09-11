@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { supabase } from '@/lib/supabase'
-import { User } from 'lucide-react'
+import { User, LogIn, UserPlus } from 'lucide-react'
 
 interface UserLoginProps {
   onUserCreated: (user: any) => void
@@ -11,16 +11,34 @@ interface UserLoginProps {
 
 export default function UserLogin({ onUserCreated }: UserLoginProps) {
   const { setUser } = useUser()
+  const [mode, setMode] = useState<'login' | 'register'>('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [department, setDepartment] = useState<'FOH' | 'BOH' | 'BOTH'>('FOH')
   const [role, setRole] = useState('employee')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [employees, setEmployees] = useState<any[]>([])
 
-  const handleCreateUser = async () => {
-    if (!name.trim() || !email.trim()) {
-      setError('Name and email are required')
+  useEffect(() => {
+    loadEmployees()
+  }, [])
+
+  const loadEmployees = async () => {
+    try {
+      const response = await fetch('/api/employees')
+      const data = await response.json()
+      if (data.success) {
+        setEmployees(data.employees)
+      }
+    } catch (error) {
+      console.error('Failed to load employees:', error)
+    }
+  }
+
+  const handleLogin = async () => {
+    if (!name.trim()) {
+      setError('Please select your name')
       return
     }
 
@@ -28,26 +46,38 @@ export default function UserLogin({ onUserCreated }: UserLoginProps) {
     setError('')
 
     try {
-      // Create employee in database
-      const response = await fetch('/api/employees', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          department,
-          role
-        })
-      })
-
-      const result = await response.json()
-
-      if (!result.success) {
-        setError(result.error || 'Failed to create user')
+      // Find employee by name
+      const employee = employees.find(emp => emp.name === name.trim())
+      
+      if (!employee) {
+        setError('Employee not found. Please register first.')
+        setMode('register')
+        setLoading(false)
         return
       }
+
+      // Store user session
+      const userData = {
+        id: employee.id,
+        name: employee.name,
+        email: employee.email,
+        department: employee.department,
+        role: employee.role,
+        isAuthenticated: true,
+        loginTime: new Date().toISOString()
+      }
+
+      localStorage.setItem('thepass_user', JSON.stringify(userData))
+      setUser(userData)
+      onUserCreated(userData)
+
+    } catch (error) {
+      setError('Login failed. Please try again.')
+      console.error('Login error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
       // Create user object for the app context
       const user = {

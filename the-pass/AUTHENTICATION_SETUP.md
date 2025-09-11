@@ -57,18 +57,41 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 5. Set application type to "Web application"
 6. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google` (development)
-   - `https://your-domain.com/api/auth/callback/google` (production)
-7. Copy Client ID and Client Secret to your `.env.local`
+   - `https://your-vercel-domain.vercel.app/api/auth/callback/google` (production)
+7. Copy Client ID and Client Secret to your environment variables
 
-### 3. Database Setup
-Run the schema setup endpoint to create the authentication tables:
+### 3. Production Environment Variables (Vercel)
+In your Vercel dashboard, add these environment variables:
+
 ```bash
-curl -X POST http://localhost:3000/api/auth/setup-schema
+# Authentication (REQUIRED)
+NEXTAUTH_URL=https://your-vercel-domain.vercel.app
+NEXTAUTH_SECRET=your-generated-secret-key
+
+# Google OAuth (REQUIRED - from Google Cloud Console)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Supabase (REQUIRED)
+NEXT_PUBLIC_SUPABASE_URL=https://xedpssqxgmnwufatyoje.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-Or visit `http://localhost:3000/api/auth/setup-schema` in your browser after starting the app.
+⚠️ **Important**: 
+- Replace `your-vercel-domain.vercel.app` with your actual Vercel domain
+- Generate a secure NEXTAUTH_SECRET using: `openssl rand -base64 32`
+- Use the Google OAuth credentials from your Google Cloud Console
 
-### 4. First Manager Account
+### 4. Database Setup
+Run the schema setup endpoint to create the authentication tables:
+```bash
+curl -X POST https://your-vercel-domain.vercel.app/api/auth/setup-schema
+```
+
+Or visit the endpoint in your browser after deployment.
+
+### 5. First Manager Account
 After the first user signs in:
 1. They will see "Account Pending Approval"
 2. Manually set their role to 'manager' in the database:
@@ -103,6 +126,17 @@ After the first user signs in:
 5. Can add photos, ratings, and notes for each task
 6. Progress is saved automatically
 
+## Fixing the NO_SECRET Error
+
+If you see the error `[next-auth][error][NO_SECRET]`, add these environment variables to Vercel:
+
+```bash
+NEXTAUTH_SECRET=your-generated-secret-key
+NEXTAUTH_URL=https://your-vercel-domain.vercel.app
+```
+
+Generate a secure secret with: `openssl rand -base64 32`
+
 ## Key Features
 
 ### Security
@@ -133,9 +167,9 @@ After the first user signs in:
 - `/src/app/api/worksheets/` - Worksheet management APIs
 
 ## Next Steps
-1. Set up Google OAuth credentials
-2. Configure environment variables
-3. Run database schema setup
+1. Set up Google OAuth credentials in Google Cloud Console
+2. Configure environment variables in Vercel
+3. Run database schema setup endpoint
 4. Create first manager account
 5. Test the complete flow
 6. Deploy and provide feedback!

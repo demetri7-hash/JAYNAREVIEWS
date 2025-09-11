@@ -28,11 +28,32 @@ export const supabaseAdmin = supabaseServiceKey
   : null
 
 // Enhanced Database Service Class
-class DatabaseService {
+export class DatabaseService {
   private client: SupabaseClient<Database>
   
   constructor(client: SupabaseClient<Database>) {
     this.client = client
+  }
+
+  // Test database connection
+  async testConnection(): Promise<any> {
+    try {
+      // Simple test to check if we can connect
+      const { data, error } = await this.client.auth.getSession()
+      
+      return {
+        status: 'connected',
+        timestamp: new Date().toISOString(),
+        auth_working: !error,
+        client_initialized: !!this.client
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
   }
 
   // Channel Management
@@ -90,14 +111,17 @@ class DatabaseService {
       .from('messages')
       .select(`
         *,
-        user:user_id(name, avatar_url)
+        employee:user_id!inner(name, avatar_url)
       `)
       .eq('channel_id', channelId)
       .is('thread_id', null) // Only get root messages, not replies
       .order('created_at', { ascending: false })
       .limit(limit)
     
-    if (error) throw error
+    if (error) {
+      console.error('Error loading messages:', error)
+      return []
+    }
     return (data || []).reverse() // Reverse to show oldest first
   }
 
@@ -117,13 +141,37 @@ class DatabaseService {
 
   async createMessage(messageData: Omit<Message, 'id' | 'created_at' | 'updated_at'>): Promise<Message | null> {
     try {
-      // Use any to bypass type inference issues
-      const { data, error } = await (this.client as any)
+      // First, ensure the user exists in the database
+      if (messageData.user_id) {
+        const { data: existingUser } = await this.client
+          .from('employees')
+          .select('id')
+          .eq('id', messageData.user_id)
+          .single()
+        
+        // If user doesn't exist, we can't create the message with that user_id
+        if (!existingUser) {
+          console.error('User not found in employees table:', messageData.user_id)
+          return null
+        }
+      }
+
+      // Create the message
+      const { data, error } = await this.client
         .from('messages')
-        .insert(messageData)
+        .insert({
+          channel_id: messageData.channel_id,
+          user_id: messageData.user_id || null,
+          content: messageData.content || '',
+          message_type: messageData.message_type,
+          metadata: messageData.metadata || null,
+          thread_id: messageData.thread_id || null,
+          worksheet_id: messageData.worksheet_id || null,
+          review_id: messageData.review_id || null
+        })
         .select(`
           *,
-          user:user_id(name, avatar_url)
+          employee:user_id(name, avatar_url)
         `)
         .single()
 

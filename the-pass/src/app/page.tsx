@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import ChannelList from '@/components/chat/ChannelList'
 import MessageList from '@/components/chat/MessageList'
 import MessageInput from '@/components/chat/MessageInput'
-import WorkflowSidebar from '@/components/workflows/WorkflowSidebar'
+import UserLogin from '@/components/auth/UserLogin'
 import type { Channel, Message, User } from '@/types'
 import { 
   Hash, 
@@ -31,63 +31,46 @@ export default function ThePassApp() {
   // Initialize app
   useEffect(() => {
     initializeApp()
+    
+    // Check for stored user
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('thepass_user')
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser)
+          setUser(userData)
+        } catch (error) {
+          console.error('Failed to parse stored user:', error)
+          localStorage.removeItem('thepass_user')
+        }
+      }
+    }
+    
     setMounted(true)
   }, [])
 
   const initializeApp = async () => {
     try {
-      // Check authentication
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      if (session?.user) {
-        // Set user from session
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata?.name || session.user.email || 'User',
-          avatar_url: session.user.user_metadata?.avatar_url,
-          language_preference: 'en',
-          notification_settings: {
-            workflow_updates: true,
-            mentions: true,
-            reviews: true,
-            system_alerts: true,
-            email_notifications: false,
-            push_notifications: true
-          },
-          status: 'online',
-          last_seen: new Date().toISOString(),
-          created_at: new Date().toISOString()
-        })
-      } else {
-        // Create demo user for now
-        setUser({
-          id: 'demo-user-' + Date.now(),
-          email: 'demo@thepass.com',
-          name: 'Demo User',
-          avatar_url: 'https://ui-avatars.com/api/?name=Demo+User&background=4f46e5&color=ffffff',
-          language_preference: language,
-          notification_settings: {
-            workflow_updates: true,
-            mentions: true,
-            reviews: true,
-            system_alerts: true,
-            email_notifications: false,
-            push_notifications: true
-          },
-          status: 'online',
-          last_seen: new Date().toISOString(),
-          created_at: new Date().toISOString()
-        })
-      }
-
-      // Load channels
+      // Load channels first
       await loadChannels()
-      
       setLoading(false)
     } catch (error) {
       console.error('Failed to initialize app:', error)
       setLoading(false)
+    }
+  }
+
+  const handleUserLogin = (userData: any) => {
+    setUser(userData)
+    // Auto-create default channels if none exist
+    if (channels.length === 0) {
+      createDefaultChannels(userData)
+    }
+  }
+
+  const handleCreateChannels = () => {
+    if (user) {
+      createDefaultChannels(user)
     }
   }
 
@@ -139,37 +122,35 @@ export default function ThePassApp() {
     }
   }
 
-  const createDefaultChannels = async () => {
-    if (!user) return
-
+  const createDefaultChannels = async (userData: User) => {
     const defaultChannels = [
       {
         name: 'general',
         description: 'General discussions and announcements',
         type: 'utility' as const,
         department: 'BOTH' as const,
-        created_by: user.id
+        created_by: userData.id
       },
       {
         name: 'foh-today',
         description: 'Front of house daily operations',
         type: 'workflow' as const,
         department: 'FOH' as const,
-        created_by: user.id
+        created_by: userData.id
       },
       {
         name: 'boh-today',
         description: 'Back of house daily operations',
         type: 'workflow' as const,
         department: 'BOH' as const,
-        created_by: user.id
+        created_by: userData.id
       },
       {
         name: 'reviews',
         description: 'Daily reviews and team feedback',
         type: 'management' as const,
         department: 'BOTH' as const,
-        created_by: user.id
+        created_by: userData.id
       }
     ]
 
@@ -181,6 +162,11 @@ export default function ThePassApp() {
     } catch (error) {
       console.error('Failed to create default channels:', error)
     }
+  }
+
+  // Show login screen if no user
+  if (!user && !loading) {
+    return <UserLogin onUserCreated={handleUserLogin} />
   }
 
   // Show loading screen
@@ -240,7 +226,7 @@ export default function ThePassApp() {
             channels={channels}
             activeChannel={activeChannel}
             onChannelSelect={handleChannelSelect}
-            onCreateChannel={createDefaultChannels}
+            onCreateChannel={handleCreateChannels}
           />
         </div>
 
@@ -315,7 +301,7 @@ export default function ThePassApp() {
                 <p className="text-pass-text-muted mb-6">{t('selectChannel')}</p>
                 {channels.length === 0 && (
                   <button
-                    onClick={createDefaultChannels}
+                    onClick={handleCreateChannels}
                     className="px-4 py-2 bg-pass-accent hover:bg-pass-accent-hover text-white rounded-md transition-colors"
                   >
                     {t('createChannel')}

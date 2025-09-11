@@ -1,0 +1,93 @@
+DEBERES DE LIMPIEZA/APERTURA -- JAYNA GYRO
+
+**POR FAVOR COMPLETE ESTA LISTA Y FIRME SU NOMBRE CON LA FECHA CUANDO
+TERMINE.**
+
+  -----------------------------------------------------------------------
+  NAME:                                        DATE:
+  -------------------------------------------- --------------------------
+
+  -----------------------------------------------------------------------
+
+## PISOS {#pisos .HEADING-NWEW}
+
+1.  BARRER TODOS LOS PISOS
+
+    a.  DETRÁS DE LA BARRA/EXPO
+
+    b.  SALÓN PRINCIPAL
+
+    c.  SALÓN PEQUEÑO
+
+    d.  OFICINA
+
+    e.  BAÑOS
+
+2.  TRAPEÉ TODOS LOS PISOS CON UN TRAPO LIMPIO, AGUA CALIENTE Y
+    LIMPIADOR DE PISOS O CLORO
+
+    a.  SIEMPRE EMPIECE 1RO EN EL SALÓN PRINCIPAL
+
+    b.  2DO SALÓN PEQUEÑO
+
+    c.  3RO DETRÁS DE LA BARRA/EXPO
+
+    d.  4TO OFICINA
+
+    e.  LO ÚLTIMO SIEMPRE SON LOS BAÑOS
+
+    f.  VACIAR EL AGUA SUCIA EN EL ÁREA DE MACETAS AFUERA
+
+    g.  GUARDAR EL CUBO AMARILLO CON EL TRAPO DETRÁS DE LA PUERTA
+        TRASERA, ESCONDIDO LO MÁS POSIBLE
+
+3.  BAJAR TODAS LAS SILLAS
+
+4.  USAR EL SOPLADOR PARA LIMPIAR TODO EL ESTACIONAMIENTO
+
+5.  REVISAR TODAS LAS MACETAS ALREDEDOR DE LA PROPIEDAD PARA BASURA Y
+    RETIRARLA SI ES NECESARIO
+
+6.  REVISAR TELARAÑAS EN EL FRENTE DEL EDIFICIO Y TAMBIÉN ALREDEDOR DE
+    LAS MACETAS EN EL ÁREA DEL PATIO LATERAL; USAR UNA ESCOBA PARA
+    QUITARLAS
+
+## BAÑOS {#baños .HEADING-NWEW}
+
+1.  DESPUÉS DE BARRER Y TRAPEAR, USE LIMPIADOR DE BAÑO Y CEPILLO PARA
+    TALLAR EL INODORO
+
+2.  CON GUANTES, USE DESENGRASANTE MORADO HD PARA LIMPIAR EL INODORO DE
+    ARRIBA A ABAJO, LIMPIANDO TODA LA PORCELANA
+
+3.  ROCIAR Y LIMPIAR EL PISO ALREDEDOR DE TODO EL INODORO, INCLUYENDO LA
+    PARTE TRASERA.
+
+4.  ASEGÚRESE DE LIMPIAR EL SOPORTE DEL CEPILLO DEL INODORO ASÍ COMO EL
+    MANGO
+
+5.  USE WINDEX PARA LIMPIAR LOS ESPEJOS CON UNA TOALLA DE MICROFIBRA DE
+    RAYAS BLANCAS/VERDES PARA EVITAR PELUSAS
+
+6.  LIMPIE LA MÁQUINA SECAMANOS
+
+7.  LIMPIE EL DISPENSADOR DE JABÓN
+
+8.  LIMPIE EL LAVAMANOS Y ENJUÁGUELO
+
+## NOTAS PARA EL EQUIPO DE APERTURA DE SALÓN {#notas-para-el-equipo-de-apertura-de-salón .HEADING-NWEW}
+
+**(DEJE AQUÍ NOTAS ÚTILES U OBSERVACIONES PARA EL EQUIPO DE LA
+MAÑANA.)**
+
+  -----------------------------------------------------------------------
+
+  -----------------------------------------------------------------------
+
+## FIRMAS {#firmas .HEADING-NWEW}
+
+  -----------------------------------------------------------------------
+  **SIGNATURE:**                                       **DATE:**
+  ---------------------------------------------------- ------------------
+
+  -----------------------------------------------------------------------

@@ -1,0 +1,100 @@
+
+> the-pass@1.0.0 dev
+> next dev
+
+ ⚠ Invalid next.config.js options detected: 
+ ⚠     Unrecognized key(s) in object: 'appDir' at "experimental"
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+   ▲ Next.js 15.5.3
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.19:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ✓ appDir
+
+ ✓ Starting...
+ ✓ Ready in 1696ms
+ ○ Compiling / ...
+ ✓ Compiled / in 7.3s (747 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 8460ms
+ ✓ Compiled in 1167ms (326 modules)
+ ✓ Compiled in 1723ms (747 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 154ms
+ ○ Compiling /api/test-user ...
+ ✓ Compiled /api/test-user in 1350ms (818 modules)
+API Error: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'new row violates row-level security policy for table "employees"'
+}
+ POST /api/test-user 500 in 1837ms
+ GET /api/test-user 200 in 175ms
+ ✓ Compiled in 1853ms (832 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 483ms
+API Error: {
+  message: 'Invalid API key',
+  hint: 'Double check your Supabase `anon` or `service_role` API key.'
+}
+ POST /api/test-user 500 in 135ms
+ ✓ Compiled in 812ms (832 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 89ms
+Service key available: true
+Using admin client: true
+API Error: {
+  message: 'Invalid API key',
+  hint: 'Double check your Supabase `anon` or `service_role` API key.'
+}
+ POST /api/test-user 500 in 109ms
+ ✓ Compiled in 2.5s (832 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 174ms
+ ✓ Compiled in 982ms (832 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 248ms
+ ✓ Compiled /_not-found in 375ms (823 modules)
+ POST /api/test-db 404 in 537ms
+ ✓ Compiled in 2.1s (748 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 1670ms
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 53ms
+ ✓ Compiled in 2.1s (734 modules)
+ ✓ Compiled in 388ms (734 modules)
+ ○ Compiling /api/test-db ...
+ ✓ Compiled /api/test-db in 756ms (818 modules)
+Testing database connectivity...
+Database test result: {
+  status: 'error',
+  timestamp: '2025-09-11T05:56:10.035Z',
+  error: "Cannot read properties of undefined (reading 'from')"
+}
+ POST /api/test-db 200 in 974ms
+ ✓ Compiled in 463ms (818 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 368ms
+Testing database connectivity...
+Database test result: {
+  status: 'error',
+  timestamp: '2025-09-11T05:56:31.343Z',
+  error: "Cannot read properties of undefined (reading 'auth')"
+}
+ POST /api/test-db 200 in 59ms
+ ✓ Compiled /api/test-user in 308ms (507 modules)
+Service key available: true
+Using admin client: true
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 122ms
+API Error: {
+  message: 'Invalid API key',
+  hint: 'Double check your Supabase `anon` or `service_role` API key.'
+}
+ POST /api/test-user 500 in 704ms
+ ✓ Compiled in 1808ms (748 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 167ms
+ ✓ Compiled /api/test-user in 463ms (505 modules)
+Service key available: true
+Using admin client: true
+API Error: {
+  message: 'Invalid API key',
+  hint: 'Double check your Supabase `anon` or `service_role` API key.'
+}
+ POST /api/test-user 500 in 874ms
+   Reload env: .env.local
+ ✓ Compiled in 865ms (818 modules)
+ GET /?id=7e3cd3b6-c006-4024-bcba-1d656440b88d&vscodeBrowserReqId=1757569842137 200 in 110ms
+[?25h

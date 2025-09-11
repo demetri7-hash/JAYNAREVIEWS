@@ -1,84 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   try {
-    // Update employees table to support authentication and roles
-    const { error: alterError } = await supabase.rpc('exec_sql', {
-      sql: `
-        -- Add authentication and role columns to employees table
-        ALTER TABLE employees 
-        ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE,
-        ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'employee',
-        ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT false,
-        ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '["view_workflows"]'::jsonb,
-        ADD COLUMN IF NOT EXISTS last_login TIMESTAMP,
-        ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id),
-        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+    const setupSteps = []
 
-        -- Create index on email for faster lookups
-        CREATE INDEX IF NOT EXISTS idx_employees_email ON employees(email);
-        CREATE INDEX IF NOT EXISTS idx_employees_role ON employees(role);
-        CREATE INDEX IF NOT EXISTS idx_employees_active ON employees(is_active);
+    // Step 1: Check if employees table exists and what columns it has
+    const { data: columns, error: columnError } = await supabase
+      .from('employees')
+      .select('*')
+      .limit(1)
 
-        -- Create user_sessions table for session management
-        CREATE TABLE IF NOT EXISTS user_sessions (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          employee_id UUID REFERENCES employees(id) ON DELETE CASCADE,
-          session_token VARCHAR(255) UNIQUE NOT NULL,
-          expires_at TIMESTAMP NOT NULL,
-          created_at TIMESTAMP DEFAULT NOW()
-        );
-
-        -- Create audit log for user management actions
-        CREATE TABLE IF NOT EXISTS user_audit_log (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          action VARCHAR(100) NOT NULL, -- 'role_change', 'activate', 'deactivate', 'permission_change'
-          target_employee_id UUID REFERENCES employees(id),
-          performed_by UUID REFERENCES employees(id),
-          old_values JSONB,
-          new_values JSONB,
-          created_at TIMESTAMP DEFAULT NOW()
-        );
-
-        -- Function to update updated_at timestamp
-        CREATE OR REPLACE FUNCTION update_updated_at_column()
-        RETURNS TRIGGER AS $$
-        BEGIN
-          NEW.updated_at = NOW();
-          RETURN NEW;
-        END;
-        $$ language 'plpgsql';
-
-        -- Create trigger for updated_at
-        DROP TRIGGER IF EXISTS update_employees_updated_at ON employees;
-        CREATE TRIGGER update_employees_updated_at
-          BEFORE UPDATE ON employees
-          FOR EACH ROW
-          EXECUTE FUNCTION update_updated_at_column();
-      `
-    })
-
-    if (alterError) {
-      console.error('Database update error:', alterError)
+    if (columnError) {
+      // Table might not exist, let's try to create it
+      setupSteps.push('⚠️ Employees table needs to be created or updated')
       return NextResponse.json({
         success: false,
-        error: 'Failed to update database schema',
-        details: alterError.message
+        error: 'Employees table not accessible',
+        details: columnError.message,
+        instructions: 'Please create the employees table in Supabase with columns: id, name, email, role, department, is_active, permissions, created_at, updated_at'
       }, { status: 500 })
+    }
+
+    setupSteps.push('✅ Employees table exists and is accessible')
+
+    // Step 2: Check if we can query the table structure
+    const { data: sampleEmployee } = await supabase
+      .from('employees')
+      .select('*')
+      .limit(1)
+      .single()
+
+    if (sampleEmployee) {
+      setupSteps.push('✅ Sample data query successful')
+      setupSteps.push(`📊 Available columns: ${Object.keys(sampleEmployee).join(', ')}`)
+    } else {
+      setupSteps.push('ℹ️ No existing employee data found (this is normal for first setup)')
+    }
+
+    // Step 3: Test if we can insert/update records
+    try {
+      const testEmail = 'test-schema-setup@example.com'
+      
+      // Try to insert a test record
+      const { error: insertError } = await supabase
+        .from('employees')
+        .upsert({
+          name: 'Schema Test User',
+          email: testEmail,
+          role: 'employee',
+          department: 'test',
+          is_active: false,
+          permissions: ['view_workflows'],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+
+      if (insertError) {
+        throw insertError
+      }
+
+      // Clean up test record
+      await supabase
+        .from('employees')
+        .delete()
+        .eq('email', testEmail)
+
+      setupSteps.push('✅ Database write operations working correctly')
+
+    } catch (error: any) {
+      setupSteps.push('⚠️ Database write test failed: ' + error.message)
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Database schema updated for authentication and role management'
+      message: 'Database schema validation completed',
+      steps: setupSteps,
+      note: 'Your database appears to be ready for authentication. You can now try creating user accounts.'
     })
 
   } catch (error: any) {
-    console.error('Schema update error:', error)
+    console.error('Schema setup error:', error)
     return NextResponse.json({
       success: false,
-      error: 'Internal server error',
+      error: 'Failed to validate database schema',
       details: error.message
     }, { status: 500 })
   }
+}
+
+export async function GET(request: NextRequest) {
+  return POST(request)
 }

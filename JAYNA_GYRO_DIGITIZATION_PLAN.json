@@ -1,0 +1,486 @@
+{
+  "jayna_gyro_digital_transformation_plan": {
+    "analysis_of_current_paper_workflows": {
+      "pain_points_identified": [
+        "Lost or damaged paper forms",
+        "Illegible handwriting causing miscommunication",
+        "No real-time visibility into task completion",
+        "Difficulty tracking trends and performance over time",
+        "Manual data entry and calculation errors",
+        "Photos of completed forms being texted to manager",
+        "No audit trail or accountability tracking",
+        "Language barriers with multilingual staff",
+        "Time-consuming manual consolidation of data",
+        "Storage and organization of physical documents"
+      ],
+      "digital_advantages": [
+        "Real-time completion tracking and notifications",
+        "Photo documentation with timestamps and GPS",
+        "Automatic calculations and trending",
+        "Multi-language support for all forms",
+        "Searchable history and audit trails",
+        "Instant manager notifications",
+        "Performance analytics and reporting",
+        "Integration between related workflows",
+        "Reduced paper waste and storage needs",
+        "Offline capability for continued operation"
+      ]
+    },
+    
+    "current_workflow_categories": {
+      "foh_operations": {
+        "opening_checklist": {
+          "current_form": "FOH OPENING CHECKLIST",
+          "sections": [
+            "Dining Room & Patio Setup (14 tasks)",
+            "Cleanliness & Walkthrough (2 tasks)",
+            "Bathroom Checks (9 tasks)",
+            "Expo Station & Sauce Prep (6 tasks)",
+            "Kitchen Support & Restock (3 tasks)",
+            "Water Station Setup (3 tasks)",
+            "Bar & Beverage Station (15 tasks)",
+            "Froyo Machine (3 tasks)",
+            "Wines by the Glass (5 tasks)"
+          ],
+          "total_tasks": 60,
+          "rating_categories": 8,
+          "multilingual_need": "High"
+        },
+        "closing_checklist": {
+          "current_form": "FOH CLOSING LIST",
+          "sections": [
+            "Dining Room & Floor Cleaning (8 tasks)",
+            "Expo & Water Station (12 tasks)",
+            "To-Go Station / Host Stand (5 tasks)",
+            "Cashier & Retail Station (3 tasks)",
+            "Coffee & Tea / Frozen Yogurt (3 tasks)",
+            "Bathrooms (6 tasks)",
+            "Office (4 tasks)"
+          ],
+          "total_tasks": 41,
+          "requires_signatures": true,
+          "notes_section": true
+        },
+        "transition_checklist": {
+          "current_form": "FOH TRANSITION CHECKLIST",
+          "sections": [
+            "Retail & Display (3 tasks)",
+            "Stocking & Utensils (6 tasks)",
+            "Dining Room & Stations (5 tasks)",
+            "Bathrooms (3 tasks)",
+            "Beverages & Prep (4 tasks)"
+          ],
+          "total_tasks": 21,
+          "rating_categories": 8,
+          "shift_handoff": true
+        },
+        "bar_closing": {
+          "current_form": "BAR CLOSING",
+          "sections": [
+            "Clean & Sanitize Equipment (15 tasks)",
+            "Wipe & Organize Surfaces (6 tasks)",
+            "Stock & Label (7 tasks)",
+            "Glassware & Dish Station (3 tasks)",
+            "Floor & Trash (3 tasks)",
+            "POS & Guest-Facing Areas (3 tasks)"
+          ],
+          "total_tasks": 37,
+          "specialized_role": "Designated Bar Closer",
+          "early_start_allowed": "9PM"
+        }
+      },
+      
+      "boh_operations": {
+        "line_ratings_am": {
+          "current_form": "LINE RATINGS AM AND PM",
+          "purpose": "Rate how closing crew left restaurant",
+          "categories": [
+            "Stations Stocked",
+            "Containers Changed & Clean", 
+            "FIFO, Dating & Labeling",
+            "Gyro Cooker",
+            "Blanched Potatoes for AM",
+            "Fryer Oil Condition",
+            "Surfaces & Tools",
+            "Floors & Mats",
+            "Stainless, Hood & Walls",
+            "To-Go, Bowls & Trays Stocked",
+            "Trash & Drains"
+          ],
+          "rating_scale": "1-5 with detailed descriptions",
+          "pass_fail_criteria": "≥85% AND no 1s",
+          "photo_requirement": "Send to manager"
+        },
+        "line_ratings_pm": {
+          "current_form": "LINE RATINGS AM AND PM",
+          "purpose": "Rate how opening/transition crew prepared for PM",
+          "categories": [
+            "Appetizer/Salad Station Refilled",
+            "Main Fridge Refilled",
+            "Meat/Gyro Station Clean & Stocked",
+            "Rice & Potatoes",
+            "Surfaces & Organization",
+            "Pita & To-Go",
+            "Gyro Readiness",
+            "Floors & Spot-Mopping",
+            "Handoff Notes Quality"
+          ],
+          "same_scoring_system": true
+        },
+        "lead_prep_worksheet": {
+          "current_form": "LEAD PREP WORKSHEET",
+          "sections": [
+            "Walk-Through Review (5 categories with ratings)",
+            "Today's Priorities (task assignment with urgency)",
+            "End-of-Day Summary (completion tracking)",
+            "Produce & Ingredient Quick Inventory (18 items with status)"
+          ],
+          "dynamic_task_assignment": true,
+          "inventory_integration": true,
+          "shift_communication": true
+        },
+        "daily_inventory": {
+          "current_form": "AM PREP DAILY INVENTORY",
+          "items_tracked": [
+            "Proteins (gyro meats, falafel)",
+            "Sauces (tzatziki, aioli, hummus, etc.)",
+            "Vegetables (prepared and whole)",
+            "Bread products (pita, lavash, tortillas)",
+            "Dairy and specialty items",
+            "Desserts (baklava varieties)"
+          ],
+          "tracking_points": "Start quantity, End quantity, Urgent flag",
+          "total_items": 30,
+          "urgency_system": true
+        }
+      },
+      
+      "shared_operations": {
+        "cleaning_opening": {
+          "current_form": "CLEANING/OPENING DUTIES",
+          "sections": [
+            "Floors (7 detailed steps with sequence)",
+            "Bathrooms (8 detailed tasks)",
+            "External areas (parking lot, planters, cobwebs)"
+          ],
+          "sequence_critical": true,
+          "equipment_specific": true,
+          "quality_standards": "Guest-ready"
+        },
+        "missing_ingredients": {
+          "current_form": "MISSING INGREDIENTS/SUPPLIES REPORT",
+          "fields": [
+            "Item name",
+            "Quantity needed",
+            "Reason for shortage",
+            "Urgency level (Low/Med/High)",
+            "Reported to",
+            "Fixed status"
+          ],
+          "escalation": "Text photo to 916-513-3192",
+          "real_time_critical": true
+        },
+        "dry_goods_inventory": {
+          "current_form": "DRY GOODS INVENTORY PACKAGING",
+          "frequency": "Twice per week (Wed/Sun)",
+          "categories": [
+            "Bowls and containers",
+            "Boxes and packaging",
+            "Cups and lids",
+            "Ramekins (multiple sizes)",
+            "Napkins and utensils",
+            "Bags and carriers"
+          ],
+          "total_items": 25,
+          "order_decision": "Y/N for each item"
+        },
+        "to_go_inventory": {
+          "current_form": "TO GO INVENTORY SHEET FOR KITCHEN",
+          "basic_tracking": "Simple count format",
+          "integration_needed": "With main inventory system"
+        }
+      }
+    },
+
+    "proposed_channel_restructure": {
+      "current_channels": [
+        "foh-morning (FOH Morning Opening)",
+        "boh-prep (BOH Prep Workflow)", 
+        "foh-closing (FOH Closing Procedures)",
+        "boh-closing (BOH Closing Checklist)"
+      ],
+      "proposed_new_structure": {
+        "foh_channels": {
+          "foh-opening": {
+            "workflows": ["FOH Opening Checklist"],
+            "staff_roles": ["Server", "Host", "Bartender"],
+            "timing": "Pre-opening (6:30-11:00 AM)"
+          },
+          "foh-transition": {
+            "workflows": ["FOH Transition Checklist"],
+            "staff_roles": ["AM Server", "PM Server"],
+            "timing": "Shift change (2:00-6:00 PM)"
+          },
+          "foh-closing": {
+            "workflows": ["FOH Closing List"],
+            "staff_roles": ["Server", "Closer"],
+            "timing": "Post-service (9:45 PM-close)"
+          },
+          "bar-operations": {
+            "workflows": ["Bar Closing"],
+            "staff_roles": ["Bartender", "Bar Closer"],
+            "timing": "Can start 9:00 PM",
+            "specialized": true
+          }
+        },
+        "boh_channels": {
+          "boh-prep": {
+            "workflows": ["Lead Prep Worksheet", "AM Prep Inventory"],
+            "staff_roles": ["Lead Prep Cook", "Prep Cook"],
+            "timing": "Morning prep (6:00 AM-2:00 PM)"
+          },
+          "boh-line": {
+            "workflows": ["Line Ratings AM", "Line Ratings PM"],
+            "staff_roles": ["Line Cook", "Kitchen Manager"],
+            "timing": "Shift transitions",
+            "rating_system": true
+          },
+          "boh-closing": {
+            "workflows": ["BOH Closing Checklist"],
+            "staff_roles": ["Line Cook", "Closer"],
+            "timing": "End of service"
+          }
+        },
+        "shared_channels": {
+          "cleaning-maintenance": {
+            "workflows": ["Cleaning/Opening Duties"],
+            "staff_roles": ["Cleaner", "Opener"],
+            "timing": "Pre-opening daily"
+          },
+          "inventory-supplies": {
+            "workflows": [
+              "Missing Ingredients Report",
+              "Dry Goods Inventory", 
+              "To-Go Inventory"
+            ],
+            "staff_roles": ["All staff", "Kitchen Manager"],
+            "timing": "Ongoing/Scheduled",
+            "real_time": true
+          }
+        }
+      }
+    },
+
+    "implementation_roadmap": {
+      "phase_1_immediate": {
+        "timeline": "Week 1-2",
+        "priority": "Critical daily operations",
+        "deliverables": [
+          {
+            "workflow": "FOH Opening Checklist",
+            "channel": "foh-opening", 
+            "tasks": 60,
+            "features": [
+              "Multi-language support (EN/ES/TR)",
+              "Photo upload for quality checks",
+              "Rating system (1-5) for 8 categories",
+              "Real-time completion tracking",
+              "Manager notification on completion"
+            ]
+          },
+          {
+            "workflow": "Missing Ingredients Report",
+            "channel": "inventory-supplies",
+            "features": [
+              "Instant reporting with urgency levels",
+              "Photo documentation",
+              "Auto-notification to manager",
+              "Status tracking (reported → ordered → resolved)",
+              "Real-time inventory alerts"
+            ]
+          }
+        ]
+      },
+      
+      "phase_2_core_operations": {
+        "timeline": "Week 3-4", 
+        "priority": "Essential workflows",
+        "deliverables": [
+          {
+            "workflow": "FOH Closing List",
+            "channel": "foh-closing",
+            "tasks": 41,
+            "features": [
+              "Time restrictions (no start before 9:45 PM)",
+              "Digital signatures",
+              "Notes handoff to next shift",
+              "Photo documentation requirements"
+            ]
+          },
+          {
+            "workflow": "Lead Prep Worksheet", 
+            "channel": "boh-prep",
+            "features": [
+              "Dynamic task assignment",
+              "Priority flagging (★ urgent)",
+              "Shift-to-shift communication",
+              "Integration with inventory tracking",
+              "Performance rating system"
+            ]
+          },
+          {
+            "workflow": "Line Ratings AM/PM",
+            "channel": "boh-line", 
+            "features": [
+              "Standardized 1-5 rating scale",
+              "Pass/fail criteria automation",
+              "Photo requirement enforcement",
+              "Performance trending",
+              "Manager alert system"
+            ]
+          }
+        ]
+      },
+
+      "phase_3_specialized": {
+        "timeline": "Week 5-6",
+        "priority": "Specialized and transition workflows",
+        "deliverables": [
+          {
+            "workflow": "Bar Closing",
+            "channel": "bar-operations",
+            "tasks": 37,
+            "features": [
+              "Early start permission (9 PM)",
+              "Equipment-specific checklists",
+              "Chemical safety protocols",
+              "Weekly deep cleaning schedules"
+            ]
+          },
+          {
+            "workflow": "FOH Transition Checklist",
+            "channel": "foh-transition", 
+            "tasks": 21,
+            "features": [
+              "Shift handoff optimization",
+              "Rating system for handoff quality",
+              "Inter-shift communication",
+              "Retail and display management"
+            ]
+          },
+          {
+            "workflow": "Cleaning/Opening Duties",
+            "channel": "cleaning-maintenance",
+            "features": [
+              "Sequence enforcement (order matters)",
+              "Equipment tracking",
+              "Quality standards verification",
+              "Multi-area coordination"
+            ]
+          }
+        ]
+      },
+
+      "phase_4_inventory": {
+        "timeline": "Week 7-8",
+        "priority": "Inventory and supply management",
+        "deliverables": [
+          {
+            "workflow": "AM Prep Daily Inventory",
+            "channel": "boh-prep",
+            "items": 30,
+            "features": [
+              "Start/end quantity tracking",
+              "Automatic par level alerts",
+              "Trend analysis and forecasting",
+              "Integration with ordering system"
+            ]
+          },
+          {
+            "workflow": "Dry Goods Inventory",
+            "channel": "inventory-supplies",
+            "items": 25,
+            "features": [
+              "Scheduled reminders (Wed/Sun)",
+              "Order decision tracking",
+              "Supply level trending",
+              "Automatic reorder suggestions"
+            ]
+          }
+        ]
+      }
+    },
+
+    "technical_implementation_plan": {
+      "database_enhancements": {
+        "new_tables_needed": [
+          "workflow_templates",
+          "workflow_instances", 
+          "task_completions",
+          "ratings_and_reviews",
+          "inventory_counts",
+          "supply_requests",
+          "shift_handoffs"
+        ],
+        "existing_table_updates": [
+          "worksheets - add template_id, shift_type fields",
+          "employees - add preferred_language, certifications",
+          "channels - add workflow_type, timing_restrictions"
+        ]
+      },
+      
+      "api_endpoints_to_create": [
+        "/api/workflows/templates",
+        "/api/workflows/instances", 
+        "/api/tasks/complete",
+        "/api/ratings/submit",
+        "/api/inventory/count",
+        "/api/supplies/request",
+        "/api/handoffs/create"
+      ],
+      
+      "frontend_components": [
+        "WorkflowTemplateSelector",
+        "TaskChecklistInterface", 
+        "RatingSystemComponent",
+        "PhotoUploadWidget",
+        "InventoryCounterForm",
+        "ShiftHandoffInterface",
+        "LanguageSwitcher",
+        "ProgressTracker"
+      ],
+      
+      "real_time_features": [
+        "Live completion status updates",
+        "Manager notification system",
+        "Cross-shift communication",
+        "Inventory level alerts",
+        "Equipment status tracking"
+      ]
+    },
+
+    "success_metrics": {
+      "operational_efficiency": [
+        "50% reduction in checklist completion time",
+        "90% improvement in task completion accuracy", 
+        "75% reduction in missed tasks",
+        "60% faster manager oversight",
+        "40% improvement in shift handover quality"
+      ],
+      "quality_improvements": [
+        "Real-time photo documentation",
+        "Standardized rating criteria", 
+        "Trend analysis and early warning",
+        "Performance accountability",
+        "Multilingual accessibility"
+      ],
+      "management_benefits": [
+        "Instant completion notifications",
+        "Historical performance data",
+        "Predictive maintenance alerts", 
+        "Staff performance trending",
+        "Automated compliance reporting"
+      ]
+    }
+  }
+}

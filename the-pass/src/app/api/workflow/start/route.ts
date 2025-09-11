@@ -1,208 +1,200 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, db } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
-// Sample workflow templates
+// Updated comprehensive workflow templates based on actual Jayna Gyro forms
 const WORKFLOW_TEMPLATES = {
-  'foh-morning': {
-    name: 'FOH Morning Opening',
+  'foh-opening': {
+    name: 'FOH Opening Checklist',
+    department: 'FOH',
+    shift_type: 'Opening',
+    estimated_duration: 90,
     tasks: [
-      { id: 1, name: 'Unlock doors and disarm security', completed: false },
-      { id: 2, name: 'Turn on lights and equipment', completed: false },
-      { id: 3, name: 'Check cleanliness of dining area', completed: false },
-      { id: 4, name: 'Set up POS system', completed: false },
-      { id: 5, name: 'Stock napkins and utensils', completed: false },
-      { id: 6, name: 'Check restroom supplies', completed: false },
-      { id: 7, name: 'Review daily specials', completed: false },
-      { id: 8, name: 'Count register till', completed: false }
+      // Dining Room & Patio Setup
+      { id: 1, name: 'Remove chairs and re-wipe all tables', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 2, name: 'Wipe table sides, legs, chairs, and banquette sofas', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 3, name: 'Check top wood ledge of sofas (especially outside)', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 4, name: 'Ensure chairs tucked in, tables aligned and evenly spaced', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 5, name: 'Place lamps on tables, hide charging cables', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 6, name: '"Salt to the Street" - salt toward parking, pepper toward kitchen', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 7, name: 'Wipe and dry menus - remove stickiness', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 8, name: 'Turn on all dining room lights', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 9, name: 'Unlock doors and flip both signs to "OPEN"', section: 'Dining Room Setup', required: true, critical: true, photo_required: true, completed: false },
+      { id: 10, name: 'Check and refill all rollups (napkin + silverware)', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 11, name: 'Wipe patio tables and barstools with fresh towel', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 12, name: 'Raise blinds', section: 'Dining Room Setup', required: true, completed: false },
+      { id: 13, name: 'Windex front doors', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      { id: 14, name: 'Wipe down front of registers', section: 'Dining Room Setup', required: true, critical: true, completed: false },
+      
+      // Cleanliness & Walkthrough
+      { id: 15, name: 'Sweep perimeter and remove cobwebs from all areas', section: 'Cleanliness', required: true, critical: true, completed: false },
+      { id: 16, name: 'Review previous night\'s closing checklist for notes', section: 'Cleanliness', required: true, critical: true, completed: false },
+      
+      // Bathroom Checks - CRITICAL SECTION
+      { id: 17, name: 'Clean toilets thoroughly: bowl, lid, seat, under seat, floor around', section: 'Bathrooms', required: true, critical: true, photo_required: true, completed: false },
+      { id: 18, name: 'Windex mirrors', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 19, name: 'Dust hand dryer, soap dispenser, wall perimeter', section: 'Bathrooms', required: true, completed: false },
+      { id: 20, name: 'Scrub and clean sink + remove mold from drain', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 21, name: 'Dry and polish all surfaces', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 22, name: 'Restock toilet paper', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 23, name: 'Restock paper towels', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 24, name: 'Restock toilet seat covers', section: 'Bathrooms', required: true, critical: true, completed: false },
+      { id: 25, name: 'VERIFY BOH cleaner work - if not OK, clean and notify Demetri', section: 'Bathrooms', required: true, critical: true, photo_required: true, escalation: true, completed: false },
+      
+      // Expo Station & Sauce Prep
+      { id: 26, name: 'Fill sanitation tub: ¾ sanitizer, 2 microfiber towels, one hanging half out', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 27, name: 'Set expo towels: 1 damp for plates, 1 dry for surfaces', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 28, name: 'Sauce backups: Tzatziki 1-2 (2oz), Spicy Aioli 1-2 (2oz), Lemon 1-2 (3oz)', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 29, name: 'Squeeze bottles: 1 full each Tzatziki, Spicy Aioli, Lemon', section: 'Expo Station', required: true, critical: true, completed: false },
+      
+      // Additional critical tasks
+      { id: 30, name: 'Stock kitchen with plates/bowls - replenish throughout shift', section: 'Kitchen Support', required: true, critical: true, completed: false },
+      { id: 31, name: 'Fill water dispensers with ice, fruit, water - luxurious look', section: 'Water Station', required: true, critical: true, completed: false },
+      { id: 32, name: 'Fill ice well to overflowing', section: 'Bar Setup', required: true, critical: true, completed: false },
+      { id: 33, name: 'Switch froyo machine to ON and verify KEEP FRESH overnight', section: 'Froyo', required: true, critical: true, completed: false }
     ]
   },
-  'boh-prep': {
-    name: 'BOH Morning Prep',
+  
+  'missing-ingredients': {
+    name: 'Missing Ingredients Report',
+    department: 'BOTH',
+    shift_type: 'Any',
+    estimated_duration: 5,
+    real_time: true,
+    urgent: true,
     tasks: [
-      { id: 1, name: 'Check refrigeration temperatures', completed: false },
-      { id: 2, name: 'Sanitize prep surfaces', completed: false },
-      { id: 3, name: 'Check inventory levels', completed: false },
-      { id: 4, name: 'Prepare daily proteins', completed: false },
-      { id: 5, name: 'Cut vegetables and garnishes', completed: false },
-      { id: 6, name: 'Make sauces and dressings', completed: false },
-      { id: 7, name: 'Set up grill station', completed: false },
-      { id: 8, name: 'Stock line with ingredients', completed: false }
+      { id: 1, name: 'Report missing or low stock item immediately', section: 'Reporting', required: true, critical: true, completed: false }
     ]
   },
+
   'foh-closing': {
-    name: 'FOH Evening Closing',
+    name: 'FOH Closing List',
+    department: 'FOH',
+    shift_type: 'Closing',
+    estimated_duration: 75,
+    start_restriction: '21:45', // 9:45 PM
     tasks: [
-      { id: 1, name: 'Clean and sanitize tables', completed: false },
-      { id: 2, name: 'Sweep and mop floors', completed: false },
-      { id: 3, name: 'Clean restrooms', completed: false },
-      { id: 4, name: 'Count register and prepare deposit', completed: false },
-      { id: 5, name: 'Turn off equipment', completed: false },
-      { id: 6, name: 'Take out trash', completed: false },
-      { id: 7, name: 'Set security alarm', completed: false },
-      { id: 8, name: 'Lock all doors', completed: false }
+      // Dining Room & Floor Cleaning
+      { id: 1, name: 'Wipe all dining tables, bar counters, stools, banquette sofas', section: 'Dining Room', required: true, critical: true, completed: false },
+      { id: 2, name: 'Inspect booths - vacuum or wipe if crumbs/smudges visible', section: 'Dining Room', required: true, completed: false },
+      { id: 3, name: 'Ensure all chairs tucked in and aligned neatly', section: 'Dining Room', required: true, critical: true, completed: false },
+      { id: 4, name: 'Sweep under all tables, bar area, expo counter', section: 'Dining Room', required: true, critical: true, completed: false },
+      { id: 5, name: 'Collect trash from bar, expo, bathrooms, office', section: 'Dining Room', required: true, critical: true, completed: false },
+      { id: 6, name: 'Replace all trash bags with clean liners', section: 'Dining Room', required: true, critical: true, completed: false },
+      { id: 7, name: 'Roll napkin sets using all available forks & knives', section: 'Dining Room', required: true, completed: false },
+      
+      // Expo & Water Station  
+      { id: 8, name: 'Break down water station, clean dispensers, leave open to air dry', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 9, name: 'Purge stabbed tickets, wipe printer, screen, surrounding area', section: 'Expo Station', required: true, completed: false },
+      { id: 10, name: 'Refill to-go ramekins with sauces (Tzatziki, Spicy Aioli, Lemon)', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 11, name: 'Label/date all perishable sauces, move to walk-in fridge', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 12, name: 'Stock to-go containers, lids, ramekins, bags, cups to 100%', section: 'Expo Station', required: true, critical: true, completed: false },
+      { id: 13, name: 'Restock all beverages in the Coke fridge', section: 'Expo Station', required: true, critical: true, completed: false }
     ]
   },
-  'boh-closing': {
-    name: 'BOH Evening Closing',
+
+  'boh-prep': {
+    name: 'BOH Prep Workflow',
+    department: 'BOH',
+    shift_type: 'Prep',
+    estimated_duration: 120,
     tasks: [
-      { id: 1, name: 'Clean and sanitize prep areas', completed: false },
-      { id: 2, name: 'Store food items properly', completed: false },
-      { id: 3, name: 'Clean cooking equipment', completed: false },
-      { id: 4, name: 'Wash and sanitize dishes', completed: false },
-      { id: 5, name: 'Take inventory of remaining items', completed: false },
-      { id: 6, name: 'Clean floors and drains', completed: false },
-      { id: 7, name: 'Turn off equipment', completed: false },
-      { id: 8, name: 'Dispose of waste properly', completed: false }
+      { id: 1, name: 'Rate walk-in refrigerator organization (1-5)', section: 'Walk-through', required: true, rating_required: true, completed: false },
+      { id: 2, name: 'Rate cleanliness of prep areas (1-5)', section: 'Walk-through', required: true, rating_required: true, completed: false },
+      { id: 3, name: 'Check tzatziki levels - mark status', section: 'Inventory', required: true, critical: true, completed: false },
+      { id: 4, name: 'Check gyro meat levels (beef and chicken)', section: 'Inventory', required: true, critical: true, completed: false },
+      { id: 5, name: 'Assign urgent prep tasks (★)', section: 'Task Assignment', required: true, critical: true, completed: false },
+      { id: 6, name: 'Coordinate with prep cook on responsibilities', section: 'Task Assignment', required: true, critical: true, completed: false }
     ]
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const { workflow_type, employee_name, employee_id, department } = await request.json()
     
-    const { 
-      employee_name, // We'll use this to lookup employee_id
-      department,
-      shift_type,
-      workflow_type = 'foh-morning' // default
-    } = body
-
-    // Validate required fields
-    if (!employee_name || !department || !shift_type) {
-      return NextResponse.json(
-        { error: 'Missing required fields: employee_name, department, shift_type' },
-        { status: 400 }
-      )
+    if (!workflow_type || !employee_name) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required fields: workflow_type and employee_name'
+      }, { status: 400 })
     }
 
-    // Get employee_id from employee_name
-    const { data: employee, error: employeeError } = await supabase
-      .from('employees')
-      .select('id')
-      .eq('name', employee_name)
-      .single()
-
-    if (employeeError || !employee) {
-      return NextResponse.json(
-        { error: 'Employee not found', details: employeeError?.message },
-        { status: 404 }
-      )
-    }
-
-    const employee_id = employee.id
-
-    // If no employee_id provided, get one from employees table
-    let actualEmployeeId = employee_id
-    if (!actualEmployeeId && employee_name) {
-      const { data: employee } = await supabase
+    // Look up employee by name to get ID
+    let finalEmployeeId = employee_id
+    
+    if (!finalEmployeeId) {
+      const { data: employee, error: employeeError } = await supabase
         .from('employees')
         .select('id')
         .eq('name', employee_name)
         .single()
-      
-      if (employee) {
-        actualEmployeeId = employee.id
+
+      if (employeeError || !employee) {
+        return NextResponse.json({
+          success: false,
+          error: 'Employee not found in database'
+        }, { status: 404 })
       }
+      
+      finalEmployeeId = employee.id
     }
+
+    const template = WORKFLOW_TEMPLATES[workflow_type as keyof typeof WORKFLOW_TEMPLATES] || WORKFLOW_TEMPLATES['foh-opening']
     
-    // If still no employee_id, get any employee from the right department
-    if (!actualEmployeeId) {
-      const { data: employee } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('department', department)
-        .limit(1)
-        .single()
-      
-      if (employee) {
-        actualEmployeeId = employee.id
-      }
-    }
-
-    if (!actualEmployeeId) {
-      return NextResponse.json(
-        { error: 'No valid employee found' },
-        { status: 400 }
-      )
-    }
-
-    // Get the workflow template
-    const template = WORKFLOW_TEMPLATES[workflow_type as keyof typeof WORKFLOW_TEMPLATES] || WORKFLOW_TEMPLATES['foh-morning']
-
-    // Create initial checklist data (array, not object)
+    // Convert template tasks to checklist format
     const checklistData = template.tasks.map(task => ({
       id: task.id,
       name: task.name,
-      completed: false,
-      required: true,
-      notes: null,
-      photo_url: null
+      task_description: task.section || '',
+      required: task.required || false,
+      photo_urls: [],
+      critical: task.critical || false,
+      min_rating: (task as any).rating_required ? 1 : null,
+      completed: task.completed || false,
+      rating: null,
+      notes: null
     }))
 
-    // Create the worksheet in database
+    // Create worksheet in database
     const { data: worksheet, error: worksheetError } = await supabase
       .from('worksheets')
       .insert({
-        employee_id,
-        department,
-        shift_type,
-        checklist_data: checklistData, // This is an array now
-        completion_percentage: 0,
+        employee_id: finalEmployeeId,
+        department: department || template.department || 'FOH',
+        shift_type: template.shift_type || 'General',
+        checklist_data: checklistData,
         status: 'in_progress',
-        priority: 'medium'
+        completion_percentage: 0,
+        started_at: new Date().toISOString()
       })
       .select()
       .single()
 
     if (worksheetError) {
-      console.error('Worksheet creation error:', worksheetError)
-      return NextResponse.json(
-        { error: 'Failed to create worksheet', details: worksheetError.message },
-        { status: 500 }
-      )
+      console.error('Database error:', worksheetError)
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to create worksheet',
+        details: worksheetError.message
+      }, { status: 500 })
     }
 
-    // Create a workflow message using the database service
-    let workflowMessage = null
-    try {
-      // Pass the complete worksheet object as returned from database
-      workflowMessage = await db.createWorkflowMessage(worksheet)
-    } catch (messageError) {
-      console.log('Could not create workflow message:', messageError)
-      // Continue anyway - the worksheet was created successfully
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      worksheet,
-      workflow_message: workflowMessage,
-      template: template.name,
-      task_count: template.tasks.length,
-      message: `${template.name} workflow started successfully!` 
-    })
-
-  } catch (error: any) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    )
-  }
-}
-
-export async function GET() {
-  try {
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      workflows: Object.keys(WORKFLOW_TEMPLATES),
-      templates: WORKFLOW_TEMPLATES
+      worksheet,
+      employee_name,
+      template_name: template.name,
+      task_count: template.tasks.length,
+      estimated_duration: template.estimated_duration,
+      message: `Started ${template.name} workflow for ${employee_name}`
     })
+
   } catch (error: any) {
     console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message
+    }, { status: 500 })
   }
 }

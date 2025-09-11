@@ -67,12 +67,13 @@ export const authOptions: NextAuthOptions = {
       return true
     },
     async jwt({ token, user }) {
-      if (user) {
-        // Fetch employee data
+      // Always fetch employee data to get current status
+      const email = user?.email || token.email
+      if (email) {
         const { data: employee } = await supabase
           .from('employees')
           .select('*')
-          .eq('email', user.email)
+          .eq('email', email)
           .single()
 
         if (employee) {

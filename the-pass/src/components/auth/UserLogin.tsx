@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useUser } from '@/contexts/UserContext'
 import { supabase } from '@/lib/supabase'
 import { User } from 'lucide-react'
 
@@ -9,6 +10,7 @@ interface UserLoginProps {
 }
 
 export default function UserLogin({ onUserCreated }: UserLoginProps) {
+  const { setUser } = useUser()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [department, setDepartment] = useState<'FOH' | 'BOH' | 'BOTH'>('FOH')
@@ -44,21 +46,15 @@ export default function UserLogin({ onUserCreated }: UserLoginProps) {
       // Create a user object for the app
       const user = {
         id: mockEmployee.id,
-        email: mockEmployee.email,
         name: mockEmployee.name,
+        email: mockEmployee.email,
         department: mockEmployee.department,
         role: mockEmployee.role,
-        avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockEmployee.name)}&background=4f46e5&color=ffffff`,
-        language_preference: 'en',
-        notification_settings: {
-          mentions: true,
-          channels: true,
-          workflows: true
-        }
+        language: 'en' as const
       }
 
-      // Store user in localStorage for persistence
-      localStorage.setItem('thepass_user', JSON.stringify(user))
+      // Set user in context (this will also store in localStorage)
+      setUser(user)
       
       onUserCreated(user)
     } catch (err: any) {
@@ -72,18 +68,13 @@ export default function UserLogin({ onUserCreated }: UserLoginProps) {
   const handleDemoLogin = () => {
     const demoUser = {
       id: 'demo-' + Date.now(),
-      email: 'demo@jaynagyro.com',
       name: 'Demo User',
+      email: 'demo@jaynagyro.com',
       department: 'BOTH' as const,
       role: 'manager',
-      avatar_url: 'https://ui-avatars.com/api/?name=Demo+User&background=4f46e5&color=ffffff',
-      language_preference: 'en',
-      notification_settings: {
-        mentions: true,
-        channels: true,
-        workflows: true
-      }
+      language: 'en' as const
     }
+    setUser(demoUser)
     onUserCreated(demoUser)
   }
 

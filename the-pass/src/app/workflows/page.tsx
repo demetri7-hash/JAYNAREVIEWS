@@ -1,10 +1,27 @@
 'use client'
+interface Workflow {
+  id: string
+  name: string
+  status: 'assigned' | 'in_progress' | 'completed' | 'overdue'
+  due_date: string | null
+  total_tasks: number
+  completed_tasks: number
+  assignee: { name: string; email: string }
+  checklist: { name: string; category: string }
+  created_at: string
+  updated_at: string
+}
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
+  Play, 
+  Search, 
+  Filter, 
+  MoreVertical, 
+  CheckCircle, 
   Play, 
   Search, 
   Filter, 
@@ -19,20 +36,12 @@ import {
   RotateCcw
 } from 'lucide-react'
 
-interface Workflow {
-  id: string
-  name: string
-  status: 'assigned' | 'in_progress' | 'completed' | 'overdue'
-  due_date: string | null
-  total_tasks: number
-  completed_tasks: number
-  assignee: { name: string; email: string }
-  checklist: { name: string; category: string }
-  created_at: string
-  updated_at: string
-}
-
 export default function WorkflowsPage() {
+  // Returns completion percentage for a workflow
+  const getCompletionPercentage = (workflow: Workflow) => {
+    if (!workflow.total_tasks || workflow.total_tasks === 0) return 0
+    return Math.round((workflow.completed_tasks / workflow.total_tasks) * 100)
+  }
   const { data: session } = useSession()
   const router = useRouter()
   const [workflows, setWorkflows] = useState<Workflow[]>([])
@@ -100,29 +109,8 @@ export default function WorkflowsPage() {
         return 'bg-yellow-100 text-yellow-800'
       case 'overdue':
         return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+  // ...existing code...
   }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4" />
-      case 'in_progress':
-        return <div className="h-4 w-4 rounded-full bg-blue-500 animate-pulse" />
-      case 'assigned':
-        return <Clock className="h-4 w-4" />
-      case 'overdue':
-        return <AlertTriangle className="h-4 w-4" />
-      default:
-        return <Clock className="h-4 w-4" />
-    }
-  }
-
-  const getCompletionPercentage = (workflow: Workflow) => {
-    if (workflow.total_tasks === 0) return 0
-    return Math.round((workflow.completed_tasks / workflow.total_tasks) * 100)
   }
 
   const formatDueDate = (dateString: string | null) => {
@@ -388,7 +376,7 @@ export default function WorkflowsPage() {
                                 <div
                                   className="bg-indigo-600 h-2 rounded-full"
                                   style={{ width: `${completion}%` }}
-                                />
+                                ></div>
                               </div>
                             </div>
                           </div>
@@ -407,7 +395,9 @@ export default function WorkflowsPage() {
                         
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(workflow.status)}`}>
-                            {getStatusIcon(workflow.status)}
+                            <span className={getStatusColor(workflow.status) + " px-2 py-1 rounded text-xs font-semibold"}>
+                              {workflow.status.replace('_', ' ')}
+                            </span>
                             <span className="ml-1">{workflow.status.replace('_', ' ')}</span>
                           </span>
                         </td>

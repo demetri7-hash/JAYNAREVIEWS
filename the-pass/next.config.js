@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // Force rebuild timestamp: 2025-09-12 22:45
+  experimental: {
+    serverActions: true
+  },
   images: {
     domains: ['ui-avatars.com', 'xedpssqxgmnwufatyoje.supabase.co'],
     remotePatterns: [

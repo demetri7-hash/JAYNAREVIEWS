@@ -53,13 +53,26 @@ export const authOptions: NextAuthOptions = {
               throw new Error('User already exists with this email')
             }
 
-            // Hash password
-            const hashedPassword = await bcrypt.hash(password, 12)
-
-            // Create new user
-            const { data: newUser, error } = await DatabaseService.users.create({
+            // Create user account in Supabase Auth (includes password)
+            const { data: authData, error: authError } = await supabase.auth.signUp({
               email,
-              encrypted_password: hashedPassword,
+              password,
+              options: {
+                data: {
+                  first_name: firstName,
+                  last_name: lastName,
+                  employee_id: employeeId,
+                  role: role || 'employee'
+                }
+              }
+            })
+
+            if (authError) throw authError
+
+            // Create user profile in our users table
+            const { data: newUser, error } = await DatabaseService.users.create({
+              id: authData.user?.id || crypto.randomUUID(),
+              email,
               first_name: firstName,
               last_name: lastName,
               employee_id: employeeId,
@@ -148,8 +161,8 @@ export const authOptions: NextAuthOptions = {
       // Persist user data in JWT token
       if (user) {
         token.role = user.role
-        token.employeeId = user.employeeId
-        token.preferredLanguage = user.preferredLanguage
+        token.employeeId = user.employee?.id
+        token.preferredLanguage = user.employee?.language
       }
 
       // Handle OAuth sign-in
@@ -166,7 +179,7 @@ export const authOptions: NextAuthOptions = {
             
             await DatabaseService.users.update(existingUser.id, {
               last_sign_in_at: new Date().toISOString(),
-              avatar_url: user.image
+              avatar_url: user.image || undefined
             })
           } else {
             // Create new user from Google account
@@ -178,7 +191,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email,
               first_name: firstName,
               last_name: lastName,
-              avatar_url: user.image,
+              avatar_url: user.image || undefined,
               role: 'employee', // Default role
               preferred_language: 'en',
               is_active: true
@@ -202,9 +215,20 @@ export const authOptions: NextAuthOptions = {
       // Send properties to the client
       if (token && session.user) {
         session.user.id = token.sub!
-        session.user.role = token.role as string
-        session.user.employeeId = token.employeeId as string
-        session.user.preferredLanguage = token.preferredLanguage as string
+        // Store employee data in the session if available
+        if (token.role) {
+          session.user.employee = {
+            id: token.employeeId as string || '',
+            name: session.user.name || '',
+            email: session.user.email || '',
+            role: token.role as string,
+            department: 'general', // Default department
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            language: token.preferredLanguage as string || 'en'
+          }
+        }
       }
       return session
     },
@@ -219,7 +243,6 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: '/auth/signin',
-    signUp: '/auth/signup',
     error: '/auth/error',
   },
 

@@ -68,7 +68,7 @@ export function QRCodeGenerator({
     if (!canvasRef.current) return;
 
     try {
-      if (navigator.share && navigator.canShare) {
+      if (navigator.share && typeof navigator.canShare === 'function') {
         canvasRef.current.toBlob(async (blob) => {
           if (blob) {
             const file = new File([blob], 'qr-code.png', { type: 'image/png' });

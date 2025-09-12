@@ -19,7 +19,7 @@ export default function Layout({
     <TranslationProvider>
       <div className="min-h-screen bg-gray-50">
         {showNavigation && (
-          <Navigation user={user} notifications={notifications} />
+          <Navigation notifications={notifications} />
         )}
         
         <main className={showNavigation ? '' : 'pt-0'}>

@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
       .from('checklists')
       .select(`
         *,
-        created_by_user:employees!checklists_created_by_fkey(name),
-        tasks:checklist_tasks(*)
+        created_by_user:employees!created_by(name),
+        tasks:tasks(*)
       `)
       .order('created_at', { ascending: false })
 

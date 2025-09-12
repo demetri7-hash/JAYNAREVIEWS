@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
 
     let query = supabase
-      .from('task_instances')
+      .from('task_completions')
       .select(`
         *,
-        workflow:workflow_instances(name, due_date, status),
-        assignee:employees!task_instances_assigned_to_fkey(name, email),
-        comments:task_comments(
+        workflow:workflows(name, due_date, status),
+        assignee:employees!task_completions_assigned_to_fkey(name, email),
+        comments:comments(
           id, comment, is_system_message, created_at,
           user:employees(name)
         )
@@ -89,8 +89,8 @@ export async function PUT(request: NextRequest) {
 
     // Get current task
     const { data: currentTask, error: fetchError } = await supabase
-      .from('task_instances')
-      .select('*, workflow:workflow_instances(assigned_to)')
+      .from('task_completions')
+      .select('*, workflow:workflows(assigned_to)')
       .eq('id', id)
       .single()
 
@@ -143,7 +143,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const { data: task, error } = await supabase
-      .from('task_instances')
+      .from('task_completions')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -178,7 +178,7 @@ export async function PUT(request: NextRequest) {
 
       // Add system message for reassignment
       await supabase
-        .from('task_comments')
+        .from('comments')
         .insert({
           task_instance_id: id,
           user_id: session.user.employee.id,
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
     // Update sort orders for all tasks
     const updates = task_orders.map(({ task_id, sort_order }: any) => 
       supabase
-        .from('task_instances')
+        .from('task_completions')
         .update({ sort_order })
         .eq('id', task_id)
         .eq('workflow_instance_id', workflow_id)

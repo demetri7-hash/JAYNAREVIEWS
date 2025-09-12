@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get('department')
 
     let query = supabase
-      .from('workflow_instances')
+      .from('workflows')
       .select(`
         *,
         checklist:checklists(name, category),
-        assignee:employees!workflow_instances_assigned_to_fkey(name, email),
-        assigner:employees!workflow_instances_assigned_by_fkey(name),
+        assignee:employees!assigned_to(name, email),
+        assigner:employees!assigned_by(name),
         tasks:task_instances(
           id, title, status, assigned_to, is_critical,
           assignee:employees!task_instances_assigned_to_fkey(name)
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     const workflowName = name || `${checklist.name} - ${new Date().toLocaleDateString()}`
     
     const { data: workflow, error: workflowError } = await supabase
-      .from('workflow_instances')
+      .from('workflows')
       .insert({
         checklist_id,
         name: workflowName,
@@ -184,7 +184,7 @@ export async function PUT(request: NextRequest) {
 
     // Get current workflow
     const { data: currentWorkflow, error: fetchError } = await supabase
-      .from('workflow_instances')
+      .from('workflows')
       .select('*')
       .eq('id', id)
       .single()
@@ -224,7 +224,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const { data: workflow, error } = await supabase
-      .from('workflow_instances')
+      .from('workflows')
       .update(updateData)
       .eq('id', id)
       .select()

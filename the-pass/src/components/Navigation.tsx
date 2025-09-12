@@ -12,9 +12,11 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  BarChart3
 } from 'lucide-react'
 import { useState } from 'react'
+import { NotificationDropdown } from '@/components/NotificationProvider'
 
 export default function Navigation() {
   const { data: session } = useSession()
@@ -29,6 +31,7 @@ export default function Navigation() {
     { name: 'My Tasks', href: '/workflows/employee', icon: CheckSquare },
     { name: 'Workflows', href: '/workflows', icon: ClipboardList },
     ...(isManager ? [
+      { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
       { name: 'Checklists', href: '/checklists', icon: ClipboardList },
       { name: 'Assign Tasks', href: '/workflows/assign', icon: Users },
       { name: 'Manage Users', href: '/admin/users', icon: Users }
@@ -106,6 +109,7 @@ export default function Navigation() {
 
             {/* User menu */}
             <div className="flex items-center space-x-4">
+              <NotificationDropdown />
               <span className="text-sm text-gray-700">
                 {session.user?.employee?.name}
               </span>

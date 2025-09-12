@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 import { 
   CheckCircleIcon, 
   ClockIcon, 
@@ -13,6 +14,7 @@ import {
   CalendarDaysIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
+import { useNotificationPermission } from '@/hooks/useNotifications';
 
 interface TaskInstance {
   id: string;
@@ -54,6 +56,15 @@ export default function MyTasks() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  // Request notification permission
+  useNotificationPermission();
+
+  // Initialize Supabase client for real-time
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   useEffect(() => {
     if (status === 'loading') return;
     if (!session?.user?.email) {
@@ -62,6 +73,46 @@ export default function MyTasks() {
     }
     fetchTasks();
   }, [session, status, router]);
+
+  // Real-time subscription for new workflow assignments
+  useEffect(() => {
+    if (!session?.user?.employee?.id) return;
+
+    const channel = supabase
+      .channel('my-workflows')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workflows',
+          filter: `assigned_to=eq.${session.user.employee.id}`,
+        },
+        (payload) => {
+          console.log('Workflow change detected:', payload);
+          // Refresh tasks when a workflow is assigned, updated, or removed
+          fetchTasks();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'task_completions',
+        },
+        (payload) => {
+          console.log('Task completion change detected:', payload);
+          // Refresh tasks when task completions change
+          fetchTasks();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.employee?.id]);
 
   const fetchTasks = async () => {
     try {

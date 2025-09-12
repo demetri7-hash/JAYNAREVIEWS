@@ -4,6 +4,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext'
 import { UserProvider } from '@/contexts/UserContext'
 import { Providers } from '@/components/Providers'
 import Navigation from '@/components/Navigation'
+import { NotificationProvider } from '@/components/NotificationProvider'
 
 export const metadata: Metadata = {
   title: 'The Pass - Jayna Gyro Collaborative Workspace',
@@ -21,10 +22,12 @@ export default function RootLayout({
         <Providers>
           <UserProvider>
             <LanguageProvider>
-              <Navigation />
-              <main>
-                {children}
-              </main>
+              <NotificationProvider>
+                <Navigation />
+                <main>
+                  {children}
+                </main>
+              </NotificationProvider>
             </LanguageProvider>
           </UserProvider>
         </Providers>

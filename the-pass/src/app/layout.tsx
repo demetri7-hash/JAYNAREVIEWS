@@ -1,21 +1,55 @@
-import type { Metadata, Viewport } from 'next'
-import './globals.css'
-import { TranslationProvider } from '@/context/TranslationContext'
-import { UserProvider } from '@/contexts/UserContext'
-import { Providers } from '@/components/Providers'
-import Navigation from '@/components/layout/Navigation'
-import { NotificationProvider } from '@/components/NotificationProvider'
-import { PWAProvider } from '@/components/PWAProvider'
-import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+import type { Metadata } from 'next'import type { Metadata } from 'next'import type { Metadata, Viewport } from 'next'
 
-export const metadata: Metadata = {
-  title: 'The Pass - Jayna Gyro Collaborative Workspace',
-  description: 'Slack-style collaborative workspace for Jayna Gyro operations and workflows',
-  manifest: '/manifest.json',
-  icons: {
-    icon: [
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+
+
+export const metadata: Metadata = {import './globals.css'
+
+  title: 'Test App',
+
+  description: 'Simple test app',export const metadata: Metadata = {import { TranslationProvider } from '@/context/TranslationContext'
+
+}
+
+  title: 'Test App',import { UserProvider } from '@/contexts/UserContext'
+
+export default function RootLayout({
+
+  children,  description: 'Simple test app',import { Providers } from '@/components/Providers'
+
+}: {
+
+  children: React.ReactNode}import Navigation from '@/components/layout/Navigation'
+
+}) {
+
+  return (import { NotificationProvider } from '@/components/NotificationProvider'
+
+    <html lang="en">
+
+      <body>{children}</body>export default function RootLayout({import { PWAProvider } from '@/components/PWAProvider'
+
+    </html>
+
+  )  children,import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+
+}
+}: {
+
+  children: React.ReactNodeexport const metadata: Metadata = {
+
+}) {  title: 'The Pass - Jayna Gyro Collaborative Workspace',
+
+  return (  description: 'Slack-style collaborative workspace for Jayna Gyro operations and workflows',
+
+    <html lang="en">  manifest: '/manifest.json',
+
+      <body>{children}</body>  icons: {
+
+    </html>    icon: [
+
+  )      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+
+}      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
     ],
     apple: [
       { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' }

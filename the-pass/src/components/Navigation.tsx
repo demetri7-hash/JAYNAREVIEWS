@@ -34,6 +34,7 @@ export default function Navigation() {
     ...(isManager ? [
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
       { name: 'Recurring Workflows', href: '/recurring-workflows', icon: Calendar },
+      { name: 'Import Workflows', href: '/import-workflows', icon: ClipboardList },
       { name: 'Checklists', href: '/checklists', icon: ClipboardList },
       { name: 'Assign Tasks', href: '/workflows/assign', icon: Users },
       { name: 'Manage Users', href: '/admin/users', icon: Users }

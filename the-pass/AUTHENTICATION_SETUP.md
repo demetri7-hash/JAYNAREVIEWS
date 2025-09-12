@@ -52,67 +52,23 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### 2. Google OAuth Setup
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing one
-3. Enable Google+ API or Google Identity API
+3. Enable Google+ API
 4. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client IDs"
 5. Set application type to "Web application"
-6. Add authorized redirect URIs (THIS IS CRITICAL):
+6. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google` (development)
-   - `https://your-actual-vercel-domain.vercel.app/api/auth/callback/google` (production)
-   
-   **⚠️ IMPORTANT**: Replace `your-actual-vercel-domain` with your real Vercel deployment URL!
-   
-   Example: If your app is deployed at `https://the-pass-123abc.vercel.app`, then add:
-   - `https://the-pass-123abc.vercel.app/api/auth/callback/google`
+   - `https://your-domain.com/api/auth/callback/google` (production)
+7. Copy Client ID and Client Secret to your `.env.local`
 
-7. Copy Client ID and Client Secret to your environment variables
-
-### 3. Fix redirect_uri_mismatch Error
-If you're getting "Error 400: redirect_uri_mismatch":
-
-1. **Find your Vercel deployment URL** from your Vercel dashboard
-2. **Go to Google Cloud Console** → Your Project → Credentials → Your OAuth Client
-3. **Add the correct redirect URI**:
-   ```
-   https://YOUR-VERCEL-URL.vercel.app/api/auth/callback/google
-   ```
-4. **Save the changes** (may take a few minutes to propagate)
-5. **Update your Vercel environment variables**:
-   ```bash
-   NEXTAUTH_URL=https://YOUR-VERCEL-URL.vercel.app
-   ```
-
-### 4. Production Environment Variables (Vercel)
-In your Vercel dashboard, add these environment variables:
-
-```bash
-# Authentication (REQUIRED)
-NEXTAUTH_URL=https://your-actual-vercel-domain.vercel.app
-NEXTAUTH_SECRET=your-generated-secret-key
-
-# Google OAuth (REQUIRED - from Google Cloud Console)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# Supabase (REQUIRED)
-NEXT_PUBLIC_SUPABASE_URL=https://xedpssqxgmnwufatyoje.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-```
-
-⚠️ **Critical Steps**:
-1. Replace `your-actual-vercel-domain.vercel.app` with your real Vercel URL
-2. Generate a secure NEXTAUTH_SECRET using: `openssl rand -base64 32`
-3. Make sure the Google OAuth redirect URI exactly matches your Vercel URL
-
-### 4. Database Setup
+### 3. Database Setup
 Run the schema setup endpoint to create the authentication tables:
 ```bash
-curl -X POST https://your-vercel-domain.vercel.app/api/auth/setup-schema
+curl -X POST http://localhost:3000/api/auth/setup-schema
 ```
 
-Or visit the endpoint in your browser after deployment.
+Or visit `http://localhost:3000/api/auth/setup-schema` in your browser after starting the app.
 
-### 5. First Manager Account
+### 4. First Manager Account
 After the first user signs in:
 1. They will see "Account Pending Approval"
 2. Manually set their role to 'manager' in the database:
@@ -147,58 +103,6 @@ After the first user signs in:
 5. Can add photos, ratings, and notes for each task
 6. Progress is saved automatically
 
-## Fixing the NO_SECRET Error
-
-If you see the error `[next-auth][error][NO_SECRET]`, add these environment variables to Vercel:
-
-```bash
-NEXTAUTH_SECRET=your-generated-secret-key
-NEXTAUTH_URL=https://your-vercel-domain.vercel.app
-```
-
-Generate a secure secret with: `openssl rand -base64 32`
-
-## Fixing redirect_uri_mismatch Error (Error 400)
-
-This is the most common issue during setup. Here's how to fix it:
-
-### Step 1: Find Your Vercel URL
-1. Go to your Vercel dashboard
-2. Find your deployed app (it will look like: `https://your-app-name-abc123.vercel.app`)
-3. Copy this exact URL
-
-### Step 2: Update Google OAuth Configuration
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Navigate to: **APIs & Services** → **Credentials**
-3. Click on your OAuth 2.0 Client ID
-4. In the "Authorized redirect URIs" section, add:
-   ```
-   https://your-exact-vercel-url.vercel.app/api/auth/callback/google
-   ```
-   
-   **Example**: If your Vercel URL is `https://the-pass-abc123.vercel.app`, add:
-   ```
-   https://the-pass-abc123.vercel.app/api/auth/callback/google
-   ```
-
-### Step 3: Update Vercel Environment Variables
-1. Go to your Vercel dashboard
-2. Go to your project → Settings → Environment Variables
-3. Update or add:
-   ```bash
-   NEXTAUTH_URL=https://your-exact-vercel-url.vercel.app
-   ```
-
-### Step 4: Redeploy
-1. After making these changes, redeploy your Vercel app
-2. The changes may take a few minutes to propagate
-
-### Common Mistakes to Avoid:
-- ❌ Using `localhost` URLs in production
-- ❌ Forgetting the `/api/auth/callback/google` path
-- ❌ Mismatched domains between Google OAuth and NEXTAUTH_URL
-- ❌ Using HTTP instead of HTTPS for production URLs
-
 ## Key Features
 
 ### Security
@@ -229,9 +133,9 @@ This is the most common issue during setup. Here's how to fix it:
 - `/src/app/api/worksheets/` - Worksheet management APIs
 
 ## Next Steps
-1. Set up Google OAuth credentials in Google Cloud Console
-2. Configure environment variables in Vercel
-3. Run database schema setup endpoint
+1. Set up Google OAuth credentials
+2. Configure environment variables
+3. Run database schema setup
 4. Create first manager account
 5. Test the complete flow
 6. Deploy and provide feedback!

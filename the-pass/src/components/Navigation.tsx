@@ -29,13 +29,12 @@ export default function Navigation() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Quick Setup', href: '/quick-setup', icon: Settings },
     { name: 'Features Overview', href: '/features', icon: Settings },
-    { name: 'My Tasks', href: '/workflows/employee', icon: CheckSquare },
-    { name: 'Workflows', href: '/workflows', icon: ClipboardList },
+    { name: 'My Tasks', href: '/workflows', icon: CheckSquare },
     ...(isManager ? [
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
       { name: 'Recurring Workflows', href: '/recurring-workflows', icon: Calendar },
-      { name: 'Import Workflows', href: '/import-workflows', icon: ClipboardList },
       { name: 'Checklists', href: '/checklists', icon: ClipboardList },
       { name: 'Assign Tasks', href: '/workflows/assign', icon: Users },
       { name: 'Manage Users', href: '/admin/users', icon: Users }

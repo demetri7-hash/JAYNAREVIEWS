@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { 
   CheckCircleIcon, 
@@ -60,6 +61,8 @@ export default function MyTasks() {
   const [uploading, setUploading] = useState(false);
   const [timeTracking, setTimeTracking] = useState<Record<string, number>>({});
   const [productivityData, setProductivityData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [needsSetup, setNeedsSetup] = useState(false);
 
   // Request notification permission
   useNotificationPermission();
@@ -123,12 +126,23 @@ export default function MyTasks() {
   const fetchTasks = async () => {
     try {
       const response = await fetch(`/api/tasks?employee_email=${session?.user?.email}`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
-      setTasks(data);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setNeedsSetup(true);
+          setError('Workflow system not initialized. Please set up the system first.');
+        } else {
+          throw new Error('Failed to fetch tasks');
+        }
+      } else {
+        const data = await response.json();
+        setTasks(data);
+        setNeedsSetup(false);
+        setError(null);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load tasks');
       setLoading(false);
     }
   };
@@ -285,6 +299,51 @@ export default function MyTasks() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div className="flex">
+              <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mr-3 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error Loading Tasks</h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
+                {needsSetup && (
+                  <div className="mt-3">
+                    <Link 
+                      href="/features"
+                      className="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    >
+                      Go to Setup Page →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Setup Required Message */}
+        {needsSetup && !error && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+            <div className="flex">
+              <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400 mr-3 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800">Setup Required</h3>
+                <p className="mt-1 text-sm text-yellow-700">
+                  The workflow system needs to be initialized before you can view tasks.
+                </p>
+                <div className="mt-3">
+                  <Link 
+                    href="/features"
+                    className="text-sm bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700"
+                  >
+                    Initialize System →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Filter Tabs */}
         <div className="mb-6">
           <div className="border-b border-gray-200">

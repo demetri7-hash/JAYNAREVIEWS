@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  BarChart3
+  BarChart3,
+  Calendar
 } from 'lucide-react'
 import { useState } from 'react'
 import { NotificationDropdown } from '@/components/NotificationProvider'
@@ -32,6 +33,7 @@ export default function Navigation() {
     { name: 'Workflows', href: '/workflows', icon: ClipboardList },
     ...(isManager ? [
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+      { name: 'Recurring Workflows', href: '/recurring-workflows', icon: Calendar },
       { name: 'Checklists', href: '/checklists', icon: ClipboardList },
       { name: 'Assign Tasks', href: '/workflows/assign', icon: Users },
       { name: 'Manage Users', href: '/admin/users', icon: Users }

@@ -15,6 +15,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 import { useNotificationPermission } from '@/hooks/useNotifications';
+import { PhotoUpload } from '@/components/PhotoUpload';
+import { TimeTracking, ProductivityInsights } from '@/components/TimeTracking';
 
 interface TaskInstance {
   id: string;
@@ -53,8 +55,11 @@ export default function MyTasks() {
   const [selectedTask, setSelectedTask] = useState<TaskInstance | null>(null);
   const [notes, setNotes] = useState('');
   const [newComment, setNewComment] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [currentPhoto, setCurrentPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [timeTracking, setTimeTracking] = useState<Record<string, number>>({});
+  const [productivityData, setProductivityData] = useState<any>(null);
 
   // Request notification permission
   useNotificationPermission();
@@ -72,6 +77,7 @@ export default function MyTasks() {
       return;
     }
     fetchTasks();
+    fetchProductivityData();
   }, [session, status, router]);
 
   // Real-time subscription for new workflow assignments
@@ -127,6 +133,18 @@ export default function MyTasks() {
     }
   };
 
+  const fetchProductivityData = async () => {
+    try {
+      const response = await fetch(`/api/time-tracking?employee_email=${session?.user?.email}&period=today`);
+      if (response.ok) {
+        const data = await response.json();
+        setProductivityData(data.stats);
+      }
+    } catch (error) {
+      console.error('Error fetching productivity data:', error);
+    }
+  };
+
   const fetchComments = async (taskId: string) => {
     try {
       const response = await fetch(`/api/tasks/${taskId}/comments`);
@@ -143,10 +161,21 @@ export default function MyTasks() {
       setUploading(true);
       
       let photoUrl: string | null = null;
-      if (photoFile) {
-        // In a real implementation, you would upload to your storage service
-        // For now, we'll just use a placeholder
-        photoUrl = `https://placeholder.com/photo-${Date.now()}`;
+      if (currentPhoto) {
+        // Upload the photo
+        const formData = new FormData();
+        formData.append('file', currentPhoto);
+        formData.append('taskId', taskId);
+        
+        const uploadResponse = await fetch('/api/upload-photo', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          photoUrl = uploadData.url;
+        }
       }
 
       const response = await fetch(`/api/tasks/${taskId}`, {
@@ -166,7 +195,8 @@ export default function MyTasks() {
       await fetchTasks();
       setSelectedTask(null);
       setNotes('');
-      setPhotoFile(null);
+      setCurrentPhoto(null);
+      setPhotoPreview(null);
     } catch (error) {
       console.error('Error updating task:', error);
     } finally {
@@ -430,6 +460,16 @@ export default function MyTasks() {
                 <p className="text-gray-600 mb-4">{selectedTask.task_description}</p>
               )}
 
+              {/* Time Tracking */}
+              {selectedTask.status === 'in_progress' && (
+                <div className="mb-4">
+                  <TimeTracking 
+                    taskId={selectedTask.id}
+                    taskTitle={selectedTask.task_title}
+                  />
+                </div>
+              )}
+
               {/* Notes Input */}
               {selectedTask.status === 'in_progress' && (
                 <div className="mb-4">
@@ -452,17 +492,14 @@ export default function MyTasks() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Photo Documentation (Optional)
                   </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  <PhotoUpload
+                    onPhotoChange={(file, preview) => {
+                      setCurrentPhoto(file);
+                      setPhotoPreview(preview);
+                    }}
+                    currentPhoto={photoPreview}
+                    disabled={uploading}
                   />
-                  {photoFile && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Selected: {photoFile.name}
-                    </p>
-                  )}
                 </div>
               )}
 

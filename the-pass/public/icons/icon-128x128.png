@@ -1,0 +1,5 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" fill="#2563eb"/>
+  <rect x="32" y="32" width="64" height="64" fill="#ffffff" rx="8"/>
+  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="16" fill="#2563eb" text-anchor="middle" dominant-baseline="middle" font-weight="bold">TP</text>
+</svg>

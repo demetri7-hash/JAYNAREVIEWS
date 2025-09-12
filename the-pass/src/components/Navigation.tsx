@@ -32,6 +32,7 @@ export default function Navigation() {
     { name: 'Quick Setup', href: '/quick-setup', icon: Settings },
     { name: 'Features Overview', href: '/features', icon: Settings },
     { name: 'My Tasks', href: '/workflows', icon: CheckSquare },
+    { name: 'Reviews', href: '/reviews', icon: ClipboardList },
     ...(isManager ? [
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
       { name: 'Recurring Workflows', href: '/recurring-workflows', icon: Calendar },

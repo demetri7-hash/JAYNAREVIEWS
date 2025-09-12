@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { LanguageProvider } from '@/contexts/LanguageContext'
+import { TranslationProvider } from '@/context/TranslationContext'
 import { UserProvider } from '@/contexts/UserContext'
 import { Providers } from '@/components/Providers'
-import Navigation from '@/components/Navigation'
+import Navigation from '@/components/layout/Navigation'
 import { NotificationProvider } from '@/components/NotificationProvider'
 import { PWAProvider } from '@/components/PWAProvider'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
@@ -67,7 +67,7 @@ export default function RootLayout({
         <PWAProvider>
           <Providers>
             <UserProvider>
-              <LanguageProvider>
+              <TranslationProvider>
                 <NotificationProvider>
                   <Navigation />
                   <main className="relative">
@@ -75,7 +75,7 @@ export default function RootLayout({
                   </main>
                   <PWAInstallPrompt />
                 </NotificationProvider>
-              </LanguageProvider>
+              </TranslationProvider>
             </UserProvider>
           </Providers>
         </PWAProvider>

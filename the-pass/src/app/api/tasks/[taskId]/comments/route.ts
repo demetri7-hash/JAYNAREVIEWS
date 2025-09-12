@@ -8,11 +8,9 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ taskId: string }> }
+  { params }: { params: { taskId: string } }
 ) {
   try {
-    const { taskId } = await context.params;
-    
     const { data: comments, error } = await supabase
       .from('task_comments')
       .select(`
@@ -21,7 +19,7 @@ export async function GET(
         created_at,
         created_by_name
       `)
-      .eq('task_instance_id', taskId)
+      .eq('task_instance_id', params.taskId)
       .order('created_at', { ascending: true });
 
     if (error) throw error;
@@ -38,10 +36,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ taskId: string }> }
+  { params }: { params: { taskId: string } }
 ) {
   try {
-    const { taskId } = await context.params;
     const body = await request.json();
     const { comment, created_by } = body;
 
@@ -62,7 +59,7 @@ export async function POST(
     const { data, error } = await supabase
       .from('task_comments')
       .insert({
-        task_instance_id: taskId,
+        task_instance_id: params.taskId,
         comment,
         created_by,
         created_by_name: employee?.name || created_by

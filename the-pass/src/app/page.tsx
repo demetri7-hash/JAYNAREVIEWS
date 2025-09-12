@@ -116,52 +116,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">The Pass</h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Employee Navigation */}
-              <button
-                onClick={() => router.push('/my-tasks')}
-                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-              >
-                My Tasks
-              </button>
-              
-              {/* Manager Navigation */}
-              {isManager && (
-                <>
-                  <button
-                    onClick={() => router.push('/workflows')}
-                    className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
-                  >
-                    Workflows
-                  </button>
-                  <button
-                    onClick={() => router.push('/admin/users')}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <Users className="h-5 w-5" />
-                  </button>
-                </>
-              )}
-              
-              <button
-                onClick={() => router.push('/auth/signin')}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <LogOut className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

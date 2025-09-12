@@ -5,7 +5,60 @@
 -- EXTENSIONS
 -- =====================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTEN-- =====================================
+-- AUDIT LOGGING
+-- =====================================
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    action VARCHAR(100) NOT NULL,
+    table_name VARCHAR(100),
+    record_id UUID,
+    old_values JSONB,
+    new_values JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =====================================
+-- WALL POSTS SYSTEM
+-- =====================================
+CREATE TABLE wall_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    author_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    post_type VARCHAR(20) DEFAULT 'public' CHECK (post_type IN ('public', 'manager', 'announcement', 'urgent')),
+    visibility VARCHAR(20) DEFAULT 'all' CHECK (visibility IN ('all', 'department', 'role', 'specific')),
+    visibility_rules JSONB DEFAULT '{}',
+    photos TEXT[],
+    requires_acknowledgment BOOLEAN DEFAULT false,
+    acknowledgment_signature_required BOOLEAN DEFAULT false,
+    pinned BOOLEAN DEFAULT false,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE wall_post_acknowledgments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID REFERENCES wall_posts(id) ON DELETE CASCADE,
+    employee_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    acknowledged_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    signature TEXT,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(post_id, employee_id)
+);
+
+CREATE TABLE wall_post_reactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID REFERENCES wall_posts(id) ON DELETE CASCADE,
+    employee_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    reaction_type VARCHAR(20) DEFAULT 'like' CHECK (reaction_type IN ('like', 'love', 'helpful', 'celebrate')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(post_id, employee_id, reaction_type)
+);STS "pgcrypto";
 
 -- =====================================
 -- ENUMS
@@ -283,6 +336,14 @@ CREATE INDEX idx_performance_metrics_timestamp ON performance_metrics(timestamp 
 CREATE INDEX idx_audit_logs_user_action ON audit_logs(user_id, action);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
 
+CREATE INDEX idx_wall_posts_author_id ON wall_posts(author_id);
+CREATE INDEX idx_wall_posts_created_at ON wall_posts(created_at DESC);
+CREATE INDEX idx_wall_posts_post_type ON wall_posts(post_type);
+CREATE INDEX idx_wall_posts_pinned ON wall_posts(pinned, created_at DESC);
+CREATE INDEX idx_wall_post_acknowledgments_post_id ON wall_post_acknowledgments(post_id);
+CREATE INDEX idx_wall_post_acknowledgments_employee_id ON wall_post_acknowledgments(employee_id);
+CREATE INDEX idx_wall_post_reactions_post_id ON wall_post_reactions(post_id);
+
 -- =====================================
 -- ROW LEVEL SECURITY
 -- =====================================
@@ -294,12 +355,23 @@ ALTER TABLE review_instances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE performance_metrics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wall_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wall_post_acknowledgments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wall_post_reactions ENABLE ROW LEVEL SECURITY;
 
 -- Basic policies
 CREATE POLICY "Users can see their own data" ON users FOR ALL USING (auth.uid() = id);
 CREATE POLICY "Users can see their notifications" ON user_notifications FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "Users can access their analytics" ON analytics_events FOR ALL USING (auth.uid()::text = user_id::text);
 CREATE POLICY "Users can access their metrics" ON performance_metrics FOR ALL USING (auth.uid()::text = user_id::text);
+
+-- Wall posts policies
+CREATE POLICY "Users can view public posts" ON wall_posts FOR SELECT USING (visibility = 'all');
+CREATE POLICY "Users can create posts" ON wall_posts FOR INSERT WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Users can update their own posts" ON wall_posts FOR UPDATE USING (auth.uid() = author_id);
+CREATE POLICY "Users can acknowledge posts" ON wall_post_acknowledgments FOR INSERT WITH CHECK (auth.uid() = employee_id);
+CREATE POLICY "Users can view acknowledgments" ON wall_post_acknowledgments FOR SELECT USING (true);
+CREATE POLICY "Users can add reactions" ON wall_post_reactions FOR ALL USING (auth.uid() = employee_id);
 
 -- =====================================
 -- TRIGGERS
@@ -360,5 +432,23 @@ VALUES (
     'high',
     true
 );
+
+-- Sample wall posts
+INSERT INTO wall_posts (author_id, content, post_type, visibility, pinned) VALUES
+((SELECT id FROM users WHERE role = 'admin' LIMIT 1), 
+ 'Welcome to The Pass! 🎉 This is your team communication hub where you can share updates, receive announcements, and stay connected with your team. Let''s make every shift count! 💪',
+ 'announcement', 'all', true);
+
+INSERT INTO wall_posts (author_id, content, post_type, requires_acknowledgment, acknowledgment_signature_required) VALUES
+((SELECT id FROM users WHERE role = 'admin' LIMIT 1),
+ '📋 NEW SAFETY PROTOCOL UPDATE
+
+Effective immediately, all team members must:
+1. Wear gloves when handling raw ingredients  
+2. Change gloves between different food items
+3. Wash hands thoroughly before and after each order
+
+This policy is mandatory for food safety compliance. Please acknowledge that you have read and understand these requirements.',
+ 'announcement', true, true);
 
 SELECT 'COMPLETE DATABASE SETUP SUCCESSFUL!' as status;

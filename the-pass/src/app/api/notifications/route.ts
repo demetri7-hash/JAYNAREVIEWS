@@ -331,6 +331,25 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const action = searchParams.get('action')
     const employee_id = searchParams.get('employee_id')
+    const userId = searchParams.get('userId')
+
+    if (action === 'get_unread_count' && userId) {
+      // Get unread notifications count
+      const { data: unreadNotifications, error } = await supabase
+        .from('user_notifications')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('is_read', false)
+
+      if (error) {
+        throw new Error(`Failed to get notifications: ${error.message}`)
+      }
+
+      return NextResponse.json({
+        success: true,
+        unreadCount: unreadNotifications?.length || 0
+      })
+    }
 
     if (action === 'get_wall_posts') {
       const post_type = searchParams.get('post_type') || 'all'

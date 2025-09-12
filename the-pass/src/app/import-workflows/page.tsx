@@ -25,17 +25,21 @@ interface ImportResponse {
   message: string;
   results: ImportResult[];
   summary: {
-    workflows_imported: number;
+    workflows_imported?: number;
+    workflows_created?: number;
     total_tasks: number;
-    languages: string[];
-    departments: string[];
+    languages?: string[];
+    departments?: string[];
+    ready_for_use?: boolean;
   };
 }
 
 export default function ImportWorkflows() {
   const { data: session } = useSession();
   const [isImporting, setIsImporting] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [importResults, setImportResults] = useState<ImportResponse | null>(null);
+  const [createResults, setCreateResults] = useState<ImportResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleImport = async () => {
@@ -62,6 +66,33 @@ export default function ImportWorkflows() {
       setError(err instanceof Error ? err.message : 'Import failed');
     } finally {
       setIsImporting(false);
+    }
+  };
+
+  const handleCreateJaynaWorkflows = async () => {
+    setIsCreating(true);
+    setError(null);
+    setCreateResults(null);
+
+    try {
+      const response = await fetch('/api/create-jayna-workflows', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Creation failed');
+      }
+
+      setCreateResults(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Creation failed');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -123,32 +154,70 @@ export default function ImportWorkflows() {
         </div>
 
         {/* Import Button */}
-        <div className="text-center mb-8">
-          <button
-            onClick={handleImport}
-            disabled={isImporting}
-            className={`
-              inline-flex items-center px-6 py-3 border border-transparent 
-              text-base font-medium rounded-md text-white
-              ${isImporting 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-pass-accent hover:bg-pass-accent-dark focus:ring-2 focus:ring-pass-accent'
-              }
-              transition-colors duration-200
-            `}
-          >
-            {isImporting ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                Importing Workflows...
-              </>
-            ) : (
-              <>
-                <CloudArrowUpIcon className="h-5 w-5 mr-2" />
-                Import All Jayna Gyro Workflows
-              </>
-            )}
-          </button>
+        <div className="text-center mb-8 space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">✨ Quick Setup (Recommended)</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Create Jayna Gyro workflows instantly from built-in templates
+            </p>
+            <button
+              onClick={handleCreateJaynaWorkflows}
+              disabled={isCreating}
+              className={`
+                inline-flex items-center px-6 py-3 border border-transparent 
+                text-base font-medium rounded-md text-white
+                ${isCreating 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500'
+                }
+                transition-colors duration-200 mr-4
+              `}
+            >
+              {isCreating ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                  Creating Workflows...
+                </>
+              ) : (
+                <>
+                  <CloudArrowUpIcon className="h-5 w-5 mr-2" />
+                  Create Jayna Gyro Workflows
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📁 Advanced Import</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Import from reference files (requires file system access)
+            </p>
+            <button
+              onClick={handleImport}
+              disabled={isImporting}
+              className={`
+                inline-flex items-center px-6 py-3 border border-transparent 
+                text-base font-medium rounded-md text-white
+                ${isImporting 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-pass-accent hover:bg-pass-accent-dark focus:ring-2 focus:ring-pass-accent'
+                }
+                transition-colors duration-200
+              `}
+            >
+              {isImporting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                  Importing from Files...
+                </>
+              ) : (
+                <>
+                  <DocumentTextIcon className="h-5 w-5 mr-2" />
+                  Import from Reference Files
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Error Display */}
@@ -165,42 +234,48 @@ export default function ImportWorkflows() {
         )}
 
         {/* Results Display */}
-        {importResults && (
+        {(importResults || createResults) && (
           <div className="bg-white shadow-sm rounded-lg p-6">
             <div className="flex items-center mb-4">
               <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Import Complete!
+                {createResults ? 'Workflows Created!' : 'Import Complete!'}
               </h2>
             </div>
 
             {/* Summary */}
             <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
-              <h3 className="font-medium text-green-900 mb-2">{importResults.message}</h3>
+              <h3 className="font-medium text-green-900 mb-2">
+                {(createResults || importResults)!.message}
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-green-700">
                 <div>
-                  <span className="font-medium">{importResults.summary.workflows_imported}</span>
+                  <span className="font-medium">
+                    {createResults ? createResults.summary.workflows_created : importResults!.summary.workflows_imported}
+                  </span>
                   <div>Workflows</div>
                 </div>
                 <div>
-                  <span className="font-medium">{importResults.summary.total_tasks}</span>
+                  <span className="font-medium">{(createResults || importResults)!.summary.total_tasks}</span>
                   <div>Tasks</div>
                 </div>
                 <div>
-                  <span className="font-medium">{importResults.summary.languages.length}</span>
-                  <div>Languages</div>
+                  <span className="font-medium">
+                    {createResults ? createResults.summary.departments?.length || 'Multiple' : importResults!.summary.languages?.length || 'Multiple'}
+                  </span>
+                  <div>{createResults ? 'Departments' : 'Languages'}</div>
                 </div>
                 <div>
-                  <span className="font-medium">{importResults.summary.departments.length}</span>
-                  <div>Departments</div>
+                  <span className="font-medium">✅</span>
+                  <div>Ready</div>
                 </div>
               </div>
             </div>
 
             {/* Detailed Results */}
             <div className="space-y-3">
-              <h3 className="font-medium text-gray-900">Imported Workflows:</h3>
-              {importResults.results.map((result, index) => (
+              <h3 className="font-medium text-gray-900">Created Workflows:</h3>
+              {(createResults || importResults)!.results.map((result, index) => (
                 <div 
                   key={index}
                   className={`

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Check if user has permission to view audit logs
     const { data: currentUser } = await supabase
       .from('employees')
-      .select('role, permissions')
+      .select('role')
       .eq('email', session.user.email)
       .single()
 
@@ -35,11 +35,10 @@ export async function GET(request: NextRequest) {
 
     // Fetch audit logs with employee names
     const { data: logs, error } = await supabase
-      .from('user_audit_log')
+      .from('audit_logs')
       .select(`
         *,
-        target_employee:employees!target_employee_id(name),
-        performed_by_employee:employees!performed_by(name)
+        employee:employees!employee_id(name)
       `)
       .order('created_at', { ascending: false })
       .limit(50)
@@ -52,10 +51,8 @@ export async function GET(request: NextRequest) {
     const formattedLogs = logs.map(log => ({
       id: log.id,
       action: log.action,
-      target_employee_name: log.target_employee?.name || 'Unknown',
-      performed_by_name: log.performed_by_employee?.name || 'Unknown',
-      old_values: log.old_values,
-      new_values: log.new_values,
+      employee_name: log.employee?.name || 'Unknown',
+      details: log.details,
       created_at: log.created_at
     }))
 

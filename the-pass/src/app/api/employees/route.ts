@@ -21,9 +21,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { data: employees, error } = await supabase
+    // Check for active filter
+    const { searchParams } = new URL(request.url)
+    const activeOnly = searchParams.get('active') === 'true'
+
+    let query = supabase
       .from('employees')
       .select('*')
+
+    if (activeOnly) {
+      query = query.eq('is_active', true)
+    }
+
+    const { data: employees, error } = await query
       .order('created_at', { ascending: false })
 
     if (error) {

@@ -79,10 +79,16 @@ CREATE POLICY "Allow all operations on checklists" ON checklists FOR ALL USING (
 CREATE POLICY "Allow all operations on workflows" ON workflows FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all operations on task_instances" ON task_instances FOR ALL USING (true) WITH CHECK (true);
 
--- 8. Insert a default employee for testing
+-- 8. Insert a default employee for testing (try different departments if one fails)
+-- Common valid departments: 'Front of House', 'Back of House', 'Kitchen', 'Bar', 'Admin'
 INSERT INTO employees (name, email, department, role) 
-VALUES ('Restaurant Manager', 'manager@jaynagyro.com', 'Management', 'manager')
+VALUES ('Restaurant Manager', 'manager@jaynagyro.com', 'Kitchen', 'manager')
 ON CONFLICT (email) DO NOTHING;
+
+-- Alternative: Try without department if above fails
+-- INSERT INTO employees (name, email, role) 
+-- VALUES ('Restaurant Manager', 'manager@jaynagyro.com', 'manager')
+-- ON CONFLICT (email) DO NOTHING;
 
 -- Confirmation message
 SELECT 'Database schema created successfully! Ready for Jayna Gyro workflows.' as status;

@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd version-2.0 && npm run build",
-  "outputDirectory": "version-2.0/.next",
-  "installCommand": "cd version-2.0 && npm install",
-  "devCommand": "cd version-2.0 && npm run dev",
+  "buildCommand": "cd the-pass && npm run build",
+  "outputDirectory": "the-pass/.next",
+  "installCommand": "cd the-pass && npm install",
+  "devCommand": "cd the-pass && npm run dev",
   "framework": "nextjs"
 }

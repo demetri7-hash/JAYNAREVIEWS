@@ -4,94 +4,75 @@ import { useState } from 'react';
 
 export default function QuickSetup() {
   const [status, setStatus] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const setupEverything = async () => {
-    setIsLoading(true);
-    setStatus('Setting up Jayna Gyro workflows...\n');
-
-    try {
-      // Step 1: Create workflow templates
-      setStatus(prev => prev + '📝 Creating workflow templates...\n');
-      const createResponse = await fetch('/api/create-jayna-workflows', {
-        method: 'POST',
-      });
-      
-      const createResult = await createResponse.json();
-      
-      if (!createResponse.ok) {
-        setStatus(prev => prev + `❌ Failed to create templates: ${createResult.error}\n`);
-        setIsLoading(false);
-        return;
-      }
-      
-      setStatus(prev => prev + `✅ Created ${createResult.summary?.workflows_created || 0} workflow templates\n`);
-      
-      // Step 2: Auto-assign workflows to current user
-      setStatus(prev => prev + '👤 Auto-assigning workflows to you...\n');
-      
-      // Get user email from session or use a default
-      const userEmail = 'manager@jaynagyro.com'; // You can change this
-      
-      const assignResponse = await fetch('/api/workflows/assign', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          templateIds: 'all', // Assign all templates
-          assigneeEmail: userEmail,
-          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Due tomorrow
-        }),
-      });
-      
-      if (assignResponse.ok) {
-        setStatus(prev => prev + '✅ Workflows assigned successfully!\n');
-      } else {
-        setStatus(prev => prev + '⚠️ Templates created but assignment may need manual setup\n');
-      }
-      
-      setStatus(prev => prev + '\n🎉 Setup complete! Go to "My Tasks" to see your workflows.');
-      
-    } catch (error) {
-      setStatus(prev => prev + `❌ Setup failed: ${error instanceof Error ? error.message : 'Unknown error'}\n`);
-    }
-    
-    setIsLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <div className="bg-white shadow rounded-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Quick Setup
+            Database Setup Required
           </h1>
           
-          <div className="space-y-4">
-            <button
-              onClick={setupEverything}
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-            >
-              {isLoading ? '⏳ Setting up...' : '🚀 Create & Assign All Jayna Gyro Workflows'}
-            </button>
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+              <h2 className="text-lg font-semibold text-blue-900 mb-3">
+                🚀 Quick Setup Instructions
+              </h2>
+              <ol className="space-y-3 text-sm text-blue-800">
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">1.</span>
+                  <span>Open <a href="https://xedpssqxgmnwufatyoje.supabase.co" target="_blank" className="text-blue-600 hover:underline font-medium">Supabase Dashboard</a></span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">2.</span>
+                  <span>Navigate to <strong>SQL Editor</strong></span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">3.</span>
+                  <span>Copy the SQL script from <code className="bg-blue-100 px-1 rounded">setup-database.sql</code></span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">4.</span>
+                  <span>Paste and <strong>Run</strong> the SQL script</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">5.</span>
+                  <span>Return here and try creating workflows again</span>
+                </li>
+              </ol>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <h3 className="text-lg font-semibold text-yellow-900 mb-3">
+                ⚠️ Current Issue
+              </h3>
+              <p className="text-sm text-yellow-800">
+                The workflow system needs the correct database tables (employees, checklists, workflows, task_instances) 
+                to match the existing API structure. The previous setup used different table names that don't work 
+                with the production system.
+              </p>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <h3 className="text-lg font-semibold text-green-900 mb-3">
+                ✅ What You'll Get After Setup
+              </h3>
+              <ul className="space-y-2 text-sm text-green-800">
+                <li>• <strong>6 Complete Jayna Gyro Workflows</strong></li>
+                <li>• <strong>51 Real Restaurant Tasks</strong></li>
+                <li>• FOH Opening/Closing, Kitchen Prep, Bar Duties</li>
+                <li>• Inventory Management, Cleaning Protocols</li>
+                <li>• Ready for actual restaurant operations</li>
+              </ul>
+            </div>
           </div>
 
-          {status && (
-            <div className="mt-6 p-4 rounded-md bg-gray-50">
-              <pre className="text-sm text-gray-900 whitespace-pre-wrap font-mono">{status}</pre>
-            </div>
-          )}
-
-          <div className="mt-6 text-xs text-gray-500">
-            <p className="mb-2"><strong>This will:</strong></p>
-            <ul className="space-y-1 ml-4">
-              <li>• Create 6 Jayna Gyro workflow templates</li>
-              <li>• Assign them all to you for immediate use</li>
-              <li>• Set due dates for tomorrow</li>
-              <li>• Make them appear in "My Tasks"</li>
-            </ul>
+          <div className="mt-8 p-4 bg-gray-50 rounded-md">
+            <h3 className="font-semibold text-gray-900 mb-2">Next Steps:</h3>
+            <p className="text-sm text-gray-700">
+              Once you run the SQL script, the workflow creation will work properly and you'll be able to 
+              see and manage real Jayna Gyro tasks in "My Tasks". No more temporary workarounds needed!
+            </p>
           </div>
         </div>
       </div>

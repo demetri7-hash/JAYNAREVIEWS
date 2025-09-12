@@ -123,13 +123,30 @@ export default function Dashboard() {
                 Welcome, {session.user.employee.name}
               </span>
               
+              {/* Employee Navigation */}
+              <button
+                onClick={() => router.push('/my-tasks')}
+                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+              >
+                My Tasks
+              </button>
+              
+              {/* Manager Navigation */}
               {isManager && (
-                <button
-                  onClick={() => router.push('/admin/users')}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <Users className="h-5 w-5" />
-                </button>
+                <>
+                  <button
+                    onClick={() => router.push('/workflows')}
+                    className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
+                  >
+                    Workflows
+                  </button>
+                  <button
+                    onClick={() => router.push('/admin/users')}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Users className="h-5 w-5" />
+                  </button>
+                </>
               )}
               
               <button

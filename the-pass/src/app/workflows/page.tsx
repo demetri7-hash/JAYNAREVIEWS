@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   User,
   Calendar,
-  Progress,
   Eye,
   UserX,
   RotateCcw
@@ -111,7 +110,7 @@ export default function WorkflowsPage() {
       case 'completed':
         return <CheckCircle className="h-4 w-4" />
       case 'in_progress':
-        return <Progress className="h-4 w-4" />
+        return <div className="h-4 w-4 rounded-full bg-blue-500 animate-pulse" />
       case 'assigned':
         return <Clock className="h-4 w-4" />
       case 'overdue':

@@ -29,6 +29,7 @@ export default function Navigation() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Features Overview', href: '/features', icon: Settings },
     { name: 'My Tasks', href: '/workflows/employee', icon: CheckSquare },
     { name: 'Workflows', href: '/workflows', icon: ClipboardList },
     ...(isManager ? [

@@ -4,11 +4,13 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, Plus, Users, Shield, RefreshCw, Calendar } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { UserRole, isManagerRole, ROLE_LABELS } from '@/types'
 
 interface UserProfile {
   email: string;
   name: string;
-  role: 'staff' | 'manager';
+  role: UserRole;
+  department_permissions?: string[];
 }
 
 export default function Home() {
@@ -105,10 +107,10 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                {userProfile?.role === 'manager' && (
+                {userProfile?.role && isManagerRole(userProfile.role) && (
                   <div className="flex items-center space-x-1 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
                     <Shield className="w-3 h-3" />
-                    <span>Manager</span>
+                    <span>{ROLE_LABELS[userProfile.role]}</span>
                   </div>
                 )}
                 <span className="text-sm text-gray-700">Welcome back, {session.user?.name}!</span>
@@ -153,7 +155,7 @@ export default function Home() {
           {/* Create Task - Only for Managers */}
           {(() => {
             console.log('Checking manager role. userProfile:', userProfile, 'role:', userProfile?.role)
-            return userProfile?.role === 'manager'
+            return userProfile?.role && isManagerRole(userProfile.role)
           })() && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
@@ -171,7 +173,7 @@ export default function Home() {
           )}
 
           {/* Team Activity - Only for Managers */}
-          {userProfile?.role === 'manager' && (
+          {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium text-gray-900">Team Activity</h2>
@@ -188,7 +190,7 @@ export default function Home() {
           )}
 
           {/* Weekly Reports - Only for Managers */}
-          {userProfile?.role === 'manager' && (
+          {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium text-gray-900">Weekly Reports</h2>
@@ -218,7 +220,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              {userProfile?.role === 'manager' 
+              {userProfile?.role && isManagerRole(userProfile.role)
                 ? 'Review and approve transfer requests'
                 : 'View transfer requests assigned to you'
               }

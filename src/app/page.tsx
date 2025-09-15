@@ -170,7 +170,10 @@ export default function Home() {
                 <Users className="w-6 h-6 text-purple-500" />
               </div>
               <p className="text-gray-600 mb-4">Recent completions and updates</p>
-              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
+              <button 
+                onClick={() => router.push('/team-activity')}
+                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
+              >
                 View All Activity
               </button>
             </div>

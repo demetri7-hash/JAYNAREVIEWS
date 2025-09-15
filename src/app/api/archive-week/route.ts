@@ -6,9 +6,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     console.log('Starting weekly archive process...')
+    
+    // Parse request body to check for overwrite flag
+    const body = await request.json().catch(() => ({}))
+    const overwrite = body.overwrite === true
+    
+    console.log('Overwrite mode:', overwrite)
     
     // Calculate the previous Monday-Sunday week
     const today = new Date()
@@ -43,11 +49,36 @@ export async function POST() {
       .eq('week_ending', weekEnding.toISOString().split('T')[0])
       .single()
     
-    if (existingReport) {
+    if (existingReport && !overwrite) {
       return NextResponse.json({ 
         message: 'Week already archived',
-        week_ending: weekEnding.toISOString().split('T')[0]
+        week_ending: weekEnding.toISOString().split('T')[0],
+        already_archived: true
       })
+    }
+    
+    if (existingReport && overwrite) {
+      console.log('Overwriting existing archive for week ending:', weekEnding.toISOString().split('T')[0])
+      
+      // Delete existing archived assignments for this week
+      await supabase
+        .from('archived_assignments')
+        .delete()
+        .eq('week_ending', weekEnding.toISOString().split('T')[0])
+      
+      // Delete existing user stats for this week
+      await supabase
+        .from('user_weekly_stats')
+        .delete()
+        .eq('week_ending', weekEnding.toISOString().split('T')[0])
+      
+      // Delete existing weekly report
+      await supabase
+        .from('weekly_reports')
+        .delete()
+        .eq('week_ending', weekEnding.toISOString().split('T')[0])
+        
+      console.log('Cleaned up existing archive data')
     }
 
     // Get all completed assignments from the past week

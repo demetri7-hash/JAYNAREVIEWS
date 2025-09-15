@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Calendar, TrendingUp, Users, Award, ArrowLeft, RefreshCw } from 'lucide-react'
+import { Calendar, TrendingUp, Users, Award, ArrowLeft, RefreshCw, AlertTriangle } from 'lucide-react'
 
 interface WeeklyReport {
   id: string
@@ -44,6 +44,8 @@ export default function WeeklyReports() {
   const [userStats, setUserStats] = useState<UserStat[]>([])
   const [selectedReport, setSelectedReport] = useState<WeeklyReport | null>(null)
   const [archiving, setArchiving] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [overwriteMode, setOverwriteMode] = useState(false)
 
   const checkAccess = async () => {
     if (!session?.user?.email) {
@@ -87,17 +89,30 @@ export default function WeeklyReports() {
     }
   }
 
-  const runArchive = async () => {
+  const runArchive = async (forceOverwrite = false) => {
     setArchiving(true)
     try {
       const response = await fetch('/api/archive-week', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ overwrite: forceOverwrite })
       })
       const result = await response.json()
+      
+      if (result.already_archived && !forceOverwrite) {
+        setOverwriteMode(true)
+        setShowConfirmDialog(true)
+        setArchiving(false)
+        return
+      }
       
       if (result.success) {
         alert(`Archive completed! ${result.tasks_archived} tasks archived for week ending ${result.week_ending}`)
         fetchReports() // Refresh data
+        setShowConfirmDialog(false)
+        setOverwriteMode(false)
       } else {
         alert(result.message || 'Archive process completed')
       }
@@ -107,6 +122,16 @@ export default function WeeklyReports() {
     } finally {
       setArchiving(false)
     }
+  }
+
+  const handleConfirmOverwrite = () => {
+    setShowConfirmDialog(false)
+    runArchive(true)
+  }
+
+  const handleCancelOverwrite = () => {
+    setShowConfirmDialog(false)
+    setOverwriteMode(false)
   }
 
   useEffect(() => {
@@ -144,7 +169,7 @@ export default function WeeklyReports() {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={runArchive}
+                onClick={() => runArchive()}
                 disabled={archiving}
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
               >
@@ -164,7 +189,7 @@ export default function WeeklyReports() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Weekly Reports Yet</h3>
             <p className="text-gray-600 mb-4">Weekly reports are generated automatically every Monday morning.</p>
             <button
-              onClick={runArchive}
+              onClick={() => runArchive()}
               disabled={archiving}
               className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
@@ -337,6 +362,57 @@ export default function WeeklyReports() {
           </div>
         )}
       </main>
+
+      {/* Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-8 w-8 text-yellow-500" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Week Already Archived
+                </h3>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-sm text-gray-600 mb-3">
+                This week has already been archived. Running the archive again will:
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <ul className="text-sm text-yellow-800 space-y-1">
+                  <li>• <strong>Delete</strong> the existing weekly report</li>
+                  <li>• <strong>Remove</strong> all archived assignments from this week</li>
+                  <li>• <strong>Reset</strong> all user statistics for this week</li>
+                  <li>• <strong>Re-process</strong> all tasks from the previous Monday-Sunday</li>
+                </ul>
+              </div>
+              <p className="text-sm text-red-600 mt-3 font-medium">
+                ⚠️ This action cannot be undone!
+              </p>
+            </div>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={handleCancelOverwrite}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmOverwrite}
+                disabled={archiving}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {archiving ? 'Processing...' : 'Yes, Overwrite'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

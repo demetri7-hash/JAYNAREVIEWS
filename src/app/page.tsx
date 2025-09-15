@@ -2,7 +2,7 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, Plus, Users, Shield } from 'lucide-react'
+import { CheckCircle, Plus, Users, Shield, RefreshCw } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 interface UserProfile {
@@ -16,6 +16,7 @@ export default function Home() {
   const router = useRouter()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [profileLoading, setProfileLoading] = useState(true)
+  const [pendingTransfers, setPendingTransfers] = useState(0)
 
   // Fetch user profile and role
   useEffect(() => {
@@ -32,6 +33,22 @@ export default function Home() {
         })
         .finally(() => {
           setProfileLoading(false)
+        })
+    }
+  }, [session])
+
+  // Fetch pending transfer count
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch('/api/pending-transfers')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setPendingTransfers(data.transfers?.length || 0)
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching pending transfers:', error)
         })
     }
   }, [session])
@@ -158,6 +175,39 @@ export default function Home() {
               </button>
             </div>
           )}
+
+          {/* Pending Transfers - For all users */}
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">Transfer Requests</h2>
+              <div className="flex items-center">
+                <RefreshCw className="w-6 h-6 text-orange-500" />
+                {pendingTransfers > 0 && (
+                  <span className="ml-2 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {pendingTransfers}
+                  </span>
+                )}
+              </div>
+            </div>
+            <p className="text-gray-600 mb-4">
+              {userProfile?.role === 'manager' 
+                ? 'Review and approve transfer requests'
+                : 'View transfer requests assigned to you'
+              }
+            </p>
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Pending approval</span>
+                <span className="font-medium text-orange-600">{pendingTransfers}</span>
+              </div>
+            </div>
+            <button 
+              onClick={() => router.push('/pending-transfers')}
+              className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
+            >
+              View Transfer Requests
+            </button>
+          </div>
         </div>
       </main>
     </div>

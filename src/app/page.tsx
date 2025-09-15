@@ -21,11 +21,16 @@ export default function Home() {
   // Fetch user profile and role
   useEffect(() => {
     if (session?.user?.email) {
+      console.log('Fetching profile for:', session.user.email)
       fetch('/api/me')
         .then(res => res.json())
         .then(data => {
+          console.log('Profile API response:', data)
           if (data.success) {
+            console.log('Setting user profile:', data.user)
             setUserProfile(data.user)
+          } else {
+            console.log('API response does not have success=true')
           }
         })
         .catch(error => {
@@ -146,7 +151,10 @@ export default function Home() {
           </div>
 
           {/* Create Task - Only for Managers */}
-          {userProfile?.role === 'manager' && (
+          {(() => {
+            console.log('Checking manager role. userProfile:', userProfile, 'role:', userProfile?.role)
+            return userProfile?.role === 'manager'
+          })() && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium text-gray-900">Create Task</h2>

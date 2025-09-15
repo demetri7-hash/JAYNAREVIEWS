@@ -33,6 +33,7 @@ export default function CompleteTask() {
   const [error, setError] = useState('')
   const [notes, setNotes] = useState('')
   const [photos, setPhotos] = useState<File[]>([])
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   useEffect(() => {
     if (assignmentId) {
@@ -59,14 +60,31 @@ export default function CompleteTask() {
   }
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files)
-      setPhotos([...photos, ...newFiles])
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setPhotos([file]) // Only allow one photo for simplicity
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setPhotoPreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index))
+  const removePhoto = () => {
+    setPhotos([])
+    setPhotoPreview(null)
+  }
+
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = error => reject(error)
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,7 +106,13 @@ export default function CompleteTask() {
     }
 
     try {
-      // For now, we'll submit without photo upload (can be enhanced later)
+      let photoUrl = null
+      
+      // Convert photo to base64 if provided
+      if (photos.length > 0) {
+        photoUrl = await convertToBase64(photos[0])
+      }
+
       const response = await fetch(`/api/assignments/${assignmentId}/complete`, {
         method: 'POST',
         headers: {
@@ -96,7 +120,7 @@ export default function CompleteTask() {
         },
         body: JSON.stringify({
           notes: notes.trim() || null,
-          photo_count: photos.length,
+          photo_url: photoUrl,
         }),
       })
 
@@ -226,34 +250,71 @@ export default function CompleteTask() {
             {/* Photos Section */}
             {assignment.task.requires_photo && (
               <div>
-                <label htmlFor="photos" className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   <Camera className="w-4 h-4 inline mr-1" />
-                  Upload Photos *
+                  Upload Photo *
                 </label>
-                <div className="space-y-3">
-                  <input
-                    type="file"
-                    id="photos"
-                    multiple
-                    accept="image/*"
-                    onChange={handlePhotoSelect}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  {photos.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600">Selected photos:</p>
-                      {photos.map((photo, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <span className="text-sm text-gray-700">{photo.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => removePhoto(index)}
-                            className="text-red-600 hover:text-red-800 text-sm"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
+                <div className="space-y-4">
+                  {/* Mobile-First Camera Button */}
+                  <div className="flex flex-col space-y-3">
+                    <label
+                      htmlFor="camera"
+                      className="flex items-center justify-center w-full py-4 px-4 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-400 bg-blue-50 hover:bg-blue-100 transition-colors"
+                    >
+                      <div className="text-center">
+                        <Camera className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                        <span className="text-lg font-medium text-blue-700">Take Photo</span>
+                        <p className="text-sm text-blue-600 mt-1">Tap to open camera</p>
+                      </div>
+                    </label>
+                    <input
+                      type="file"
+                      id="camera"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                    
+                    <label
+                      htmlFor="gallery"
+                      className="flex items-center justify-center w-full py-3 px-4 border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="text-center">
+                        <span className="text-base font-medium text-gray-700">Choose from Gallery</span>
+                        <p className="text-sm text-gray-500 mt-1">Select existing photo</p>
+                      </div>
+                    </label>
+                    <input
+                      type="file"
+                      id="gallery"
+                      accept="image/*"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                  </div>
+                  
+                  {/* Photo Preview */}
+                  {photoPreview && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-700">Photo Preview:</p>
+                      <div className="relative inline-block">
+                        <img
+                          src={photoPreview}
+                          alt="Photo preview"
+                          className="max-w-full h-auto rounded-lg shadow-sm border border-gray-200"
+                          style={{ maxHeight: '300px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={removePhoto}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -275,6 +336,74 @@ export default function CompleteTask() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Any additional comments or observations..."
                 />
+              </div>
+            )}
+
+            {/* Optional Photo for non-required tasks */}
+            {!assignment.task.requires_photo && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <Camera className="w-4 h-4 inline mr-1" />
+                  Add Photo (Optional)
+                </label>
+                <div className="space-y-4">
+                  <div className="flex flex-col space-y-3">
+                    <label
+                      htmlFor="optional-camera"
+                      className="flex items-center justify-center w-full py-3 px-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 bg-gray-50 hover:bg-blue-50 transition-colors"
+                    >
+                      <div className="text-center">
+                        <Camera className="w-6 h-6 text-gray-600 mx-auto mb-1" />
+                        <span className="text-base font-medium text-gray-700">Take Photo</span>
+                      </div>
+                    </label>
+                    <input
+                      type="file"
+                      id="optional-camera"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                    
+                    <label
+                      htmlFor="optional-gallery"
+                      className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-gray-600">Choose from Gallery</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="optional-gallery"
+                      accept="image/*"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                  </div>
+                  
+                  {photoPreview && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-700">Photo Preview:</p>
+                      <div className="relative inline-block">
+                        <img
+                          src={photoPreview}
+                          alt="Photo preview"
+                          className="max-w-full h-auto rounded-lg shadow-sm border border-gray-200"
+                          style={{ maxHeight: '300px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={removePhoto}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

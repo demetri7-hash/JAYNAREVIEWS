@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Plus } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { ArrowLeft, Plus, Shield, AlertTriangle } from 'lucide-react'
 
 interface User {
   id: string
@@ -11,14 +12,23 @@ interface User {
   role: string | null
 }
 
+interface UserProfile {
+  email: string;
+  name: string;
+  role: 'staff' | 'manager';
+}
+
 export default function CreateTask() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [loadingUsers, setLoadingUsers] = useState(true)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,9 +39,35 @@ export default function CreateTask() {
     due_time: '',
   })
 
+  // Check user role on mount
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    if (session?.user?.email) {
+      fetch('/api/me')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setUserProfile(data.user)
+            if (data.user.role !== 'manager') {
+              // Redirect non-managers to homepage
+              router.push('/')
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user profile:', error)
+          router.push('/')
+        })
+        .finally(() => {
+          setProfileLoading(false)
+        })
+    }
+  }, [session, router])
+
+  useEffect(() => {
+    if (userProfile?.role === 'manager') {
+      fetchUsers()
+    }
+  }, [userProfile])
 
   const fetchUsers = async () => {
     try {
@@ -119,6 +155,41 @@ export default function CreateTask() {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading while checking authentication and role
+  if (status === 'loading' || profileLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show unauthorized access for non-managers
+  if (!session || userProfile?.role !== 'manager') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-6">
+            Only managers can create tasks. You need manager privileges to access this page.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

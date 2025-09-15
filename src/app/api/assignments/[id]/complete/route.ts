@@ -16,9 +16,9 @@ export async function POST(
 
     const { id: assignmentId } = await params
     const body = await request.json()
-    const { notes, photo_count } = body
+    const { notes, photo_url } = body
 
-    console.log('Completion request:', { assignmentId, notes, photo_count })
+    console.log('Completion request:', { assignmentId, notes, photo_url: photo_url ? 'photo_provided' : 'no_photo' })
 
     // Get the user's profile
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -51,7 +51,7 @@ export async function POST(
       completed_by: profile.id,
       completed_at: new Date().toISOString(),
       notes: notes || null,
-      photo_url: photo_count > 0 ? 'photos_uploaded' : null // Placeholder for now
+      photo_url: photo_url || null
     })
 
     const { data: completion, error: completionError } = await supabaseAdmin
@@ -62,7 +62,7 @@ export async function POST(
           completed_by: profile.id,
           completed_at: new Date().toISOString(),
           notes: notes || null,
-          photo_url: photo_count > 0 ? 'photos_uploaded' : null // Placeholder for now
+          photo_url: photo_url || null
         }
       ])
       .select()

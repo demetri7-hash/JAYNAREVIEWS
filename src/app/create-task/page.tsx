@@ -52,7 +52,37 @@ export default function CreateTask() {
     setIsSubmitting(true);
     setError('');
 
+    // Additional validation
+    if (!formData.title.trim()) {
+      setError('Task title is required');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.due_date) {
+      setError('Due date is required');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.due_time) {
+      setError('Due time is required');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (selectedUsers.length === 0) {
+      setError('Please assign this task to at least one person');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
+      console.log('Submitting form data:', {
+        ...formData,
+        assignees: selectedUsers,
+      });
+
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: {
@@ -66,6 +96,7 @@ export default function CreateTask() {
 
       if (!response.ok) {
         const data = await response.json();
+        console.error('API Error:', data);
         throw new Error(data.error || 'Failed to create task');
       }
 
@@ -194,6 +225,7 @@ export default function CreateTask() {
                   type="time"
                   id="due_time"
                   required
+                  step="60"
                   value={formData.due_time}
                   onChange={(e) => setFormData({ ...formData, due_time: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

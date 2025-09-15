@@ -13,9 +13,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     
+    console.log('Received task creation request:', body)
+    
     const { title, description, frequency, requires_notes, requires_photo, assignees, due_date, due_time } = body
 
     if (!title || !frequency || !due_date || !due_time) {
+      console.log('Validation failed:', { title, frequency, due_date, due_time })
       return NextResponse.json({ error: 'Title, frequency, due date, and due time are required' }, { status: 400 })
     }
 
@@ -56,13 +59,18 @@ export async function POST(request: NextRequest) {
 
     // If assignees are provided, create assignments
     if (assignees && Array.isArray(assignees) && assignees.length > 0) {
-      // Combine date and time into a proper ISO string for Pacific timezone
+      // Combine date and time into a proper ISO string
+      // Assume the time is already in Pacific timezone and user wants it as-is
       const dueDateTimeString = `${due_date}T${due_time}:00`
       const dueDateTime = new Date(dueDateTimeString)
       
-      // Convert to UTC for storage (assuming input is Pacific time)
-      const pacificOffset = -8 * 60 // Pacific Standard Time offset in minutes
-      const utcDateTime = new Date(dueDateTime.getTime() - (pacificOffset * 60 * 1000))
+      // Check if the date is valid
+      if (isNaN(dueDateTime.getTime())) {
+        return NextResponse.json({ 
+          error: 'Invalid date or time format',
+          details: `Could not parse: ${dueDateTimeString}`
+        }, { status: 400 })
+      }
       
       for (const assigneeId of assignees) {
         const { error: assignmentError } = await supabaseAdmin
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
               task_id: task.id,
               assigned_to: assigneeId,
               assigned_by: profile.id,
-              due_date: utcDateTime.toISOString(),
+              due_date: dueDateTime.toISOString(),
               recurrence: frequency
             }
           ])

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar } from 'lucide-react'
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar, RefreshCw, Users, X } from 'lucide-react'
 
 interface Task {
   id: string
@@ -22,6 +22,13 @@ interface Assignment {
   task: Task
 }
 
+interface User {
+  id: string
+  email: string
+  name: string | null
+  role: string | null
+}
+
 export default function MyTasks() {
   const router = useRouter()
   const [assignments, setAssignments] = useState<Assignment[]>([])
@@ -35,6 +42,14 @@ export default function MyTasks() {
     hasMore: false
   })
   const [loadingMore, setLoadingMore] = useState(false)
+  
+  // Transfer modal state
+  const [showTransferModal, setShowTransferModal] = useState(false)
+  const [transferAssignmentId, setTransferAssignmentId] = useState<string | null>(null)
+  const [transferUsers, setTransferUsers] = useState<User[]>([])
+  const [selectedTransferUser, setSelectedTransferUser] = useState('')
+  const [transferReason, setTransferReason] = useState('')
+  const [transferSubmitting, setTransferSubmitting] = useState(false)
 
   useEffect(() => {
     fetchMyTasks()
@@ -77,6 +92,65 @@ export default function MyTasks() {
   const loadMoreTasks = () => {
     if (pagination.hasMore && !loadingMore) {
       fetchMyTasks(pagination.page + 1, true)
+    }
+  }
+
+  // Transfer functions
+  const openTransferModal = (assignmentId: string) => {
+    setTransferAssignmentId(assignmentId)
+    setShowTransferModal(true)
+    fetchTransferUsers()
+  }
+
+  const closeTransferModal = () => {
+    setShowTransferModal(false)
+    setTransferAssignmentId(null)
+    setSelectedTransferUser('')
+    setTransferReason('')
+  }
+
+  const fetchTransferUsers = async () => {
+    try {
+      const response = await fetch('/api/users')
+      if (response.ok) {
+        const data = await response.json()
+        setTransferUsers(data.users || [])
+      }
+    } catch (error) {
+      console.error('Error fetching users for transfer:', error)
+    }
+  }
+
+  const submitTransfer = async () => {
+    if (!transferAssignmentId || !selectedTransferUser) return
+
+    setTransferSubmitting(true)
+    try {
+      const response = await fetch('/api/transfer-task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assignmentId: transferAssignmentId,
+          toUserId: selectedTransferUser,
+          reason: transferReason
+        })
+      })
+
+      if (response.ok) {
+        closeTransferModal()
+        // Refresh tasks to show updated status
+        fetchMyTasks(1, false)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to submit transfer request')
+      }
+    } catch (error) {
+      console.error('Error submitting transfer:', error)
+      setError('Failed to submit transfer request')
+    } finally {
+      setTransferSubmitting(false)
     }
   }
 
@@ -280,14 +354,23 @@ export default function MyTasks() {
                       </div>
                     </div>
 
-                    <div className="ml-4">
+                    <div className="ml-4 flex flex-col space-y-2">
                       {(getTaskStatus(assignment) === 'pending' || getTaskStatus(assignment) === 'overdue') ? (
-                        <button
-                          onClick={() => router.push(`/complete-task/${assignment.id}`)}
-                          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-                        >
-                          Complete Task
-                        </button>
+                        <>
+                          <button
+                            onClick={() => router.push(`/complete-task/${assignment.id}`)}
+                            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                          >
+                            Complete Task
+                          </button>
+                          <button
+                            onClick={() => openTransferModal(assignment.id)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Transfer
+                          </button>
+                        </>
                       ) : (
                         <button
                           onClick={() => router.push(`/view-task/${assignment.id}`)}
@@ -329,6 +412,86 @@ export default function MyTasks() {
           </div>
         </div>
       </div>
+
+      {/* Transfer Modal */}
+      {showTransferModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Transfer Task</h3>
+              <button
+                onClick={closeTransferModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="transferUser" className="block text-sm font-medium text-gray-700 mb-2">
+                  Transfer to:
+                </label>
+                <select
+                  id="transferUser"
+                  value={selectedTransferUser}
+                  onChange={(e) => setSelectedTransferUser(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Select a team member</option>
+                  {transferUsers.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="transferReason" className="block text-sm font-medium text-gray-700 mb-2">
+                  Reason for transfer (optional):
+                </label>
+                <textarea
+                  id="transferReason"
+                  value={transferReason}
+                  onChange={(e) => setTransferReason(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Why are you transferring this task?"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={closeTransferModal}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                disabled={transferSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitTransfer}
+                disabled={!selectedTransferUser || transferSubmitting}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {transferSubmitting ? (
+                  <>
+                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 mr-2" />
+                    Submit Transfer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

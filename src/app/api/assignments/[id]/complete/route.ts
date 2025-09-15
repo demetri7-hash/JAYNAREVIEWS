@@ -18,6 +18,8 @@ export async function POST(
     const body = await request.json()
     const { notes, photo_count } = body
 
+    console.log('Completion request:', { assignmentId, notes, photo_count })
+
     // Get the user's profile
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
@@ -44,6 +46,14 @@ export async function POST(
     }
 
     // Create completion record
+    console.log('Creating completion record:', {
+      assignment_id: assignmentId,
+      completed_by: profile.id,
+      completed_at: new Date().toISOString(),
+      notes: notes || null,
+      photo_url: photo_count > 0 ? 'photos_uploaded' : null // Placeholder for now
+    })
+
     const { data: completion, error: completionError } = await supabaseAdmin
       .from('completions')
       .insert([
@@ -52,7 +62,7 @@ export async function POST(
           completed_by: profile.id,
           completed_at: new Date().toISOString(),
           notes: notes || null,
-          photo_count: photo_count || 0
+          photo_url: photo_count > 0 ? 'photos_uploaded' : null // Placeholder for now
         }
       ])
       .select()
@@ -60,9 +70,12 @@ export async function POST(
 
     if (completionError) {
       console.error('Error creating completion:', completionError)
+      console.error('Completion error details:', JSON.stringify(completionError, null, 2))
       return NextResponse.json({ 
         error: 'Failed to create completion record',
-        details: completionError.message 
+        details: completionError.message,
+        code: completionError.code,
+        hint: completionError.hint
       }, { status: 500 })
     }
 
@@ -70,8 +83,7 @@ export async function POST(
     const { error: updateError } = await supabaseAdmin
       .from('assignments')
       .update({ 
-        status: 'completed',
-        updated_at: new Date().toISOString()
+        status: 'completed'
       })
       .eq('id', assignmentId)
 

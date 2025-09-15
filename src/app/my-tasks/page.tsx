@@ -81,20 +81,31 @@ export default function MyTasks() {
   })
 
   const formatDueDate = (dateString: string) => {
+    // Convert UTC date back to Pacific time for display
     const date = new Date(dateString)
-    const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    
+    // Create date objects in Pacific timezone for comparison
+    const pacificOptions = { timeZone: 'America/Los_Angeles' }
+    const nowPacific = new Date(new Date().toLocaleString('en-US', pacificOptions))
+    const duePacific = new Date(date.toLocaleString('en-US', pacificOptions))
+    
+    const today = new Date(nowPacific.getFullYear(), nowPacific.getMonth(), nowPacific.getDate())
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000)
-    const assignmentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    const dueDay = new Date(duePacific.getFullYear(), duePacific.getMonth(), duePacific.getDate())
 
-    if (assignmentDate.getTime() === today.getTime()) {
+    if (dueDay.getTime() === today.getTime()) {
       return 'Due Today'
-    } else if (assignmentDate.getTime() === tomorrow.getTime()) {
+    } else if (dueDay.getTime() === tomorrow.getTime()) {
       return 'Due Tomorrow'
-    } else if (assignmentDate < today) {
+    } else if (dueDay < today) {
       return 'Overdue'
     } else {
-      return date.toLocaleDateString()
+      return duePacific.toLocaleDateString('en-US', { 
+        timeZone: 'America/Los_Angeles',
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      })
     }
   }
 

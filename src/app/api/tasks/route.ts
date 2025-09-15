@@ -60,17 +60,27 @@ export async function POST(request: NextRequest) {
     // If assignees are provided, create assignments
     if (assignees && Array.isArray(assignees) && assignees.length > 0) {
       // Combine date and time into a proper ISO string
-      // Assume the time is already in Pacific timezone and user wants it as-is
+      // The user inputs time in Pacific timezone, so we need to convert to UTC for storage
       const dueDateTimeString = `${due_date}T${due_time}:00`
-      const dueDateTime = new Date(dueDateTimeString)
+      
+      // Parse as if it's Pacific time and convert to UTC
+      // Pacific Time is UTC-8 (PST) or UTC-7 (PDT) - for simplicity using UTC-8
+      const localDateTime = new Date(dueDateTimeString)
       
       // Check if the date is valid
-      if (isNaN(dueDateTime.getTime())) {
+      if (isNaN(localDateTime.getTime())) {
         return NextResponse.json({ 
           error: 'Invalid date or time format',
           details: `Could not parse: ${dueDateTimeString}`
         }, { status: 400 })
       }
+      
+      // Convert from Pacific to UTC (add 8 hours)
+      const utcDateTime = new Date(localDateTime.getTime() + (8 * 60 * 60 * 1000))
+      
+      console.log('User input (Pacific):', dueDateTimeString)
+      console.log('Parsed local:', localDateTime.toISOString())
+      console.log('Converted to UTC:', utcDateTime.toISOString())
       
       for (const assigneeId of assignees) {
         const { error: assignmentError } = await supabaseAdmin
@@ -80,7 +90,7 @@ export async function POST(request: NextRequest) {
               task_id: task.id,
               assigned_to: assigneeId,
               assigned_by: profile.id,
-              due_date: dueDateTime.toISOString(),
+              due_date: utcDateTime.toISOString(),
               recurrence: frequency
             }
           ])

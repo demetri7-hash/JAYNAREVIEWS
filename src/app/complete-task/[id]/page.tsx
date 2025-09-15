@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Clock, CheckCircle, FileText, Camera } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Clock, FileText, Camera } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface Task {
   id: string
@@ -87,6 +88,33 @@ export default function CompleteTask() {
     })
   }
 
+  const uploadPhotoToStorage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `task-completions/${fileName}`
+
+      const { data, error } = await supabase.storage
+        .from('task-photos')
+        .upload(filePath, file)
+
+      if (error) {
+        console.error('Error uploading photo:', error)
+        return null
+      }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('task-photos')
+        .getPublicUrl(filePath)
+
+      return urlData.publicUrl
+    } catch (error) {
+      console.error('Error in photo upload:', error)
+      return null
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
@@ -108,9 +136,14 @@ export default function CompleteTask() {
     try {
       let photoUrl = null
       
-      // Convert photo to base64 if provided
+      // Upload photo to Supabase Storage if provided
       if (photos.length > 0) {
-        photoUrl = await convertToBase64(photos[0])
+        photoUrl = await uploadPhotoToStorage(photos[0])
+        if (!photoUrl) {
+          setError('Failed to upload photo. Please try again.')
+          setSubmitting(false)
+          return
+        }
       }
 
       const response = await fetch(`/api/assignments/${assignmentId}/complete`, {

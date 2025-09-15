@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ChecklistItem, UserRole, Department, isManagerRole, getDepartmentPermissions, ROLE_LABELS } from '../../types';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -24,6 +28,7 @@ interface User {
 export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles'>('tasks');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,8 +78,8 @@ export default function ManagerDashboard() {
         const tasksData = await tasksResponse.json();
         console.log('Tasks data received:', tasksData?.length || 0, 'tasks');
 
-        // Fetch all users for reassignment
-        const usersResponse = await fetch('/api/users');
+        // Fetch all users for reassignment and user management
+        const usersResponse = await fetch('/api/manager/users');
         console.log('Users response status:', usersResponse.status);
         
         if (!usersResponse.ok) {
@@ -237,6 +242,51 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-lg shadow-lg mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('tasks')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'tasks'
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Task Management
+              </button>
+              {userRole === 'manager' && (
+                <>
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'users'
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    User Management
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('roles')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'roles'
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Role Configuration
+                  </button>
+                </>
+              )}
+            </nav>
+          </div>
+        </div>
+
+        {/* Content based on active tab */}
+        {activeTab === 'tasks' && (
+          <>
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -434,6 +484,178 @@ export default function ManagerDashboard() {
             </div>
           )}
         </div>
+        </>
+        )}
+
+        {/* User Management Tab */}
+        {activeTab === 'users' && userRole === 'manager' && (
+          <UserManagementTab users={users} setUsers={setUsers} />
+        )}
+
+        {/* Role Configuration Tab */}
+        {activeTab === 'roles' && userRole === 'manager' && (
+          <RoleConfigurationTab />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// User Management Tab Component
+function UserManagementTab({ 
+  users, 
+  setUsers 
+}: { 
+  users: User[], 
+  setUsers: React.Dispatch<React.SetStateAction<User[]>> 
+}) {
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('staff');
+
+  const updateUserRole = async (userId: string, newRole: UserRole) => {
+    try {
+      const response = await fetch('/api/manager/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
+
+      if (response.ok) {
+        setUsers(prev => prev.map(user => 
+          user.id === userId ? { ...user, role: newRole } : user
+        ));
+        setEditingUser(null);
+      }
+    } catch (error) {
+      console.error('Error updating user role:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">User Management</h2>
+      <div className="grid gap-4">
+        {users.map(user => (
+          <Card key={user.id}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">{user.name}</h3>
+                  <p className="text-sm text-gray-600">{user.email}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  {editingUser === user.id ? (
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedRole} onValueChange={(value: UserRole) => setSelectedRole(value)}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="staff">Staff</SelectItem>
+                          <SelectItem value="kitchen_manager">Kitchen Manager</SelectItem>
+                          <SelectItem value="ordering_manager">Ordering Manager</SelectItem>
+                          <SelectItem value="manager">General Manager</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button onClick={() => updateUserRole(user.id, selectedRole)} size="sm">
+                        Save
+                      </Button>
+                      <Button onClick={() => setEditingUser(null)} variant="outline" size="sm">
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{ROLE_LABELS[user.role]}</Badge>
+                      <Button 
+                        onClick={() => {
+                          setEditingUser(user.id);
+                          setSelectedRole(user.role);
+                        }} 
+                        size="sm"
+                      >
+                        Edit Role
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Role Configuration Tab Component
+function RoleConfigurationTab() {
+  const [rolePermissions, setRolePermissions] = useState<Record<UserRole, Department[]>>({
+    staff: [], // Staff see only assigned tasks, no department filtering needed
+    kitchen_manager: ['BOH', 'PREP'],
+    ordering_manager: ['BOH', 'PREP'],
+    lead_prep_cook: ['BOH', 'PREP'],
+    assistant_foh_manager: ['FOH', 'TRANSITION'],
+    manager: ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'],
+  });
+
+  const toggleDepartmentPermission = (role: UserRole, department: Department) => {
+    setRolePermissions(prev => ({
+      ...prev,
+      [role]: prev[role].includes(department)
+        ? prev[role].filter(d => d !== department)
+        : [...prev[role], department]
+    }));
+  };
+
+  const saveDepartmentConfig = async (role: UserRole) => {
+    try {
+      const response = await fetch('/api/manager/role-permissions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, departments: rolePermissions[role] }),
+      });
+
+      if (response.ok) {
+        // Show success message
+        console.log('Role permissions updated');
+      }
+    } catch (error) {
+      console.error('Error updating role permissions:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Role Configuration</h2>
+      <div className="grid gap-6">
+        {Object.entries(ROLE_LABELS).map(([role, label]) => (
+          <Card key={role}>
+            <CardHeader>
+              <CardTitle>{label}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">Select departments this role has access to:</p>
+                <div className="flex flex-wrap gap-2">
+                  {(['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'] as Department[]).map(department => (
+                    <Button
+                      key={department}
+                      variant={rolePermissions[role as UserRole]?.includes(department) ? "default" : "outline"}
+                      onClick={() => toggleDepartmentPermission(role as UserRole, department)}
+                      size="sm"
+                    >
+                      {department.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </Button>
+                  ))}
+                </div>
+                <Button onClick={() => saveDepartmentConfig(role as UserRole)} className="mt-4">
+                  Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

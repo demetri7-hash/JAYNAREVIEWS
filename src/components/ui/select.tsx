@@ -1,0 +1,127 @@
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+export interface SelectProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children: React.ReactNode;
+}
+
+export const Select: React.FC<SelectProps> = ({ value, onValueChange, children }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [internalValue, setInternalValue] = React.useState(value || '');
+
+  const handleValueChange = (newValue: string) => {
+    setInternalValue(newValue);
+    onValueChange?.(newValue);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, {
+            ...child.props,
+            value: internalValue,
+            onValueChange: handleValueChange,
+            isOpen,
+            setIsOpen,
+          } as any);
+        }
+        return child;
+      })}
+    </div>
+  );
+};
+
+export const SelectTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    value?: string;
+    isOpen?: boolean;
+    setIsOpen?: (open: boolean) => void;
+  }
+>(({ className, children, value, isOpen, setIsOpen, ...props }, ref) => (
+  <button
+    ref={ref}
+    type="button"
+    className={cn(
+      'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+      className
+    )}
+    onClick={() => setIsOpen?.(!isOpen)}
+    {...props}
+  >
+    {children}
+  </button>
+));
+SelectTrigger.displayName = 'SelectTrigger';
+
+export const SelectValue = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement> & {
+    value?: string;
+    placeholder?: string;
+  }
+>(({ className, value, placeholder, ...props }, ref) => (
+  <span ref={ref} className={cn(className)} {...props}>
+    {value || placeholder || 'Select...'}
+  </span>
+));
+SelectValue.displayName = 'SelectValue';
+
+export const SelectContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    isOpen?: boolean;
+    onValueChange?: (value: string) => void;
+  }
+>(({ className, children, isOpen, onValueChange, ...props }, ref) => {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'absolute top-full left-0 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md',
+        className
+      )}
+      {...props}
+    >
+      <div className="p-1">
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              ...child.props,
+              onValueChange,
+            } as any);
+          }
+          return child;
+        })}
+      </div>
+    </div>
+  );
+});
+SelectContent.displayName = 'SelectContent';
+
+export const SelectItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    value: string;
+    onValueChange?: (value: string) => void;
+  }
+>(({ className, children, value, onValueChange, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+      className
+    )}
+    onClick={() => onValueChange?.(value)}
+    {...props}
+  >
+    {children}
+  </div>
+));
+SelectItem.displayName = 'SelectItem';

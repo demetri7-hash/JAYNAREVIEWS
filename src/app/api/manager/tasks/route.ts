@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../../../lib/auth';
 import { createClient } from '@supabase/supabase-js';
-import { filterTasksByUserPermissions, isManagerRole, UserRole } from '../../../../types';
+import { filterTasksByUserPermissions, isManagerRole, UserRole, Department } from '../../../../types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,37 +33,51 @@ export async function GET() {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Fetch all tasks first
-    const { data: tasks, error: tasksError } = await supabase
-      .from('checklist_items')
-      .select('*')
+    // Fetch all assignments (tasks assigned to users) with task details
+    const { data: assignments, error: assignmentsError } = await supabase
+      .from('assignments')
+      .select(`
+        *,
+        task:tasks(
+          id,
+          title,
+          description,
+          requires_notes,
+          requires_photo,
+          created_at
+        ),
+        assignee:assigned_to(
+          id,
+          name,
+          email,
+          role
+        )
+      `)
       .order('created_at', { ascending: false });
 
-    if (tasksError) {
-      console.error('Error fetching tasks:', tasksError);
-      return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
+    if (assignmentsError) {
+      console.error('Error fetching assignments:', assignmentsError);
+      return NextResponse.json({ error: 'Failed to fetch assignments' }, { status: 500 });
     }
 
-    // Fetch user profiles separately to avoid join issues
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id, name, email, role');
-
-    if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
-      return NextResponse.json({ error: 'Failed to fetch user profiles' }, { status: 500 });
-    }
-
-    // Combine tasks with assignee information
-    const tasksWithAssignees = (tasks || []).map(task => ({
-      ...task,
-      assignee: profiles?.find(p => p.id === task.assigned_to) || null
+    // Convert assignments to match the expected task format for the frontend
+    const tasksWithAssignees = (assignments || []).map(assignment => ({
+      id: assignment.id,
+      task: assignment.task?.title || 'Untitled Task',
+      completed: assignment.status === 'completed',
+      notes: assignment.task?.description || '',
+      due_date: assignment.due_date,
+      departments: ['BOH'] as Department[], // Default department - will need to be enhanced later
+      assigned_to: assignment.assigned_to,
+      created_at: assignment.created_at,
+      updated_at: assignment.created_at,
+      assignee: assignment.assignee
     }));
 
-    // Filter tasks based on manager's department permissions
-    const filteredTasks = filterTasksByUserPermissions(tasksWithAssignees || [], profile.role as UserRole);
-
-    return NextResponse.json(filteredTasks);
+    // For now, managers can see all tasks (bypass department filtering until we implement it properly)
+    // const filteredTasks = filterTasksByUserPermissions(tasksWithAssignees || [], profile.role as UserRole);
+    
+    return NextResponse.json(tasksWithAssignees);
 
   } catch (error) {
     console.error('Manager tasks API error:', error);

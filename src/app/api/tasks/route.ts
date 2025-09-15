@@ -15,11 +15,16 @@ export async function POST(request: NextRequest) {
     
     console.log('Received task creation request:', body)
     
-    const { title, description, frequency, requires_notes, requires_photo, assignees, due_date, due_time } = body
+    const { title, description, frequency, requires_notes, requires_photo, assignees, due_date, due_time, departments } = body
 
     if (!title || !frequency || !due_date || !due_time) {
       console.log('Validation failed:', { title, frequency, due_date, due_time })
       return NextResponse.json({ error: 'Title, frequency, due date, and due time are required' }, { status: 400 })
+    }
+
+    if (!departments || !Array.isArray(departments) || departments.length === 0) {
+      console.log('Departments validation failed:', { departments })
+      return NextResponse.json({ error: 'At least one department must be selected' }, { status: 400 })
     }
 
     // Get the user's profile to get their UUID
@@ -43,7 +48,8 @@ export async function POST(request: NextRequest) {
           description: description || null,
           requires_notes: requires_notes || false,
           requires_photo: requires_photo || false,
-          created_by: profile.id
+          created_by: profile.id,
+          departments: departments || []
         }
       ])
       .select()

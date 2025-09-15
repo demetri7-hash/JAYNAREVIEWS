@@ -37,6 +37,7 @@ export default function CreateTask() {
     requires_photo: false,
     due_date: '',
     due_time: '',
+    departments: [] as string[],
   })
 
   // Check user role on mount
@@ -113,6 +114,12 @@ export default function CreateTask() {
       return;
     }
 
+    if (formData.departments.length === 0) {
+      setError('Please select at least one department');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       console.log('Submitting form data:', {
         ...formData,
@@ -145,6 +152,7 @@ export default function CreateTask() {
         requires_photo: false,
         due_date: '',
         due_time: '',
+        departments: [],
       });
       setSelectedUsers([]);
       router.push('/');
@@ -369,6 +377,64 @@ export default function CreateTask() {
                   Require photos when completing this task
                 </label>
               </div>
+            </div>
+
+            {/* Department Tags Selection */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Department Tags
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <p className="text-sm text-gray-600">
+                Select one or more departments for this task. This helps organize tasks and allows department managers to filter their relevant tasks.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { value: 'BOH', label: 'Back of House', color: 'bg-red-100 text-red-800 border-red-200' },
+                  { value: 'FOH', label: 'Front of House', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+                  { value: 'AM', label: 'Morning Shift', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
+                  { value: 'PM', label: 'Evening Shift', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+                  { value: 'PREP', label: 'Prep Kitchen', color: 'bg-green-100 text-green-800 border-green-200' },
+                  { value: 'CLEAN', label: 'Cleaning', color: 'bg-gray-100 text-gray-800 border-gray-200' },
+                  { value: 'CATERING', label: 'Catering', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+                  { value: 'SPECIAL', label: 'Special Tasks', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+                ].map((dept) => (
+                  <label
+                    key={dept.value}
+                    className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                      formData.departments.includes(dept.value)
+                        ? dept.color + ' border-current'
+                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.departments.includes(dept.value)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            departments: [...formData.departments, dept.value]
+                          })
+                        } else {
+                          setFormData({
+                            ...formData,
+                            departments: formData.departments.filter(d => d !== dept.value)
+                          })
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="text-center w-full">
+                      <div className="text-xs font-medium">{dept.value}</div>
+                      <div className="text-xs opacity-75">{dept.label}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              {formData.departments.length === 0 && (
+                <p className="text-sm text-red-600">Please select at least one department.</p>
+              )}
             </div>
 
             <div className="flex gap-4 pt-6">

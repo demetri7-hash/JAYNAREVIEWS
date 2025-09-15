@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     
-    const { title, description, frequency, requires_notes, requires_photo, assignees } = body
+    const { title, description, frequency, requires_notes, requires_photo, assignees, due_date, due_time } = body
 
-    if (!title || !frequency) {
-      return NextResponse.json({ error: 'Title and frequency are required' }, { status: 400 })
+    if (!title || !frequency || !due_date || !due_time) {
+      return NextResponse.json({ error: 'Title, frequency, due date, and due time are required' }, { status: 400 })
     }
 
     // Get the user's profile to get their UUID
@@ -56,6 +56,14 @@ export async function POST(request: NextRequest) {
 
     // If assignees are provided, create assignments
     if (assignees && Array.isArray(assignees) && assignees.length > 0) {
+      // Combine date and time into a proper ISO string for Pacific timezone
+      const dueDateTimeString = `${due_date}T${due_time}:00`
+      const dueDateTime = new Date(dueDateTimeString)
+      
+      // Convert to UTC for storage (assuming input is Pacific time)
+      const pacificOffset = -8 * 60 // Pacific Standard Time offset in minutes
+      const utcDateTime = new Date(dueDateTime.getTime() - (pacificOffset * 60 * 1000))
+      
       for (const assigneeId of assignees) {
         const { error: assignmentError } = await supabaseAdmin
           .from('assignments')
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
               task_id: task.id,
               assigned_to: assigneeId,
               assigned_by: profile.id,
-              due_date: getNextDueDate(frequency),
+              due_date: utcDateTime.toISOString(),
               recurrence: frequency
             }
           ])

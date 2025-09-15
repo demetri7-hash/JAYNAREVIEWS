@@ -25,6 +25,8 @@ export default function CreateTask() {
     frequency: 'daily',
     requires_notes: false,
     requires_photo: false,
+    due_date: '',
+    due_time: '',
   })
 
   useEffect(() => {
@@ -74,6 +76,8 @@ export default function CreateTask() {
         frequency: 'daily',
         requires_notes: false,
         requires_photo: false,
+        due_date: '',
+        due_time: '',
       });
       setSelectedUsers([]);
       router.push('/');
@@ -164,6 +168,37 @@ export default function CreateTask() {
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
               </select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-2">
+                  Due Date *
+                </label>
+                <input
+                  type="date"
+                  id="due_date"
+                  required
+                  value={formData.due_date}
+                  onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="due_time" className="block text-sm font-medium text-gray-700 mb-2">
+                  Due Time (Pacific Time) *
+                </label>
+                <input
+                  type="time"
+                  id="due_time"
+                  required
+                  value={formData.due_time}
+                  onChange={(e) => setFormData({ ...formData, due_time: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             <div>

@@ -28,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
-    // Fetch the specific assignment with task details
+    // Fetch the specific assignment with task details and completion info
     const { data: assignment, error: assignmentError } = await supabaseAdmin
       .from('assignments')
       .select(`
@@ -40,6 +40,16 @@ export async function GET(
           requires_notes,
           requires_photo,
           created_at
+        ),
+        completion:completions(
+          id,
+          notes,
+          photo_url,
+          completed_at,
+          completed_by:profiles!completions_completed_by_fkey(
+            name,
+            email
+          )
         )
       `)
       .eq('id', assignmentId)
@@ -66,7 +76,8 @@ export async function GET(
     return NextResponse.json({ 
       assignment: {
         ...assignment,
-        status
+        status,
+        completion: Array.isArray(assignment.completion) ? assignment.completion[0] : assignment.completion
       }
     })
 

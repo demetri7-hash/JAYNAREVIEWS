@@ -261,10 +261,7 @@ export default function MyTasks() {
                         </button>
                       ) : (
                         <button
-                          onClick={() => {
-                            // TODO: Navigate to view completion details
-                            console.log('View completion:', assignment.id)
-                          }}
+                          onClick={() => router.push(`/view-task/${assignment.id}`)}
                           className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
                         >
                           View Details

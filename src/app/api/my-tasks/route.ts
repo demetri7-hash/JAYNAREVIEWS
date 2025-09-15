@@ -49,27 +49,12 @@ export async function GET() {
     }
 
     // Calculate status for each assignment
-    const now = new Date()
-    console.log('Current time for overdue calculation:', now.toISOString())
-    
     const assignmentsWithStatus = assignments.map(assignment => {
-      const dueDate = new Date(assignment.due_date)
-      console.log('Checking assignment due date:', assignment.due_date, 'parsed as:', dueDate.toISOString())
-      
-      let status = assignment.status
-
-      // If not manually completed, check if overdue
-      // Only mark as overdue if the due date/time has actually passed
-      if (status === 'pending' && dueDate < now) {
-        console.log('Marking as overdue:', assignment.due_date)
-        status = 'overdue'
-      } else if (status === 'pending') {
-        console.log('Keeping as pending:', assignment.due_date)
-      }
-
+      // Don't override the status with overdue calculation here
+      // Let the frontend handle overdue display consistently
       return {
         ...assignment,
-        status
+        status: assignment.status // Keep the original status from database
       }
     })
 

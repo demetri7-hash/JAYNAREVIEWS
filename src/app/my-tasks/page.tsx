@@ -51,6 +51,26 @@ export default function MyTasks() {
     }
   }
 
+  const getTaskStatus = (assignment: Assignment) => {
+    // If manually completed, return completed
+    if (assignment.status === 'completed') {
+      return 'completed'
+    }
+    
+    // Calculate if overdue using same logic as formatDueDate
+    const date = new Date(assignment.due_date)
+    const pacificOptions = { timeZone: 'America/Los_Angeles' }
+    const nowPacific = new Date(new Date().toLocaleString('en-US', pacificOptions))
+    const duePacific = new Date(date.toLocaleString('en-US', pacificOptions))
+    
+    // Compare including time, not just date
+    if (duePacific < nowPacific) {
+      return 'overdue'
+    }
+    
+    return 'pending'
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -77,7 +97,7 @@ export default function MyTasks() {
 
   const filteredAssignments = assignments.filter(assignment => {
     if (filter === 'all') return true
-    return assignment.status === filter
+    return getTaskStatus(assignment) === filter
   })
 
   const formatDueDate = (dateString: string) => {
@@ -198,9 +218,9 @@ export default function MyTasks() {
                         <h3 className="text-lg font-medium text-gray-900 mr-3">
                           {assignment.task.title}
                         </h3>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(assignment.status)}`}>
-                          {getStatusIcon(assignment.status)}
-                          <span className="ml-1 capitalize">{assignment.status}</span>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(getTaskStatus(assignment))}`}>
+                          {getStatusIcon(getTaskStatus(assignment))}
+                          <span className="ml-1 capitalize">{getTaskStatus(assignment)}</span>
                         </span>
                       </div>
                       
@@ -232,7 +252,7 @@ export default function MyTasks() {
                     </div>
 
                     <div className="ml-4">
-                      {assignment.status === 'pending' || assignment.status === 'overdue' ? (
+                      {(getTaskStatus(assignment) === 'pending' || getTaskStatus(assignment) === 'overdue') ? (
                         <button
                           onClick={() => router.push(`/complete-task/${assignment.id}`)}
                           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"

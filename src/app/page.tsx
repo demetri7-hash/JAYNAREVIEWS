@@ -2,16 +2,47 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, Plus, Users } from 'lucide-react'
+import { CheckCircle, Plus, Users, Shield } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+interface UserProfile {
+  email: string;
+  name: string;
+  role: 'staff' | 'manager';
+}
 
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
 
-  if (status === 'loading') {
+  // Fetch user profile and role
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch('/api/me')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setUserProfile(data.user)
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user profile:', error)
+        })
+        .finally(() => {
+          setProfileLoading(false)
+        })
+    }
+  }, [session])
+
+  if (status === 'loading' || (session && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your profile...</p>
+        </div>
       </div>
     )
   }
@@ -51,7 +82,15 @@ export default function Home() {
               <h1 className="text-xl font-semibold text-gray-900">Task Manager</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome back, {session.user?.name}!</span>
+              <div className="flex items-center space-x-2">
+                {userProfile?.role === 'manager' && (
+                  <div className="flex items-center space-x-1 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
+                    <Shield className="w-3 h-3" />
+                    <span>Manager</span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-700">Welcome back, {session.user?.name}!</span>
+              </div>
               <button 
                 onClick={() => signOut()}
                 className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-200"
@@ -89,30 +128,36 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-gray-900">Create Task</h2>
-              <Plus className="w-6 h-6 text-blue-500" />
+          {/* Create Task - Only for Managers */}
+          {userProfile?.role === 'manager' && (
+            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium text-gray-900">Create Task</h2>
+                <Plus className="w-6 h-6 text-blue-500" />
+              </div>
+              <p className="text-gray-600 mb-4">Create new tasks and assign to staff</p>
+              <button 
+                onClick={() => router.push('/create-task')}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Create New Task
+              </button>
             </div>
-            <p className="text-gray-600 mb-4">Create new tasks and assign to staff</p>
-            <button 
-              onClick={() => router.push('/create-task')}
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-            >
-              Create New Task
-            </button>
-          </div>
+          )}
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-gray-900">Team Activity</h2>
-              <Users className="w-6 h-6 text-purple-500" />
+          {/* Team Activity - Only for Managers */}
+          {userProfile?.role === 'manager' && (
+            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium text-gray-900">Team Activity</h2>
+                <Users className="w-6 h-6 text-purple-500" />
+              </div>
+              <p className="text-gray-600 mb-4">Recent completions and updates</p>
+              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
+                View All Activity
+              </button>
             </div>
-            <p className="text-gray-600 mb-4">Recent completions and updates</p>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
-              View All Activity
-            </button>
-          </div>
+          )}
         </div>
       </main>
     </div>

@@ -55,7 +55,10 @@ export default function WeeklyReports() {
       const response = await fetch('/api/me')
       const userData = await response.json()
       
-      if (userData.role !== 'manager') {
+      if (userData.success && userData.user?.role !== 'manager') {
+        router.push('/')
+        return
+      } else if (!userData.success) {
         router.push('/')
         return
       }

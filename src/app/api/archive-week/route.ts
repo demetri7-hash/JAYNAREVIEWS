@@ -10,19 +10,31 @@ export async function POST() {
   try {
     console.log('Starting weekly archive process...')
     
-    // Get the previous Sunday (week ending date)
+    // Calculate the previous Monday-Sunday week
     const today = new Date()
     const dayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, etc.
-    const daysToSubtract = dayOfWeek === 0 ? 7 : dayOfWeek // If today is Sunday, get last Sunday
-    const weekEnding = new Date(today)
-    weekEnding.setDate(today.getDate() - daysToSubtract)
-    weekEnding.setHours(23, 59, 59, 999) // End of Sunday
     
-    const weekStart = new Date(weekEnding)
-    weekStart.setDate(weekEnding.getDate() - 6)
+    // Calculate days back to get to the previous week's Monday
+    let daysBackToLastMonday
+    if (dayOfWeek === 0) { // Sunday
+      daysBackToLastMonday = 8 // Go back to previous Monday
+    } else if (dayOfWeek === 1) { // Monday
+      daysBackToLastMonday = 7 // Go back to previous Monday
+    } else { // Tuesday-Saturday
+      daysBackToLastMonday = dayOfWeek + 6 // Go back to previous Monday
+    }
+    
+    const weekStart = new Date(today)
+    weekStart.setDate(today.getDate() - daysBackToLastMonday)
     weekStart.setHours(0, 0, 0, 0) // Start of Monday
     
+    const weekEnding = new Date(weekStart)
+    weekEnding.setDate(weekStart.getDate() + 6)
+    weekEnding.setHours(23, 59, 59, 999) // End of Sunday
+    
     console.log(`Archiving week: ${weekStart.toISOString()} to ${weekEnding.toISOString()}`)
+    console.log(`Week start (Monday): ${weekStart.toLocaleDateString()}`)
+    console.log(`Week end (Sunday): ${weekEnding.toLocaleDateString()}`)
 
     // Check if we already archived this week
     const { data: existingReport } = await supabase

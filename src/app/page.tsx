@@ -1,10 +1,12 @@
 'use client'
 
 import { useSession, signIn, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle, Plus, Users } from 'lucide-react'
 
 export default function Home() {
   const { data: session, status } = useSession()
+  const router = useRouter()
 
   if (status === 'loading') {
     return (
@@ -90,7 +92,10 @@ export default function Home() {
               <Plus className="w-6 h-6 text-blue-500" />
             </div>
             <p className="text-gray-600 mb-4">Create new tasks and assign to staff</p>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+            <button 
+              onClick={() => router.push('/create-task')}
+              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+            >
               Create New Task
             </button>
           </div>

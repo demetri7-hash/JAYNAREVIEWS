@@ -3,13 +3,18 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '20')
+    const offset = (page - 1) * limit
 
     // Get the user's profile to get their UUID
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -23,7 +28,7 @@ export async function GET() {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
-    // Fetch assignments for this user with task details
+    // Fetch assignments for this user with task details, sorted by newest first
     const { data: assignments, error: assignmentsError } = await supabaseAdmin
       .from('assignments')
       .select(`
@@ -38,7 +43,8 @@ export async function GET() {
         )
       `)
       .eq('assigned_to', profile.id)
-      .order('due_date', { ascending: true })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
 
     if (assignmentsError) {
       console.error('Error fetching assignments:', assignmentsError)
@@ -46,6 +52,16 @@ export async function GET() {
         error: 'Failed to fetch assignments',
         details: assignmentsError.message 
       }, { status: 500 })
+    }
+
+    // Get total count for pagination
+    const { count, error: countError } = await supabaseAdmin
+      .from('assignments')
+      .select('*', { count: 'exact', head: true })
+      .eq('assigned_to', profile.id)
+
+    if (countError) {
+      console.error('Error getting count:', countError)
     }
 
     // Calculate status for each assignment
@@ -58,12 +74,14 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ 
-      assignments: assignmentsWithStatus,
-      total: assignmentsWithStatus.length,
-      pending: assignmentsWithStatus.filter(a => a.status === 'pending').length,
-      completed: assignmentsWithStatus.filter(a => a.status === 'completed').length,
-      overdue: assignmentsWithStatus.filter(a => a.status === 'overdue').length
+        return NextResponse.json({ 
+      assignments: assignments || [],
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        hasMore: (count || 0) > offset + limit
+      }
     })
 
   } catch (error) {

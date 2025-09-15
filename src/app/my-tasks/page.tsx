@@ -28,26 +28,55 @@ export default function MyTasks() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'overdue'>('all')
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    hasMore: false
+  })
+  const [loadingMore, setLoadingMore] = useState(false)
 
   useEffect(() => {
     fetchMyTasks()
   }, [])
 
-  const fetchMyTasks = async () => {
+  const fetchMyTasks = async (page = 1, append = false) => {
     try {
-      const response = await fetch('/api/my-tasks')
+      if (!append) setLoading(true)
+      else setLoadingMore(true)
+
+      const response = await fetch(`/api/my-tasks?page=${page}&limit=20`)
       
       if (!response.ok) {
         throw new Error('Failed to fetch tasks')
       }
 
       const data = await response.json()
-      setAssignments(data.assignments || [])
+      
+      if (append) {
+        setAssignments(prev => [...prev, ...(data.assignments || [])])
+      } else {
+        setAssignments(data.assignments || [])
+      }
+      
+      setPagination(data.pagination || {
+        page: 1,
+        limit: 20,
+        total: 0,
+        hasMore: false
+      })
     } catch (error) {
       console.error('Error fetching tasks:', error)
       setError(error instanceof Error ? error.message : 'Failed to load tasks')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  const loadMoreTasks = () => {
+    if (pagination.hasMore && !loadingMore) {
+      fetchMyTasks(pagination.page + 1, true)
     }
   }
 
@@ -272,6 +301,31 @@ export default function MyTasks() {
                 </div>
               ))
             )}
+          </div>
+
+          {/* Load More Button */}
+          {pagination.hasMore && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={loadMoreTasks}
+                disabled={loadingMore}
+                className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Loading more...
+                  </>
+                ) : (
+                  `Load More Tasks (${pagination.total - assignments.length} remaining)`
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Summary */}
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Showing {assignments.length} of {pagination.total} tasks
           </div>
         </div>
       </div>

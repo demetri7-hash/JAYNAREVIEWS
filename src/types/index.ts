@@ -1,23 +1,20 @@
-// Shared type definitions for the task management system
+// Shared types for the restaurant task management system
 
-export type UserRole = 
-  | 'staff' 
-  | 'manager' 
-  | 'kitchen_manager' 
-  | 'ordering_manager' 
-  | 'lead_prep_cook' 
-  | 'assistant_foh_manager'
+export type UserRole = 'staff' | 'manager' | 'kitchen_manager' | 'ordering_manager' | 'lead_prep_cook' | 'assistant_foh_manager';
 
-export type Department = 
-  | 'BOH' 
-  | 'FOH' 
-  | 'AM' 
-  | 'PM' 
-  | 'PREP' 
-  | 'CLEAN' 
-  | 'CATERING' 
-  | 'SPECIAL' 
-  | 'TRANSITION'
+export type Department = 'BOH' | 'FOH' | 'AM' | 'PM' | 'PREP' | 'CLEAN' | 'CATERING' | 'SPECIAL' | 'TRANSITION';
+
+export interface ChecklistItem {
+  id: string;
+  task: string;
+  completed: boolean;
+  notes?: string;
+  due_date?: string;
+  departments: Department[];
+  assigned_to?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface UserProfile {
   id: string;
@@ -32,27 +29,45 @@ export const ROLE_PERMISSIONS: Record<UserRole, Department[]> = {
   staff: [], // Staff see only assigned tasks, no department filtering needed
   manager: ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'], // Full access
   kitchen_manager: ['BOH', 'PREP', 'AM', 'PM'], // Kitchen operations
-  ordering_manager: ['CATERING', 'SPECIAL', 'PREP'], // Ordering and catering
-  lead_prep_cook: ['PREP', 'BOH', 'AM'], // Prep and morning operations
-  assistant_foh_manager: ['FOH', 'CLEAN', 'TRANSITION'], // Front of house operations
-}
+  ordering_manager: ['CATERING', 'SPECIAL', 'PREP'], // Ordering and special events
+  lead_prep_cook: ['PREP', 'BOH', 'AM'], // Prep leadership and morning prep
+  assistant_foh_manager: ['FOH', 'CLEAN', 'TRANSITION'] // Front of house operations
+};
 
-// Role display names
+// Human-readable role labels
 export const ROLE_LABELS: Record<UserRole, string> = {
   staff: 'Staff',
   manager: 'General Manager',
   kitchen_manager: 'Kitchen Manager',
-  ordering_manager: 'Ordering Manager', 
+  ordering_manager: 'Ordering Manager',
   lead_prep_cook: 'Lead Prep Cook',
-  assistant_foh_manager: 'Assistant FOH Manager',
-}
+  assistant_foh_manager: 'Assistant FOH Manager'
+};
 
-// Helper function to check if a role has manager privileges
+// Helper functions
 export function isManagerRole(role: UserRole): boolean {
-  return role !== 'staff'
+  return role !== 'staff';
 }
 
-// Helper function to get department permissions for a role
 export function getDepartmentPermissions(role: UserRole): Department[] {
-  return ROLE_PERMISSIONS[role] || []
+  return ROLE_PERMISSIONS[role] || [];
+}
+
+export function canAccessDepartment(userRole: UserRole, department: Department): boolean {
+  const permissions = getDepartmentPermissions(userRole);
+  return permissions.includes(department);
+}
+
+export function filterTasksByUserPermissions<T extends { departments: Department[] }>(
+  tasks: T[],
+  userRole: UserRole
+): T[] {
+  if (userRole === 'manager') {
+    return tasks; // Managers can see all tasks
+  }
+  
+  const permissions = getDepartmentPermissions(userRole);
+  return tasks.filter(task => 
+    task.departments.some(dept => permissions.includes(dept))
+  );
 }

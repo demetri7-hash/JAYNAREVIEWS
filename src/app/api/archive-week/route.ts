@@ -16,31 +16,37 @@ export async function POST(request: NextRequest) {
     
     console.log('Overwrite mode:', overwrite)
     
-    // Calculate the previous Monday-Sunday week
-    const today = new Date()
-    const dayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, etc.
+    // Calculate the previous Monday-Sunday week using Los Angeles timezone
+    // Today is Monday Sep 15, 2025, so previous week should be Sep 8-14, 2025
+    
+    // Get current date in Los Angeles timezone
+    const now = new Date()
+    const laDate = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}))
+    const dayOfWeek = laDate.getDay() // 0 = Sunday, 1 = Monday, etc.
+    
+    console.log(`Current LA date: ${laDate.toLocaleDateString()} (day of week: ${dayOfWeek})`)
     
     // Calculate days back to get to the previous week's Monday
     let daysBackToLastMonday
-    if (dayOfWeek === 0) { // Sunday
-      daysBackToLastMonday = 8 // Go back to previous Monday
-    } else if (dayOfWeek === 1) { // Monday
+    if (dayOfWeek === 1) { // If today is Monday
       daysBackToLastMonday = 7 // Go back to previous Monday
+    } else if (dayOfWeek === 0) { // If today is Sunday
+      daysBackToLastMonday = 6 // Go back to Monday of this week
     } else { // Tuesday-Saturday
-      daysBackToLastMonday = dayOfWeek + 6 // Go back to previous Monday
+      daysBackToLastMonday = dayOfWeek - 1 + 7 // Go back to previous Monday
     }
     
-    const weekStart = new Date(today)
-    weekStart.setDate(today.getDate() - daysBackToLastMonday)
+    const weekStart = new Date(laDate)
+    weekStart.setDate(laDate.getDate() - daysBackToLastMonday)
     weekStart.setHours(0, 0, 0, 0) // Start of Monday
     
     const weekEnding = new Date(weekStart)
     weekEnding.setDate(weekStart.getDate() + 6)
     weekEnding.setHours(23, 59, 59, 999) // End of Sunday
     
-    console.log(`Archiving week: ${weekStart.toISOString()} to ${weekEnding.toISOString()}`)
-    console.log(`Week start (Monday): ${weekStart.toLocaleDateString()}`)
-    console.log(`Week end (Sunday): ${weekEnding.toLocaleDateString()}`)
+    console.log(`Archiving week: ${weekStart.toLocaleDateString()} to ${weekEnding.toLocaleDateString()}`)
+    console.log(`Week start (Monday): ${weekStart.toISOString()}`)
+    console.log(`Week end (Sunday): ${weekEnding.toISOString()}`)
 
     // Check if we already archived this week
     const { data: existingReport } = await supabase

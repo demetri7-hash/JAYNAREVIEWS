@@ -24,21 +24,22 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Calculate what the archive would be looking for
-    const today = new Date()
-    const dayOfWeek = today.getDay()
+    // Calculate what the archive would be looking for (using LA timezone)
+    const now = new Date()
+    const laDate = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}))
+    const dayOfWeek = laDate.getDay()
     
     let daysBackToLastMonday
-    if (dayOfWeek === 0) { // Sunday
-      daysBackToLastMonday = 8
-    } else if (dayOfWeek === 1) { // Monday
-      daysBackToLastMonday = 7
+    if (dayOfWeek === 1) { // If today is Monday
+      daysBackToLastMonday = 7 // Go back to previous Monday
+    } else if (dayOfWeek === 0) { // If today is Sunday
+      daysBackToLastMonday = 6 // Go back to Monday of this week
     } else { // Tuesday-Saturday
-      daysBackToLastMonday = dayOfWeek + 6
+      daysBackToLastMonday = dayOfWeek - 1 + 7 // Go back to previous Monday
     }
     
-    const weekStart = new Date(today)
-    weekStart.setDate(today.getDate() - daysBackToLastMonday)
+    const weekStart = new Date(laDate)
+    weekStart.setDate(laDate.getDate() - daysBackToLastMonday)
     weekStart.setHours(0, 0, 0, 0)
     
     const weekEnding = new Date(weekStart)
@@ -48,7 +49,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       debug: {
-        today: today.toISOString(),
+        currentUTC: now.toISOString(),
+        currentLA: laDate.toISOString(),
         weekStart: weekStart.toISOString(),
         weekEnding: weekEnding.toISOString(),
         dayOfWeek,

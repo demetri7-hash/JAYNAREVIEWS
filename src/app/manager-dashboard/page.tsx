@@ -209,7 +209,7 @@ export default function ManagerDashboard() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
               <select
                 value={filters.department}
-                onChange={(e) => setFilters(prev => ({ ...prev, department: e.target.value as any }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, department: e.target.value as Department | 'all' }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               >
                 <option value="all">All Departments</option>
@@ -222,7 +222,7 @@ export default function ManagerDashboard() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as 'all' | 'pending' | 'completed' }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               >
                 <option value="all">All Status</option>

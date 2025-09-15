@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     
@@ -157,30 +157,4 @@ export async function GET(request: NextRequest) {
       error: 'Internal server error' 
     }, { status: 500 })
   }
-}
-
-function getNextDueDate(frequency: string): string {
-  const now = new Date()
-  
-  switch (frequency) {
-    case 'daily':
-      now.setDate(now.getDate() + 1)
-      break
-    case 'weekly':
-      now.setDate(now.getDate() + 7)
-      break
-    case 'monthly':
-      now.setMonth(now.getMonth() + 1)
-      break
-    case 'yearly':
-      now.setFullYear(now.getFullYear() + 1)
-      break
-    case 'once':
-    default:
-      // For 'once', set due date to tomorrow by default
-      now.setDate(now.getDate() + 1)
-      break
-  }
-  
-  return now.toISOString()
 }

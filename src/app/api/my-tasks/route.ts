@@ -64,16 +64,6 @@ export async function GET(request: NextRequest) {
       console.error('Error getting count:', countError)
     }
 
-    // Calculate status for each assignment
-    const assignmentsWithStatus = assignments.map(assignment => {
-      // Don't override the status with overdue calculation here
-      // Let the frontend handle overdue display consistently
-      return {
-        ...assignment,
-        status: assignment.status // Keep the original status from database
-      }
-    })
-
         return NextResponse.json({ 
       assignments: assignments || [],
       pagination: {

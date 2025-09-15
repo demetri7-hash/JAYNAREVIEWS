@@ -303,7 +303,7 @@ export async function GET() {
       latest_report: latestReport,
       archive_available: true
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to check archive status' },
       { status: 500 }

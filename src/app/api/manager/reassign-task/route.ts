@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../../../lib/auth';
 import { createClient } from '@supabase/supabase-js';
-import { isManagerRole, UserRole, getDepartmentPermissions } from '../../../../types';
+import { isManagerRole, UserRole, getDepartmentPermissions, Department } from '../../../../types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Check permissions for the task
     const userPermissions = getDepartmentPermissions(profile.role as UserRole);
     const hasPermission = task.departments.some((dept: string) => 
-      userPermissions.includes(dept as any)
+      userPermissions.includes(dept as Department)
     );
     
     if (!hasPermission && profile.role !== 'manager') {

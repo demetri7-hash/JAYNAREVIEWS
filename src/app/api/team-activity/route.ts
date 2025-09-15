@@ -138,10 +138,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Format recent completions
-    const formattedCompletions = recentCompletions?.map((completion: any) => ({
+    const formattedCompletions = recentCompletions?.map((completion) => ({
       id: completion.id,
-      task_title: completion.assignment?.task?.title || 'Unknown Task',
-      completed_by_name: completion.completed_by?.name || 'Unknown User',
+      task_title: (completion.assignment as { task?: { title?: string } })?.task?.title || 'Unknown Task',
+      completed_by_name: (completion.completed_by as { name?: string })?.name || 'Unknown User',
       completed_at: completion.completed_at,
       notes: completion.notes,
       has_photo: !!completion.photo_url

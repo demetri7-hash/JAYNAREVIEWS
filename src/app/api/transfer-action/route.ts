@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Check authorization based on current status and user role
     let canTakeAction = false
     let newStatus = ''
-    let updateFields: any = {}
+    let updateFields: Record<string, string> = {}
 
     if (transfer.status === 'pending_transferee' && transfer.to_user_id === currentUser.id) {
       // Transferee can approve/reject

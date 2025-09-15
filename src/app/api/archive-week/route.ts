@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get all completed assignments from the past week
+    // We need to join with completions table and filter by completion date, not creation date
     const { data: completedAssignments, error: assignmentsError } = await supabase
       .from('assignments')
       .select(`
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
         due_date,
         status,
         created_at,
-        completions (
+        completions!inner (
           completed_by,
           notes,
           photo_url,
@@ -100,8 +101,11 @@ export async function POST(request: NextRequest) {
         )
       `)
       .eq('status', 'completed')
-      .gte('created_at', weekStart.toISOString())
-      .lte('created_at', weekEnding.toISOString())
+      .gte('completions.completed_at', weekStart.toISOString())
+      .lte('completions.completed_at', weekEnding.toISOString())
+
+    console.log(`Week range: ${weekStart.toISOString()} to ${weekEnding.toISOString()}`)
+    console.log(`Query: Looking for completions between these dates`)
 
     if (assignmentsError) {
       throw assignmentsError

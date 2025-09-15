@@ -33,18 +33,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Fetch all tasks with assignee information
+    // Fetch all tasks first
     const { data: tasks, error: tasksError } = await supabase
       .from('checklist_items')
-      .select(`
-        *,
-        assignee:assigned_to(
-          id,
-          name,
-          email,
-          role
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (tasksError) {
@@ -52,8 +44,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
     }
 
+    // Fetch user profiles separately to avoid join issues
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, name, email, role');
+
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+      return NextResponse.json({ error: 'Failed to fetch user profiles' }, { status: 500 });
+    }
+
+    // Combine tasks with assignee information
+    const tasksWithAssignees = (tasks || []).map(task => ({
+      ...task,
+      assignee: profiles?.find(p => p.id === task.assigned_to) || null
+    }));
+
     // Filter tasks based on manager's department permissions
-    const filteredTasks = filterTasksByUserPermissions(tasks || [], profile.role as UserRole);
+    const filteredTasks = filterTasksByUserPermissions(tasksWithAssignees || [], profile.role as UserRole);
 
     return NextResponse.json(filteredTasks);
 

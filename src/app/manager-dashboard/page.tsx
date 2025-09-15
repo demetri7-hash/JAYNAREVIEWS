@@ -27,6 +27,7 @@ export default function ManagerDashboard() {
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     department: 'all' as Department | 'all',
@@ -52,29 +53,51 @@ export default function ManagerDashboard() {
 
   // Fetch tasks and users
   useEffect(() => {
-    if (!session?.user?.id || !userRole) return;
+    if (!session?.user?.email || !userRole) return;
 
     const fetchData = async () => {
       try {
+        console.log('Fetching manager dashboard data...', { userEmail: session?.user?.email, userRole });
+        setError(null);
+        
         // Fetch tasks with assignee info
         const tasksResponse = await fetch('/api/manager/tasks');
+        console.log('Tasks response status:', tasksResponse.status);
+        
+        if (!tasksResponse.ok) {
+          const errorText = await tasksResponse.text();
+          console.error('Tasks API error:', errorText);
+          throw new Error(`Tasks API failed: ${tasksResponse.status} - ${errorText}`);
+        }
+        
         const tasksData = await tasksResponse.json();
+        console.log('Tasks data received:', tasksData?.length || 0, 'tasks');
 
         // Fetch all users for reassignment
         const usersResponse = await fetch('/api/users');
+        console.log('Users response status:', usersResponse.status);
+        
+        if (!usersResponse.ok) {
+          const errorText = await usersResponse.text();
+          console.error('Users API error:', errorText);
+          throw new Error(`Users API failed: ${usersResponse.status} - ${errorText}`);
+        }
+        
         const usersData = await usersResponse.json();
+        console.log('Users data received:', usersData?.length || 0, 'users');
 
-        setTasks(tasksData);
-        setUsers(usersData);
+        setTasks(tasksData || []);
+        setUsers(usersData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [session?.user?.id, userRole]);
+  }, [session?.user?.email, userRole]);
 
   // Filter tasks based on manager's department permissions and current filters
   const filteredTasks = tasks.filter(task => {
@@ -169,6 +192,18 @@ export default function ManagerDashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading manager dashboard...</p>
+          {error && (
+            <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-md">
+              <p className="font-medium">Error loading dashboard:</p>
+              <p className="text-sm mt-1">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

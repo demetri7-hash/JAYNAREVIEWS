@@ -13,10 +13,22 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     
-    const { title, description, frequency, notes_required, photos_required, assigned_to } = body
+    const { title, description, frequency, requires_notes, requires_photo, assignees } = body
 
     if (!title || !frequency) {
       return NextResponse.json({ error: 'Title and frequency are required' }, { status: 400 })
+    }
+
+    // Get the user's profile to get their UUID
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (profileError || !profile) {
+      console.error('Error finding user profile:', profileError)
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
     // Create the task template
@@ -26,10 +38,9 @@ export async function POST(request: NextRequest) {
         {
           title,
           description: description || null,
-          frequency,
-          notes_required: notes_required || false,
-          photos_required: photos_required || false,
-          created_by: session.user.email
+          requires_notes: requires_notes || false,
+          requires_photo: requires_photo || false,
+          created_by: profile.id
         }
       ])
       .select()
@@ -37,25 +48,31 @@ export async function POST(request: NextRequest) {
 
     if (taskError) {
       console.error('Error creating task:', taskError)
-      return NextResponse.json({ error: 'Failed to create task' }, { status: 500 })
+      return NextResponse.json({ 
+        error: 'Failed to create task',
+        details: taskError.message 
+      }, { status: 500 })
     }
 
-    // If assigned_to is provided, create an assignment
-    if (assigned_to && assigned_to.trim()) {
-      const { error: assignmentError } = await supabaseAdmin
-        .from('assignments')
-        .insert([
-          {
-            task_id: task.id,
-            assigned_to: assigned_to.trim(),
-            assigned_by: session.user.email,
-            due_date: getNextDueDate(frequency)
-          }
-        ])
+    // If assignees are provided, create assignments
+    if (assignees && Array.isArray(assignees) && assignees.length > 0) {
+      for (const assigneeId of assignees) {
+        const { error: assignmentError } = await supabaseAdmin
+          .from('assignments')
+          .insert([
+            {
+              task_id: task.id,
+              assigned_to: assigneeId,
+              assigned_by: profile.id,
+              due_date: getNextDueDate(frequency),
+              recurrence: frequency
+            }
+          ])
 
-      if (assignmentError) {
-        console.error('Error creating assignment:', assignmentError)
-        // Don't fail the request, just log the error
+        if (assignmentError) {
+          console.error('Error creating assignment for user:', assigneeId, assignmentError)
+          // Don't fail the request, just log the error
+        }
       }
     }
 
@@ -68,7 +85,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Task creation error:', error)
     return NextResponse.json({ 
-      error: 'Internal server error' 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

@@ -1,24 +1,54 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Plus } from 'lucide-react'
+
+interface User {
+  id: string
+  email: string
+  name: string | null
+  role: string | null
+}
 
 export default function CreateTask() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [users, setUsers] = useState<User[]>([])
+  const [loadingUsers, setLoadingUsers] = useState(true)
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     frequency: 'daily',
-    notes_required: false,
-    photos_required: false,
-    assigned_to: ''
+    requires_notes: false,
+    requires_photo: false,
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users')
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data.users)
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    } finally {
+      setLoadingUsers(false)
+    }
+  }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
 
     try {
       const response = await fetch('/api/tasks', {
@@ -26,20 +56,34 @@ export default function CreateTask() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
-      })
+        body: JSON.stringify({
+          ...formData,
+          assignees: selectedUsers,
+        }),
+      });
 
-      if (response.ok) {
-        router.push('/')
-      } else {
-        alert('Error creating task')
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create task');
       }
+
+      // Reset form and redirect to dashboard
+      setFormData({
+        title: '',
+        description: '',
+        frequency: 'daily',
+        requires_notes: false,
+        requires_photo: false,
+      });
+      setSelectedUsers([]);
+      router.push('/');
     } catch (error) {
-      alert('Error creating task')
+      console.error('Error creating task:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
-      setLoading(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -64,6 +108,14 @@ export default function CreateTask() {
               <p className="text-gray-600">Create a task template for your restaurant staff</p>
             </div>
           </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+              <div className="flex">
+                <div className="text-red-600 text-sm">{error}</div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -115,17 +167,40 @@ export default function CreateTask() {
             </div>
 
             <div>
-              <label htmlFor="assigned_to" className="block text-sm font-medium text-gray-700 mb-2">
-                Assign To (Email)
+              <label htmlFor="assigned_users" className="block text-sm font-medium text-gray-700 mb-2">
+                Assign To (Select Staff)
               </label>
-              <input
-                type="email"
-                id="assigned_to"
-                value={formData.assigned_to}
-                onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="staff@example.com (optional - can assign later)"
-              />
+              {loadingUsers ? (
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                  Loading users...
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {users.map((user) => (
+                    <div key={user.id} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`user_${user.id}`}
+                        checked={selectedUsers.includes(user.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedUsers([...selectedUsers, user.id])
+                          } else {
+                            setSelectedUsers(selectedUsers.filter(id => id !== user.id))
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <label htmlFor={`user_${user.id}`} className="ml-2 text-sm text-gray-700">
+                        {user.name || user.email} {user.role && `(${user.role})`}
+                      </label>
+                    </div>
+                  ))}
+                  {users.length === 0 && (
+                    <div className="text-sm text-gray-500">No users found. You can assign later.</div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -134,12 +209,12 @@ export default function CreateTask() {
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="notes_required"
-                  checked={formData.notes_required}
-                  onChange={(e) => setFormData({ ...formData, notes_required: e.target.checked })}
+                  id="requires_notes"
+                  checked={formData.requires_notes}
+                  onChange={(e) => setFormData({ ...formData, requires_notes: e.target.checked })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor="notes_required" className="ml-2 text-sm text-gray-700">
+                <label htmlFor="requires_notes" className="ml-2 text-sm text-gray-700">
                   Require notes when completing this task
                 </label>
               </div>
@@ -147,12 +222,12 @@ export default function CreateTask() {
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="photos_required"
-                  checked={formData.photos_required}
-                  onChange={(e) => setFormData({ ...formData, photos_required: e.target.checked })}
+                  id="requires_photo"
+                  checked={formData.requires_photo}
+                  onChange={(e) => setFormData({ ...formData, requires_photo: e.target.checked })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor="photos_required" className="ml-2 text-sm text-gray-700">
+                <label htmlFor="requires_photo" className="ml-2 text-sm text-gray-700">
                   Require photos when completing this task
                 </label>
               </div>

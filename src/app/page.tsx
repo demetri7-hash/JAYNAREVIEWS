@@ -81,7 +81,10 @@ export default function Home() {
                 <span className="font-medium text-green-600">5</span>
               </div>
             </div>
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => router.push('/my-tasks')}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            >
               View My Tasks
             </button>
           </div>

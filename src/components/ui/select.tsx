@@ -11,6 +11,13 @@ export const Select: React.FC<SelectProps> = ({ value, onValueChange, children }
   const [isOpen, setIsOpen] = React.useState(false);
   const [internalValue, setInternalValue] = React.useState(value || '');
 
+  // Update internal value when prop changes
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setInternalValue(value);
+    }
+  }, [value]);
+
   const handleValueChange = (newValue: string) => {
     setInternalValue(newValue);
     onValueChange?.(newValue);
@@ -97,12 +104,12 @@ export const SelectContent = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'absolute top-full left-0 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md',
+        'absolute top-full left-0 z-50 w-full rounded-md border bg-white text-gray-900 shadow-lg ring-1 ring-black ring-opacity-5',
         className
       )}
       {...props}
     >
-      <div className="p-1">
+      <div className="p-1 bg-white rounded-md">
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child) && child.type === SelectItem) {
             return React.cloneElement(child as React.ReactElement<{ onValueChange?: (value: string) => void }>, { onValueChange });
@@ -125,7 +132,7 @@ export const SelectItem = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+      'relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none bg-white hover:bg-blue-50 hover:text-blue-900 focus:bg-blue-50 focus:text-blue-900 transition-colors',
       className
     )}
     onClick={() => onValueChange?.(value)}

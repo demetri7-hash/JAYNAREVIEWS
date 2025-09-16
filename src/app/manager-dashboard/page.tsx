@@ -511,8 +511,11 @@ function UserManagementTab({
 }) {
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('staff');
+  const [savingUser, setSavingUser] = useState<string | null>(null);
+  const [savedUser, setSavedUser] = useState<string | null>(null);
 
   const updateUserRole = async (userId: string, newRole: UserRole) => {
+    setSavingUser(userId);
     try {
       const response = await fetch('/api/manager/users', {
         method: 'PATCH',
@@ -525,9 +528,13 @@ function UserManagementTab({
           user.id === userId ? { ...user, role: newRole } : user
         ));
         setEditingUser(null);
+        setSavedUser(userId);
+        setTimeout(() => setSavedUser(null), 2000); // Reset after 2 seconds
       }
     } catch (error) {
       console.error('Error updating user role:', error);
+    } finally {
+      setSavingUser(null);
     }
   };
 
@@ -536,7 +543,7 @@ function UserManagementTab({
       <h2 className="text-2xl font-bold">User Management</h2>
       <div className="grid gap-4">
         {users.map(user => (
-          <Card key={user.id}>
+          <Card key={user.id} className={savedUser === user.id ? "ring-2 ring-green-500 transition-all duration-500" : ""}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -546,33 +553,75 @@ function UserManagementTab({
                 <div className="flex items-center gap-4">
                   {editingUser === user.id ? (
                     <div className="flex items-center gap-2">
-                      <Select value={selectedRole} onValueChange={(value: string) => setSelectedRole(value as UserRole)}>
-                        <SelectTrigger className="w-40">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="staff">Staff</SelectItem>
-                          <SelectItem value="kitchen_manager">Kitchen Manager</SelectItem>
-                          <SelectItem value="ordering_manager">Ordering Manager</SelectItem>
-                          <SelectItem value="manager">General Manager</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button onClick={() => updateUserRole(user.id, selectedRole)} size="sm">
-                        Save
+                      <div className="w-40">
+                        <Select value={selectedRole} onValueChange={(value: string) => setSelectedRole(value as UserRole)}>
+                          <SelectTrigger className="w-full bg-white border-2 border-blue-200 focus:border-blue-500">
+                            <SelectValue placeholder="Select role">
+                              {ROLE_LABELS[selectedRole] || 'Select role'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="staff">
+                              <span className="font-medium">Staff</span>
+                            </SelectItem>
+                            <SelectItem value="kitchen_manager">
+                              <span className="font-medium">Kitchen Manager</span>
+                            </SelectItem>
+                            <SelectItem value="ordering_manager">
+                              <span className="font-medium">Ordering Manager</span>
+                            </SelectItem>
+                            <SelectItem value="manager">
+                              <span className="font-medium">General Manager</span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button 
+                        onClick={() => updateUserRole(user.id, selectedRole)} 
+                        size="sm"
+                        disabled={savingUser === user.id}
+                        className="min-w-[70px]"
+                      >
+                        {savingUser === user.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                            Saving
+                          </>
+                        ) : (
+                          'Save'
+                        )}
                       </Button>
-                      <Button onClick={() => setEditingUser(null)} variant="outline" size="sm">
+                      <Button 
+                        onClick={() => {
+                          setEditingUser(null);
+                          setSelectedRole('staff');
+                        }} 
+                        variant="outline" 
+                        size="sm"
+                        disabled={savingUser === user.id}
+                      >
                         Cancel
                       </Button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">{ROLE_LABELS[user.role]}</Badge>
+                      <Badge 
+                        variant="outline" 
+                        className={`${savedUser === user.id ? 'bg-green-100 border-green-500 text-green-700' : ''} transition-colors duration-500`}
+                      >
+                        {ROLE_LABELS[user.role]}
+                        {savedUser === user.id && (
+                          <span className="ml-1 text-green-600">✓</span>
+                        )}
+                      </Badge>
                       <Button 
                         onClick={() => {
                           setEditingUser(user.id);
                           setSelectedRole(user.role);
                         }} 
                         size="sm"
+                        variant="outline"
+                        className="hover:bg-blue-50 hover:border-blue-300"
                       >
                         Edit Role
                       </Button>
@@ -599,6 +648,9 @@ function RoleConfigurationTab() {
     manager: ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'],
   });
 
+  const [savingRole, setSavingRole] = useState<UserRole | null>(null);
+  const [savedRole, setSavedRole] = useState<UserRole | null>(null);
+
   const toggleDepartmentPermission = (role: UserRole, department: Department) => {
     setRolePermissions(prev => ({
       ...prev,
@@ -609,6 +661,7 @@ function RoleConfigurationTab() {
   };
 
   const saveDepartmentConfig = async (role: UserRole) => {
+    setSavingRole(role);
     try {
       const response = await fetch('/api/manager/role-permissions', {
         method: 'PATCH',
@@ -617,11 +670,13 @@ function RoleConfigurationTab() {
       });
 
       if (response.ok) {
-        // Show success message
-        console.log('Role permissions updated');
+        setSavedRole(role);
+        setTimeout(() => setSavedRole(null), 2000); // Reset after 2 seconds
       }
     } catch (error) {
       console.error('Error updating role permissions:', error);
+    } finally {
+      setSavingRole(null);
     }
   };
 
@@ -636,21 +691,44 @@ function RoleConfigurationTab() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p className="text-sm text-gray-600">Select departments this role has access to:</p>
+                <p className="text-sm text-gray-600">
+                  Select departments this role has access to. 
+                  <span className="font-medium text-green-600 ml-2">Green = Access Granted</span>
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  {(['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'] as Department[]).map(department => (
-                    <Button
-                      key={department}
-                      variant={rolePermissions[role as UserRole]?.includes(department) ? "default" : "outline"}
-                      onClick={() => toggleDepartmentPermission(role as UserRole, department)}
-                      size="sm"
-                    >
-                      {department.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </Button>
-                  ))}
+                  {(['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'] as Department[]).map(department => {
+                    const hasAccess = rolePermissions[role as UserRole]?.includes(department);
+                    return (
+                      <Button
+                        key={department}
+                        variant={hasAccess ? "default" : "outline"}
+                        onClick={() => toggleDepartmentPermission(role as UserRole, department)}
+                        size="sm"
+                        className={hasAccess ? "bg-green-600 hover:bg-green-700 text-white border-green-600" : "border-gray-300 hover:bg-gray-50"}
+                      >
+                        {department.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </Button>
+                    );
+                  })}
                 </div>
-                <Button onClick={() => saveDepartmentConfig(role as UserRole)} className="mt-4">
-                  Save Changes
+                <Button 
+                  onClick={() => saveDepartmentConfig(role as UserRole)} 
+                  className="mt-4"
+                  disabled={savingRole === role as UserRole}
+                >
+                  {savingRole === role as UserRole ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : savedRole === role as UserRole ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 text-green-500">✓</div>
+                      Saved!
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
                 </Button>
               </div>
             </CardContent>

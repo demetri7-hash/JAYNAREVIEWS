@@ -564,6 +564,18 @@ function UserManagementTab({
                             <SelectItem value="staff">
                               <span className="font-medium">Staff</span>
                             </SelectItem>
+                            <SelectItem value="foh_team_member">
+                              <span className="font-medium">FOH Team Member</span>
+                            </SelectItem>
+                            <SelectItem value="boh_team_member">
+                              <span className="font-medium">BOH Team Member</span>
+                            </SelectItem>
+                            <SelectItem value="lead_prep_cook">
+                              <span className="font-medium">Lead Prep Cook</span>
+                            </SelectItem>
+                            <SelectItem value="assistant_foh_manager">
+                              <span className="font-medium">Assistant FOH Manager</span>
+                            </SelectItem>
                             <SelectItem value="kitchen_manager">
                               <span className="font-medium">Kitchen Manager</span>
                             </SelectItem>
@@ -641,6 +653,8 @@ function UserManagementTab({
 function RoleConfigurationTab() {
   const [rolePermissions, setRolePermissions] = useState<Record<UserRole, Department[]>>({
     staff: [], // Staff see only assigned tasks, no department filtering needed
+    foh_team_member: ['FOH', 'CLEAN', 'TRANSITION'],
+    boh_team_member: ['BOH', 'PREP'],
     kitchen_manager: ['BOH', 'PREP'],
     ordering_manager: ['BOH', 'PREP'],
     lead_prep_cook: ['BOH', 'PREP'],

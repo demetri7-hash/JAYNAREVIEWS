@@ -12,6 +12,17 @@ export interface TranslationResult {
 
 export async function translateText(text: string, detectedLanguage?: string): Promise<TranslationResult> {
   try {
+    // Quick validation
+    if (!text || text.trim().length === 0) {
+      return { en: text, es: text, tr: text };
+    }
+
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
+      console.warn('OpenAI API key not configured, returning original text for all languages');
+      return { en: text, es: text, tr: text };
+    }
+
     const prompt = `
 Translate the following text into English, Latin American Spanish, and Turkish. 
 ${detectedLanguage ? `The original text is in ${detectedLanguage}.` : 'Auto-detect the original language.'}

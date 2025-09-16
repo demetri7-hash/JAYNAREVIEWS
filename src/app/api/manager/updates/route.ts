@@ -111,9 +111,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    // Auto-translate title and message
-    const titleTranslations = await translateText(title);
-    const messageTranslations = await translateText(message);
+    // Auto-translate title and message with error handling
+    let titleTranslations, messageTranslations;
+    try {
+      titleTranslations = await translateText(title);
+      messageTranslations = await translateText(message);
+    } catch (error) {
+      console.error('Translation failed, using original text:', error);
+      // Fallback to original text for all languages
+      titleTranslations = { en: title, es: title, tr: title };
+      messageTranslations = { en: message, es: message, tr: message };
+    }
 
     // Create the update in the database with translations
     const { data: newUpdate, error } = await supabase

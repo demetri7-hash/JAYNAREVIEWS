@@ -114,8 +114,11 @@ export async function POST(request: NextRequest) {
     // Auto-translate title and message with error handling
     let titleTranslations, messageTranslations;
     try {
+      console.log('Attempting translation for title:', title);
+      console.log('OpenAI API Key configured:', !!process.env.OPENAI_API_KEY);
       titleTranslations = await translateText(title);
       messageTranslations = await translateText(message);
+      console.log('Translation successful');
     } catch (error) {
       console.error('Translation failed, using original text:', error);
       // Fallback to original text for all languages

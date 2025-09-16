@@ -139,10 +139,10 @@ export default function ManagerDashboard() {
   };
 
   const handleSelectAll = () => {
-    if (selectedTasks.length === filteredTasks.length) {
+    if (selectedTasks.length === (filteredTasks || []).length) {
       setSelectedTasks([]);
     } else {
-      setSelectedTasks(filteredTasks.map(task => task.id));
+      setSelectedTasks((filteredTasks || []).map(task => task.id));
     }
   };
 
@@ -418,7 +418,7 @@ export default function ManagerDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredTasks.map((task) => (
+                {(filteredTasks || []).map((task) => (
                   <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
@@ -436,7 +436,7 @@ export default function ManagerDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
-                        {task.departments.map((dept: string) => (
+                        {(task.departments || []).map((dept: string) => (
                           <span
                             key={dept}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -474,7 +474,7 @@ export default function ManagerDashboard() {
                           defaultValue=""
                         >
                           <option value="">Reassign...</option>
-                          {users.map(user => (
+                          {(users || []).map(user => (
                             <option key={user.id} value={user.id}>
                               {user.name} ({ROLE_LABELS[user.role]})
                             </option>
@@ -803,7 +803,7 @@ function ManagerUpdatesTab() {
             No updates created yet. Create your first update above.
           </div>
         ) : (
-          updates.map((update) => (
+          (updates || []).map((update) => (
             <Card key={update.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -957,7 +957,7 @@ function UserManagementTab({
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">User Management</h2>
       <div className="grid gap-4">
-        {users.map(user => (
+        {(users || []).map(user => (
           <Card key={user.id} className={savedUser === user.id ? "ring-2 ring-green-500 transition-all duration-500" : ""}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -966,8 +966,8 @@ function UserManagementTab({
                   <p className="text-sm text-gray-600">{user.email}</p>
                   <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
                     <span>Departments:</span>
-                    {getUserPermissions(user).length > 0 ? (
-                      getUserPermissions(user).map(dept => (
+                    {(getUserPermissions(user) || []).length > 0 ? (
+                      (getUserPermissions(user) || []).map(dept => (
                         <span key={dept} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
                           {dept}
                         </span>

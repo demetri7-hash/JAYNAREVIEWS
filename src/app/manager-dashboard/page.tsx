@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
+import { LanguageToggleCompact } from '@/components/LanguageToggle';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -28,6 +30,7 @@ interface User {
 export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { language, getText } = useLanguage();
   const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates'>('tasks');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -233,12 +236,15 @@ export default function ManagerDashboard() {
                 Department Access: {departmentPermissions.join(', ')}
               </p>
             </div>
-            <button
-              onClick={() => router.push('/')}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Back to Main
-            </button>
+            <div className="flex items-center gap-4">
+              <LanguageToggleCompact />
+              <button
+                onClick={() => router.push('/')}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Back to Main
+              </button>
+            </div>
           </div>
         </div>
 
@@ -254,7 +260,7 @@ export default function ManagerDashboard() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Task Management
+                {getText(staticTranslations.taskManagement.en, staticTranslations.taskManagement.es, staticTranslations.taskManagement.tr)}
               </button>
               {userRole === 'manager' && (
                 <>
@@ -266,7 +272,7 @@ export default function ManagerDashboard() {
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    User Management
+                    {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
                   </button>
                   <button
                     onClick={() => setActiveTab('roles')}
@@ -286,7 +292,7 @@ export default function ManagerDashboard() {
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    Manager Updates
+                    {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
                   </button>
                 </>
               )}
@@ -518,10 +524,18 @@ export default function ManagerDashboard() {
 
 // Manager Updates Tab Component
 function ManagerUpdatesTab() {
+  const { language, getText } = useLanguage();
+  
   interface ManagerUpdate {
     id: string;
     title: string;
     message: string;
+    title_en?: string;
+    title_es?: string;
+    title_tr?: string;
+    message_en?: string;
+    message_es?: string;
+    message_tr?: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     type: 'announcement' | 'alert' | 'policy' | 'emergency';
     requires_acknowledgment: boolean;
@@ -810,9 +824,11 @@ function ManagerUpdatesTab() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-xl">{getTypeIcon(update.type)}</span>
-                      <h4 className="font-semibold text-gray-900">{update.title}</h4>
+                      <h4 className="font-semibold text-gray-900">
+                        {getText(update.title_en || update.title, update.title_es, update.title_tr)}
+                      </h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(update.priority)}`}>
-                        {update.priority.toUpperCase()}
+                        {getText(staticTranslations[update.priority]?.en || update.priority.toUpperCase(), staticTranslations[update.priority]?.es, staticTranslations[update.priority]?.tr)}
                       </span>
                       {update.requires_acknowledgment && (
                         <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
@@ -820,7 +836,9 @@ function ManagerUpdatesTab() {
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-700 mb-3">{update.message}</p>
+                    <p className="text-gray-700 mb-3">
+                      {getText(update.message_en || update.message, update.message_es, update.message_tr)}
+                    </p>
                     <div className="text-xs text-gray-500">
                       Created: {new Date(update.created_at).toLocaleString()}
                       {update.expires_at && (

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
+import { translateText } from '@/lib/translation';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,6 +40,12 @@ export async function GET(request: NextRequest) {
         id,
         title,
         message,
+        title_en,
+        title_es,
+        title_tr,
+        message_en,
+        message_es,
+        message_tr,
         priority,
         type,
         requires_acknowledgment,
@@ -105,12 +112,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    // Create the update in the database
+    // Auto-translate title and message
+    const titleTranslations = await translateText(title);
+    const messageTranslations = await translateText(message);
+
+    // Create the update in the database with translations
     const { data: newUpdate, error } = await supabase
       .from('manager_updates')
       .insert({
         title,
         message,
+        title_en: titleTranslations.en,
+        title_es: titleTranslations.es,
+        title_tr: titleTranslations.tr,
+        message_en: messageTranslations.en,
+        message_es: messageTranslations.es,
+        message_tr: messageTranslations.tr,
         priority,
         type,
         requires_acknowledgment: requiresAcknowledgment || priority === 'critical',

@@ -45,11 +45,7 @@ export async function GET(request: NextRequest) {
         created_at,
         expires_at,
         is_active,
-        created_by,
-        profiles!manager_updates_created_by_fkey (
-          name,
-          email
-        )
+        created_by
       `)
       .eq('is_active', true)
       .order('created_at', { ascending: false });

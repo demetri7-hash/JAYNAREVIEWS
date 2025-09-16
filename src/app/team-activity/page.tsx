@@ -105,9 +105,9 @@ export default function TeamActivity() {
         setRecentCompletions(data.recentCompletions)
         setUserActivity(data.userActivity)
         
-        // Mock gamification data (in production, this would come from API)
-        generateMockAchievements(data.userActivity)
-        generateMockManagerUpdates()
+        // Fetch real achievements and manager updates from API
+        await fetchAchievements()
+        await fetchManagerUpdates()
       } else {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to fetch team activity')
@@ -120,68 +120,42 @@ export default function TeamActivity() {
     }
   }
 
-  const generateMockAchievements = (users: UserActivity[]) => {
-    const mockAchievements: Achievement[] = [
-      {
-        id: '1',
-        name: 'Perfect Day',
-        description: 'Completed all assigned tasks today',
-        icon: '🏆',
-        earnedBy: users.filter(u => u.completion_rate === 100).map(u => u.user_name)
-      },
-      {
-        id: '2', 
-        name: 'Speed Demon',
-        description: 'Completed 5+ tasks in one day',
-        icon: '⚡',
-        earnedBy: users.filter(u => u.completed_today >= 5).map(u => u.user_name)
-      },
-      {
-        id: '3',
-        name: 'Team Player',
-        description: 'Helped with task transfers',
-        icon: '🤝',
-        earnedBy: users.slice(0, 2).map(u => u.user_name)
-      },
-      {
-        id: '4',
-        name: 'Consistent Performer',
-        description: 'Maintained 80%+ completion rate',
-        icon: '🎯',
-        earnedBy: users.filter(u => u.completion_rate >= 80).map(u => u.user_name)
-      }
-    ]
-    setAchievements(mockAchievements)
+  const fetchAchievements = async () => {
+    try {
+      // For now, set empty achievements since gamification isn't fully implemented yet
+      // In the future, this would call an achievements API endpoint
+      setAchievements([])
+    } catch (error) {
+      console.error('Error fetching achievements:', error)
+    }
   }
 
-  const generateMockManagerUpdates = () => {
-    const mockUpdates: ManagerUpdate[] = [
-      {
-        id: '1',
-        title: 'New Team Member Roles Available',
-        message: 'FOH and BOH Team Member roles have been added for better department management.',
-        priority: 'medium',
-        timestamp: new Date().toISOString(),
-        type: 'announcement'
-      },
-      {
-        id: '2',
-        title: 'Outstanding Performance Alert',
-        message: 'Team completion rate is above 85% this week! Keep up the great work!',
-        priority: 'high',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        type: 'achievement'
-      },
-      {
-        id: '3',
-        title: 'Task Assignment Reminder',
-        message: 'Remember to review and assign tomorrow\'s prep tasks before end of shift.',
-        priority: 'medium',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-        type: 'alert'
+  const fetchManagerUpdates = async () => {
+    try {
+      const response = await fetch('/api/manager/updates?requiresAck=false')
+      if (response.ok) {
+        const data = await response.json()
+        const formattedUpdates: ManagerUpdate[] = data.updates?.map((update: {
+          id: string;
+          title: string;
+          message: string;
+          priority: string;
+          created_at: string;
+          type: string;
+        }) => ({
+          id: update.id,
+          title: update.title,
+          message: update.message,
+          priority: update.priority,
+          timestamp: update.created_at,
+          type: update.type
+        })) || []
+        setManagerUpdates(formattedUpdates)
       }
-    ]
-    setManagerUpdates(mockUpdates)
+    } catch (error) {
+      console.error('Error fetching manager updates:', error)
+      setManagerUpdates([])
+    }
   }
 
   const formatDate = (dateString: string) => {

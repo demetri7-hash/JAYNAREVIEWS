@@ -35,10 +35,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
     }
 
-    // For now, return empty overrides until database tables are ready
+    // Get user permission overrides from database
+    const { data: overrides, error } = await supabase
+      .from('user_permission_overrides')
+      .select('department')
+      .eq('user_id', userId)
+      .eq('access_granted', true);
+
+    if (error) {
+      console.error('Error fetching user permission overrides:', error);
+      return NextResponse.json({ error: 'Failed to fetch user permission overrides' }, { status: 500 });
+    }
+
+    // Convert to simple array of departments
+    const userOverrides = overrides?.map(override => override.department) || [];
+
     return NextResponse.json({ 
-      overrides: {},
-      message: 'User permission overrides feature will be available once database migration is applied'
+      overrides: userOverrides
     });
   } catch (error) {
     console.error('Error in GET /api/manager/user-permissions:', error);
@@ -50,37 +63,51 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
     // Check if user is a manager
     const { data: userProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('email', session.user.email)
       .single();
-
     if (!userProfile || userProfile.role !== 'manager') {
       return NextResponse.json({ error: 'Only managers can modify user permissions' }, { status: 403 });
     }
-
-    const { userId, department, accessGranted } = await request.json();
-
-    if (!userId || !department || typeof accessGranted !== 'boolean') {
-      return NextResponse.json({ error: 'Missing userId, department, or accessGranted' }, { status: 400 });
+    const { userId, departments } = await request.json();
+    if (!userId || !Array.isArray(departments)) {
+      return NextResponse.json({ error: 'Missing userId or departments array' }, { status: 400 });
     }
-
-    // For now, log the change until database is ready
-    console.log(`Manager ${session.user.email} ${accessGranted ? 'granted' : 'removed'} ${department} access for user ${userId}`);
-
-    return NextResponse.json({ 
+    // Remove all previous overrides for this user
+    const { error: deleteError } = await supabase
+      .from('user_permission_overrides')
+      .delete()
+      .eq('user_id', userId);
+    if (deleteError) {
+      console.error('Error deleting previous overrides:', deleteError);
+      return NextResponse.json({ error: 'Failed to update user permissions' }, { status: 500 });
+    }
+    // Insert new overrides
+    if (departments.length > 0) {
+      const overridesToInsert = departments.map((department: string) => ({
+        user_id: userId,
+        department,
+        access_granted: true
+      }));
+      const { error: insertError } = await supabase
+        .from('user_permission_overrides')
+        .insert(overridesToInsert);
+      if (insertError) {
+        console.error('Error inserting new overrides:', insertError);
+        return NextResponse.json({ error: 'Failed to save user permissions' }, { status: 500 });
+      }
+    }
+    return NextResponse.json({
       success: true,
-      message: `User permission override updated successfully`,
+      message: `User permission overrides updated successfully`,
       userId,
-      department,
-      accessGranted
+      departments
     });
   } catch (error) {
     console.error('Error in PATCH /api/manager/user-permissions:', error);

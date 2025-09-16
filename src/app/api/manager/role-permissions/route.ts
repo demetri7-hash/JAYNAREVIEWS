@@ -28,19 +28,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // For now, return hardcoded permissions until migration is applied
-    const defaultPermissions = {
+    // Fetch role permissions from database
+    const { data: rolePermissions, error } = await supabase
+      .from('role_permissions')
+      .select('role, department');
+
+    if (error) {
+      console.error('Error fetching role permissions:', error);
+      return NextResponse.json({ error: 'Failed to fetch role permissions' }, { status: 500 });
+    }
+
+    // Group permissions by role
+    const permissions: Record<string, string[]> = {
       staff: [],
-      foh_team_member: ['FOH', 'CLEAN', 'TRANSITION'],
-      boh_team_member: ['BOH', 'PREP'],
-      kitchen_manager: ['BOH', 'PREP'],
-      ordering_manager: ['BOH', 'PREP'],
-      lead_prep_cook: ['BOH', 'PREP'],
-      assistant_foh_manager: ['FOH', 'TRANSITION'],
-      manager: ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'],
+      foh_team_member: [],
+      boh_team_member: [],
+      kitchen_manager: [],
+      ordering_manager: [],
+      lead_prep_cook: [],
+      assistant_foh_manager: [],
+      manager: [],
     };
 
-    return NextResponse.json({ permissions: defaultPermissions });
+    rolePermissions?.forEach(({ role, department }) => {
+      if (permissions[role]) {
+        permissions[role].push(department);
+      }
+    });
+
+    return NextResponse.json({ permissions });
   } catch (error) {
     console.error('Error in GET /api/manager/role-permissions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -73,12 +89,33 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Missing role or departments array' }, { status: 400 });
     }
 
-    // For now, store in a simple way until we have the database tables
-    // This is a temporary solution - in production you'd save to the role_permissions table
-    console.log(`Manager ${session.user.email} updated ${role} permissions to:`, departments);
+    // First, delete existing permissions for this role
+    const { error: deleteError } = await supabase
+      .from('role_permissions')
+      .delete()
+      .eq('role', role);
 
-    // Simulate a delay to show saving state
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (deleteError) {
+      console.error('Error deleting existing permissions:', deleteError);
+      return NextResponse.json({ error: 'Failed to update role permissions' }, { status: 500 });
+    }
+
+    // Then, insert new permissions
+    if (departments.length > 0) {
+      const permissionsToInsert = departments.map(department => ({
+        role,
+        department
+      }));
+
+      const { error: insertError } = await supabase
+        .from('role_permissions')
+        .insert(permissionsToInsert);
+
+      if (insertError) {
+        console.error('Error inserting new permissions:', insertError);
+        return NextResponse.json({ error: 'Failed to save role permissions' }, { status: 500 });
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

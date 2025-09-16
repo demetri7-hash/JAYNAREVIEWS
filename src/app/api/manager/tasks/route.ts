@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../../../lib/auth';
 import { createClient } from '@supabase/supabase-js';
-import { isManagerRole, UserRole, Department } from '../../../../types';
+import { isManagerRole, UserRole, Department, ROLE_PERMISSIONS } from '../../../../types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,23 +61,47 @@ export async function GET() {
     }
 
     // Convert assignments to match the expected task format for the frontend
-    const tasksWithAssignees = (assignments || []).map(assignment => ({
-      id: assignment.id,
-      task: assignment.task?.title || 'Untitled Task',
-      completed: assignment.status === 'completed',
-      notes: assignment.task?.description || '',
-      due_date: assignment.due_date,
-      departments: ['BOH'] as Department[], // Default department - will need to be enhanced later
-      assigned_to: assignment.assigned_to,
-      created_at: assignment.created_at,
-      updated_at: assignment.created_at,
-      assignee: assignment.assignee
-    }));
+    const tasksWithAssignees = (assignments || []).map(assignment => {
+      // Determine departments based on task title/content or default to general
+      const taskTitle = assignment.task?.title?.toLowerCase() || '';
+      let departments: Department[] = [];
+      
+      if (taskTitle.includes('prep') || taskTitle.includes('cook') || taskTitle.includes('kitchen')) {
+        departments = ['BOH', 'PREP'];
+      } else if (taskTitle.includes('clean') || taskTitle.includes('sanitize')) {
+        departments = ['CLEAN'];
+      } else if (taskTitle.includes('front') || taskTitle.includes('service') || taskTitle.includes('host')) {
+        departments = ['FOH'];
+      } else if (taskTitle.includes('open') || taskTitle.includes('morning')) {
+        departments = ['AM'];
+      } else if (taskTitle.includes('close') || taskTitle.includes('closing')) {
+        departments = ['PM'];
+      } else {
+        // Default to BOH for general tasks
+        departments = ['BOH'];
+      }
 
-    // For now, managers can see all tasks (bypass department filtering until we implement it properly)
-    // const filteredTasks = filterTasksByUserPermissions(tasksWithAssignees || [], profile.role as UserRole);
+      return {
+        id: assignment.id,
+        task: assignment.task?.title || 'Untitled Task',
+        completed: assignment.status === 'completed',
+        notes: assignment.task?.description || '',
+        due_date: assignment.due_date,
+        departments,
+        assigned_to: assignment.assigned_to,
+        created_at: assignment.created_at,
+        updated_at: assignment.created_at,
+        assignee: assignment.assignee
+      };
+    });
+
+    // Apply proper department filtering based on manager's role and permissions
+    const userPermissions = ROLE_PERMISSIONS[profile.role as UserRole] || [];
+    const filteredTasks = tasksWithAssignees.filter(task => 
+      task.departments.some(dept => userPermissions.includes(dept))
+    );
     
-    return NextResponse.json(tasksWithAssignees);
+    return NextResponse.json(filteredTasks);
 
   } catch (error) {
     console.error('Manager tasks API error:', error);

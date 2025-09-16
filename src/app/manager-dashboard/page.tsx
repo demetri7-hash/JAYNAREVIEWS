@@ -546,7 +546,7 @@ function UserManagementTab({
                 <div className="flex items-center gap-4">
                   {editingUser === user.id ? (
                     <div className="flex items-center gap-2">
-                      <Select value={selectedRole} onValueChange={(value: UserRole) => setSelectedRole(value)}>
+                      <Select value={selectedRole} onValueChange={(value: string) => setSelectedRole(value as UserRole)}>
                         <SelectTrigger className="w-40">
                           <SelectValue />
                         </SelectTrigger>

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../../../lib/auth';
 import { createClient } from '@supabase/supabase-js';
-import { filterTasksByUserPermissions, isManagerRole, UserRole, Department } from '../../../../types';
+import { isManagerRole, UserRole, Department } from '../../../../types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

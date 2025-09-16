@@ -21,13 +21,26 @@ export const Select: React.FC<SelectProps> = ({ value, onValueChange, children }
     <div className="relative">
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            ...child.props,
-            value: internalValue,
-            onValueChange: handleValueChange,
-            isOpen,
-            setIsOpen,
-          } as any);
+          if (child.type === SelectTrigger) {
+            return React.cloneElement(child as React.ReactElement<{ 
+              value?: string; 
+              isOpen?: boolean; 
+              setIsOpen?: (open: boolean) => void; 
+            }>, {
+              value: internalValue,
+              isOpen,
+              setIsOpen,
+            });
+          }
+          if (child.type === SelectContent) {
+            return React.cloneElement(child as React.ReactElement<{ 
+              isOpen?: boolean; 
+              onValueChange?: (value: string) => void; 
+            }>, {
+              isOpen,
+              onValueChange: handleValueChange,
+            });
+          }
         }
         return child;
       })}
@@ -42,7 +55,7 @@ export const SelectTrigger = React.forwardRef<
     isOpen?: boolean;
     setIsOpen?: (open: boolean) => void;
   }
->(({ className, children, value, isOpen, setIsOpen, ...props }, ref) => (
+>(({ className, children, isOpen, setIsOpen, ...props }, ref) => (
   <button
     ref={ref}
     type="button"
@@ -91,11 +104,8 @@ export const SelectContent = React.forwardRef<
     >
       <div className="p-1">
         {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              ...child.props,
-              onValueChange,
-            } as any);
+          if (React.isValidElement(child) && child.type === SelectItem) {
+            return React.cloneElement(child as React.ReactElement<{ onValueChange?: (value: string) => void }>, { onValueChange });
           }
           return child;
         })}

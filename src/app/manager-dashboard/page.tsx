@@ -30,7 +30,7 @@ interface User {
 export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { language, getText } = useLanguage();
+  const { getText } = useLanguage();
   const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates'>('tasks');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -524,7 +524,7 @@ export default function ManagerDashboard() {
 
 // Manager Updates Tab Component
 function ManagerUpdatesTab() {
-  const { language, getText } = useLanguage();
+  const { getText } = useLanguage();
   
   interface ManagerUpdate {
     id: string;

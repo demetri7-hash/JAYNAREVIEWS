@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { ChecklistItem, UserRole, Department, isManagerRole, getDepartmentPermissions, ROLE_LABELS } from '../../types';
+import { ChecklistItem, UserRole, Department, isManagerRole, getDepartmentPermissions, ROLE_LABELS, ROLE_PERMISSIONS } from '../../types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -513,6 +513,8 @@ function UserManagementTab({
   const [selectedRole, setSelectedRole] = useState<UserRole>('staff');
   const [savingUser, setSavingUser] = useState<string | null>(null);
   const [savedUser, setSavedUser] = useState<string | null>(null);
+  const [customizingPermissions, setCustomizingPermissions] = useState<string | null>(null);
+  const [userPermissionOverrides, setUserPermissionOverrides] = useState<Record<string, Department[]>>({});
 
   const updateUserRole = async (userId: string, newRole: UserRole) => {
     setSavingUser(userId);
@@ -538,6 +540,52 @@ function UserManagementTab({
     }
   };
 
+  const toggleUserPermission = (userId: string, department: Department) => {
+    setUserPermissionOverrides(prev => {
+      const current = prev[userId] || [];
+      const updated = current.includes(department)
+        ? current.filter(d => d !== department)
+        : [...current, department];
+      return { ...prev, [userId]: updated };
+    });
+  };
+
+  const saveUserPermissions = async (userId: string) => {
+    try {
+      const departments = userPermissionOverrides[userId] || [];
+      // For now, just log the changes
+      console.log(`Saving custom permissions for user ${userId}:`, departments);
+      
+      // In production, you would save each department override:
+      // for (const dept of allDepartments) {
+      //   await fetch('/api/manager/user-permissions', {
+      //     method: 'PATCH',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({ 
+      //       userId, 
+      //       department: dept, 
+      //       accessGranted: departments.includes(dept) 
+      //     }),
+      //   });
+      // }
+      
+      setCustomizingPermissions(null);
+      setSavedUser(userId);
+      setTimeout(() => setSavedUser(null), 2000);
+    } catch (error) {
+      console.error('Error saving user permissions:', error);
+    }
+  };
+
+  const getUserPermissions = (user: User): Department[] => {
+    // Get base permissions from role
+    const rolePermissions = ROLE_PERMISSIONS[user.role] || [];
+    // Apply user-specific overrides
+    const overrides = userPermissionOverrides[user.id] || [];
+    // For now, just return overrides if any, otherwise role permissions
+    return overrides.length > 0 ? overrides : rolePermissions;
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">User Management</h2>
@@ -549,6 +597,18 @@ function UserManagementTab({
                 <div>
                   <h3 className="font-semibold">{user.name}</h3>
                   <p className="text-sm text-gray-600">{user.email}</p>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                    <span>Departments:</span>
+                    {getUserPermissions(user).length > 0 ? (
+                      getUserPermissions(user).map(dept => (
+                        <span key={dept} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                          {dept}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="italic">None (tasks only)</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
                   {editingUser === user.id ? (
@@ -615,6 +675,48 @@ function UserManagementTab({
                         Cancel
                       </Button>
                     </div>
+                  ) : customizingPermissions === user.id ? (
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-700">Customize Departments for {user.name}:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'] as Department[]).map(department => {
+                          const hasAccess = (userPermissionOverrides[user.id] || getUserPermissions(user)).includes(department);
+                          return (
+                            <Button
+                              key={department}
+                              variant={hasAccess ? "default" : "outline"}
+                              onClick={() => toggleUserPermission(user.id, department)}
+                              size="sm"
+                              className={hasAccess ? "bg-green-600 hover:bg-green-700 text-white border-green-600" : "border-gray-300 hover:bg-gray-50"}
+                            >
+                              {department.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => saveUserPermissions(user.id)} 
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          Save Custom Permissions
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            setCustomizingPermissions(null);
+                            setUserPermissionOverrides(prev => {
+                              const { [user.id]: _, ...rest } = prev;
+                              return rest;
+                            });
+                          }} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <Badge 
@@ -636,6 +738,23 @@ function UserManagementTab({
                         className="hover:bg-blue-50 hover:border-blue-300"
                       >
                         Edit Role
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          setCustomizingPermissions(user.id);
+                          // Initialize with current role permissions if no overrides exist
+                          if (!userPermissionOverrides[user.id]) {
+                            setUserPermissionOverrides(prev => ({
+                              ...prev,
+                              [user.id]: getUserPermissions(user)
+                            }));
+                          }
+                        }} 
+                        size="sm"
+                        variant="outline"
+                        className="hover:bg-purple-50 hover:border-purple-300 text-purple-700"
+                      >
+                        Custom Permissions
                       </Button>
                     </div>
                   )}
@@ -664,6 +783,35 @@ function RoleConfigurationTab() {
 
   const [savingRole, setSavingRole] = useState<UserRole | null>(null);
   const [savedRole, setSavedRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Load existing role permissions on component mount
+  useEffect(() => {
+    loadRolePermissions();
+  }, []);
+
+  const loadRolePermissions = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/manager/role-permissions');
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.permissions) {
+          setRolePermissions(data.permissions);
+        }
+      } else {
+        console.error('Failed to load role permissions');
+        setError('Failed to load saved role permissions. Using defaults.');
+      }
+    } catch (error) {
+      console.error('Error loading role permissions:', error);
+      setError('Error loading role permissions. Using defaults.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleDepartmentPermission = (role: UserRole, department: Department) => {
     setRolePermissions(prev => ({
@@ -676,6 +824,7 @@ function RoleConfigurationTab() {
 
   const saveDepartmentConfig = async (role: UserRole) => {
     setSavingRole(role);
+    setError('');
     try {
       const response = await fetch('/api/manager/role-permissions', {
         method: 'PATCH',
@@ -684,19 +833,60 @@ function RoleConfigurationTab() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         setSavedRole(role);
-        setTimeout(() => setSavedRole(null), 2000); // Reset after 2 seconds
+        setTimeout(() => setSavedRole(null), 3000); // Reset after 3 seconds
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to save role permissions');
       }
     } catch (error) {
       console.error('Error updating role permissions:', error);
+      setError('Network error occurred while saving');
     } finally {
       setSavingRole(null);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">Role Configuration</h2>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading role permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Role Configuration</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Role Configuration</h2>
+        <button
+          onClick={loadRolePermissions}
+          className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded transition-colors"
+        >
+          Refresh Permissions
+        </button>
+      </div>
+      
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6">
         {Object.entries(ROLE_LABELS).map(([role, label]) => (
           <Card key={role}>

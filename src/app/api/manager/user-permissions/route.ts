@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// GET: Fetch role permissions
+// GET: Fetch user permission overrides
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -28,26 +28,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // For now, return hardcoded permissions until migration is applied
-    const defaultPermissions = {
-      staff: [],
-      foh_team_member: ['FOH', 'CLEAN', 'TRANSITION'],
-      boh_team_member: ['BOH', 'PREP'],
-      kitchen_manager: ['BOH', 'PREP'],
-      ordering_manager: ['BOH', 'PREP'],
-      lead_prep_cook: ['BOH', 'PREP'],
-      assistant_foh_manager: ['FOH', 'TRANSITION'],
-      manager: ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'],
-    };
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId');
 
-    return NextResponse.json({ permissions: defaultPermissions });
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
+    }
+
+    // For now, return empty overrides until database tables are ready
+    return NextResponse.json({ 
+      overrides: {},
+      message: 'User permission overrides feature will be available once database migration is applied'
+    });
   } catch (error) {
-    console.error('Error in GET /api/manager/role-permissions:', error);
+    console.error('Error in GET /api/manager/user-permissions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// PATCH: Update role permissions  
+// PATCH: Update user permission overrides
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -64,30 +63,27 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (!userProfile || userProfile.role !== 'manager') {
-      return NextResponse.json({ error: 'Only managers can modify role permissions' }, { status: 403 });
+      return NextResponse.json({ error: 'Only managers can modify user permissions' }, { status: 403 });
     }
 
-    const { role, departments } = await request.json();
+    const { userId, department, accessGranted } = await request.json();
 
-    if (!role || !Array.isArray(departments)) {
-      return NextResponse.json({ error: 'Missing role or departments array' }, { status: 400 });
+    if (!userId || !department || typeof accessGranted !== 'boolean') {
+      return NextResponse.json({ error: 'Missing userId, department, or accessGranted' }, { status: 400 });
     }
 
-    // For now, store in a simple way until we have the database tables
-    // This is a temporary solution - in production you'd save to the role_permissions table
-    console.log(`Manager ${session.user.email} updated ${role} permissions to:`, departments);
-
-    // Simulate a delay to show saving state
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // For now, log the change until database is ready
+    console.log(`Manager ${session.user.email} ${accessGranted ? 'granted' : 'removed'} ${department} access for user ${userId}`);
 
     return NextResponse.json({ 
-      success: true, 
-      message: `Role permissions for ${role} updated successfully`,
-      role,
-      departments 
+      success: true,
+      message: `User permission override updated successfully`,
+      userId,
+      department,
+      accessGranted
     });
   } catch (error) {
-    console.error('Error in PATCH /api/manager/role-permissions:', error);
+    console.error('Error in PATCH /api/manager/user-permissions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

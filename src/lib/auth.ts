@@ -12,14 +12,22 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     })
   ],
-  debug: process.env.NODE_ENV === 'development',
+  debug: true,
   session: {
     strategy: 'jwt',
   },
   callbacks: {
     async session({ session }) {
+      console.log('NextAuth session callback:', session.user?.email);
       // Add user role to session
       if (session.user?.email) {
         const { data: profile } = await supabaseAdmin
@@ -32,7 +40,8 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async signIn({ user }) {
+    async signIn({ user, account, profile }) {
+      console.log('NextAuth signIn callback:', { user: user?.email, account: account?.provider });
       if (user?.email) {
         // Create or update user profile
         const { error } = await supabaseAdmin

@@ -62,10 +62,6 @@ export const authOptions: NextAuthOptions = {
       return true
     }
   },
-  pages: {
-    signIn: '/',
-    error: '/', // Redirect errors back to homepage
-  },
   secret: process.env.NEXTAUTH_SECRET,
 }
 

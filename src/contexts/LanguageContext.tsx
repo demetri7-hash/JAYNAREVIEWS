@@ -669,6 +669,53 @@ export const staticTranslations = {
     en: 'Failed to create task',
     es: 'Error al crear la tarea',
     tr: 'Görev oluşturulamadı'
+  },
+
+  // Additional missing translations for create-task page
+  taskDetails: {
+    en: 'Task Details',
+    es: 'Detalles de la Tarea',
+    tr: 'Görev Detayları'
+  },
+  taskDescription: {
+    en: 'Task Description',
+    es: 'Descripción de la Tarea',
+    tr: 'Görev Açıklaması'
+  },
+  assignToUsers: {
+    en: 'Assign to Users',
+    es: 'Asignar a Usuarios',
+    tr: 'Kullanıcılara Ata'
+  },
+  taskRequirements: {
+    en: 'Task Requirements',
+    es: 'Requisitos de la Tarea',
+    tr: 'Görev Gereksinimleri'
+  },
+  managerOnlyAccess: {
+    en: 'Manager-only access required',
+    es: 'Se requiere acceso solo para gerentes',
+    tr: 'Sadece yönetici erişimi gerekli'
+  },
+  oneTime: {
+    en: 'One Time',
+    es: 'Una Vez',
+    tr: 'Bir Kez'
+  },
+  dueTime: {
+    en: 'Due Time',
+    es: 'Hora de Vencimiento',
+    tr: 'Bitiş Saati'
+  },
+  notesDescription: {
+    en: 'Require staff to include notes when completing this task',
+    es: 'Requerir que el personal incluya notas al completar esta tarea',
+    tr: 'Bu görevi tamamlarken personelin not eklemesini gerektir'
+  },
+  photoDescription: {
+    en: 'Require staff to upload photos when completing this task',
+    es: 'Requerir que el personal suba fotos al completar esta tarea',
+    tr: 'Bu görevi tamamlarken personelin fotoğraf yüklemesini gerektir'
   }
 };
 

@@ -146,37 +146,46 @@ export default function WeeklyReports() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading weekly reports...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
+      <header className="glass border-b border-white/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
               <button
                 onClick={() => router.push('/')}
-                className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                className="mr-6 p-3 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-xl transition-all duration-200"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <Calendar className="w-8 h-8 text-blue-600 mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">Weekly Reports</h1>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-black brand-header">
+                  <span className="gradient-text">Weekly Reports</span>
+                </h1>
+                <p className="text-slate-600 brand-subtitle">Performance analytics and insights</p>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => runArchive()}
                 disabled={archiving}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                className="flex items-center bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 disabled:opacity-50 transition-all duration-200 font-medium shadow-lg shadow-green-500/25"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${archiving ? 'animate-spin' : ''}`} />
                 {archiving ? 'Archiving...' : 'Run Archive'}
               </button>
-              <span className="text-sm text-gray-700">Manager Dashboard</span>
             </div>
           </div>
         </div>
@@ -184,14 +193,16 @@ export default function WeeklyReports() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {reports.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Weekly Reports Yet</h3>
-            <p className="text-gray-600 mb-4">Weekly reports are generated automatically every Monday morning.</p>
+          <div className="text-center py-16 animate-fade-in-up">
+            <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <Calendar className="w-12 h-12 text-slate-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3 brand-header">No Weekly Reports Yet</h3>
+            <p className="text-slate-600 mb-6 max-w-md mx-auto brand-subtitle">Weekly reports are generated automatically every Monday morning.</p>
             <button
               onClick={() => runArchive()}
               disabled={archiving}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25"
             >
               {archiving ? 'Processing...' : 'Generate First Report'}
             </button>
@@ -199,35 +210,36 @@ export default function WeeklyReports() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Reports List */}
-            <div className="lg:col-span-1">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Report History</h2>
-              <div className="space-y-3">
-                {reports.map((report) => (
+            <div className="lg:col-span-1 animate-fade-in-up">
+              <h2 className="text-xl font-bold text-slate-900 mb-6 brand-header">Report History</h2>
+              <div className="space-y-4">
+                {reports.map((report, index) => (
                   <div
                     key={report.id}
                     onClick={() => setSelectedReport(report)}
-                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                    className={`p-6 rounded-2xl border cursor-pointer transition-all duration-200 animate-fade-in-up ${
                       selectedReport?.id === report.id
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                        ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-lg shadow-blue-500/20'
+                        : 'bg-white/50 backdrop-blur-sm border-white/30 hover:bg-white/70 hover:shadow-lg'
                     }`}
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium text-gray-900">{report.formatted_week}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <h3 className="font-bold text-slate-900 brand-header">{report.formatted_week}</h3>
+                        <p className="text-sm text-slate-600 mt-2">
                           {report.total_tasks_completed} tasks completed
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-600">
                           {report.completion_rate}% completion rate
                         </p>
                       </div>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
+                      <span className={`px-3 py-1.5 text-xs font-medium rounded-xl ${
                         report.completion_rate >= 80
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-green-100 text-green-700 border border-green-200'
                           : report.completion_rate >= 60
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                          : 'bg-red-100 text-red-700 border border-red-200'
                       }`}>
                         {report.completion_rate}%
                       </span>

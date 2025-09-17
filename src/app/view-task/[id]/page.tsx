@@ -87,21 +87,27 @@ export default function ViewTask({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading task details...</p>
+        </div>
       </div>
     )
   }
 
   if (error || !assignment) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error</h2>
-          <p className="text-gray-600 mb-4">{error || 'Task not found'}</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-3 brand-header">Error</h2>
+          <p className="text-slate-600 mb-6 brand-subtitle">{error || 'Task not found'}</p>
           <button
             onClick={() => router.back()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25"
           >
             Go Back
           </button>
@@ -111,65 +117,73 @@ export default function ViewTask({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-8 animate-fade-in-up">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200 bg-white/70 hover:bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/50"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to My Tasks
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="glass rounded-3xl border border-white/20 overflow-hidden animate-fade-in-scale">
           {/* Header */}
-          <div className="bg-green-50 border-b border-green-200 p-6">
+          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-green-200/50 p-8">
             <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{assignment.task.title}</h1>
-                <p className="text-green-700 font-medium">Task Completed</p>
+                <h1 className="text-3xl font-black text-slate-900 mb-2 brand-header">{assignment.task.title}</h1>
+                <p className="text-green-700 font-medium text-lg">Task Completed ✨</p>
               </div>
             </div>
           </div>
 
           {/* Task Details */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Task Details</h2>
+          <div className="p-8 border-b border-white/10">
+            <h2 className="text-xl font-bold text-slate-900 mb-6 brand-header">Task Details</h2>
             
             {assignment.task.description && (
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                <p className="text-gray-600">{assignment.task.description}</p>
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-slate-700 mb-3">Description</h3>
+                <div className="bg-white/50 rounded-xl p-4 border border-white/20">
+                  <p className="text-slate-600 leading-relaxed">{assignment.task.description}</p>
+                </div>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center text-sm text-gray-600">
-                <Calendar className="w-4 h-4 mr-2" />
-                <span className="font-medium mr-2">Due Date:</span>
-                {formatDueDate(assignment.due_date)}
+              <div className="flex items-center bg-slate-100 px-4 py-3 rounded-xl">
+                <Calendar className="w-5 h-5 mr-3 text-blue-500" />
+                <div>
+                  <span className="text-sm font-medium text-slate-700">Due Date</span>
+                  <p className="text-slate-900 font-medium">{formatDueDate(assignment.due_date)}</p>
+                </div>
               </div>
               
-              <div className="flex items-center text-sm text-gray-600">
-                <Clock className="w-4 h-4 mr-2" />
-                <span className="font-medium mr-2">Recurrence:</span>
-                <span className="capitalize">{assignment.recurrence}</span>
+              <div className="flex items-center bg-slate-100 px-4 py-3 rounded-xl">
+                <Clock className="w-5 h-5 mr-3 text-purple-500" />
+                <div>
+                  <span className="text-sm font-medium text-slate-700">Recurrence</span>
+                  <p className="text-slate-900 font-medium capitalize">{assignment.recurrence}</p>
+                </div>
               </div>
 
               {assignment.task.requires_notes && (
-                <div className="flex items-center text-sm text-gray-600">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Notes required
+                <div className="flex items-center bg-blue-100 px-4 py-3 rounded-xl">
+                  <FileText className="w-5 h-5 mr-3 text-blue-500" />
+                  <span className="text-blue-700 font-medium">Notes required</span>
                 </div>
               )}
 
               {assignment.task.requires_photo && (
-                <div className="flex items-center text-sm text-gray-600">
-                  <Camera className="w-4 h-4 mr-2" />
-                  Photo required
+                <div className="flex items-center bg-purple-100 px-4 py-3 rounded-xl">
+                  <Camera className="w-5 h-5 mr-3 text-purple-500" />
+                  <span className="text-purple-700 font-medium">Photo required</span>
                 </div>
               )}
             </div>
@@ -177,39 +191,43 @@ export default function ViewTask({ params }: { params: { id: string } }) {
 
           {/* Completion Details */}
           {assignment.completion && (
-            <div className="p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Completion Details</h2>
+            <div className="p-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-6 brand-header">Completion Details</h2>
               
-              <div className="space-y-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <User className="w-4 h-4 mr-2" />
-                  <span className="font-medium mr-2">Completed by:</span>
-                  {assignment.completion.completed_by.name}
+              <div className="space-y-6">
+                <div className="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 rounded-xl">
+                  <User className="w-5 h-5 mr-3 text-blue-500" />
+                  <div>
+                    <span className="text-sm font-medium text-slate-700">Completed by</span>
+                    <p className="text-slate-900 font-medium">{assignment.completion.completed_by.name}</p>
+                  </div>
                 </div>
 
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4 mr-2" />
-                  <span className="font-medium mr-2">Completed at:</span>
-                  {formatDateTime(assignment.completion.completed_at)}
+                <div className="flex items-center bg-gradient-to-r from-green-50 to-green-100 px-4 py-3 rounded-xl">
+                  <Clock className="w-5 h-5 mr-3 text-green-500" />
+                  <div>
+                    <span className="text-sm font-medium text-slate-700">Completed at</span>
+                    <p className="text-slate-900 font-medium">{formatDateTime(assignment.completion.completed_at)}</p>
+                  </div>
                 </div>
 
                 {assignment.completion.notes && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Notes</h3>
-                    <div className="bg-gray-50 rounded-md p-3">
-                      <p className="text-gray-700 whitespace-pre-wrap">{assignment.completion.notes}</p>
+                    <h3 className="text-sm font-medium text-slate-700 mb-3">Notes</h3>
+                    <div className="bg-white/50 rounded-xl p-6 border border-white/20">
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{assignment.completion.notes}</p>
                     </div>
                   </div>
                 )}
 
                 {assignment.completion.photo_url && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Photo</h3>
-                    <div className="bg-gray-50 rounded-md p-3">
+                    <h3 className="text-sm font-medium text-slate-700 mb-3">Photo</h3>
+                    <div className="bg-white/50 rounded-xl p-6 border border-white/20">
                       <img 
                         src={assignment.completion.photo_url} 
                         alt="Task completion photo"
-                        className="max-w-full h-auto rounded-md shadow-sm"
+                        className="max-w-full h-auto rounded-xl shadow-lg"
                         style={{ maxHeight: '400px' }}
                       />
                     </div>

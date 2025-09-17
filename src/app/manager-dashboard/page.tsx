@@ -196,17 +196,24 @@ export default function ManagerDashboard() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading manager dashboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading manager dashboard...</p>
           {error && (
-            <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-md">
-              <p className="font-medium">Error loading dashboard:</p>
-              <p className="text-sm mt-1">{error}</p>
+            <div className="mt-6 glass rounded-2xl p-6 max-w-md border border-red-200">
+              <div className="flex items-center mb-3">
+                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <p className="font-medium text-red-700">Error loading dashboard</p>
+              </div>
+              <p className="text-sm text-red-600 mb-4">{error}</p>
               <button 
                 onClick={() => window.location.reload()} 
-                className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium"
               >
                 Retry
               </button>
@@ -222,25 +229,29 @@ export default function ManagerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex justify-between items-center">
+        <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Manager Dashboard</h1>
-              <p className="text-gray-600 mt-2">
-                Role: <span className="font-medium text-indigo-600">{ROLE_LABELS[userRole]}</span>
-              </p>
-              <p className="text-sm text-gray-500">
-                Department Access: {departmentPermissions.join(', ')}
-              </p>
+              <h1 className="text-4xl font-black mb-3 brand-header">
+                <span className="gradient-text">Manager Dashboard</span>
+              </h1>
+              <div className="space-y-2">
+                <p className="text-slate-600 brand-subtitle">
+                  Role: <span className="font-bold text-blue-600">{ROLE_LABELS[userRole]}</span>
+                </p>
+                <p className="text-sm text-slate-500">
+                  Department Access: <span className="font-medium">{departmentPermissions.join(', ')}</span>
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <LanguageToggleCompact />
               <button
                 onClick={() => router.push('/')}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="bg-white/70 text-slate-700 px-6 py-3 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-white/50 hover:border-slate-200"
               >
                 Back to Main
               </button>
@@ -249,15 +260,15 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-lg shadow-lg mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+        <div className="glass rounded-2xl mb-8 border border-white/20 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <div className="p-2">
+            <nav className="flex flex-wrap gap-2" aria-label="Tabs">
               <button
                 onClick={() => setActiveTab('tasks')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'tasks'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 {getText(staticTranslations.taskManagement.en, staticTranslations.taskManagement.es, staticTranslations.taskManagement.tr)}
@@ -266,30 +277,30 @@ export default function ManagerDashboard() {
                 <>
                   <button
                     onClick={() => setActiveTab('users')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                       activeTab === 'users'
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                     }`}
                   >
                     {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
                   </button>
                   <button
                     onClick={() => setActiveTab('roles')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                       activeTab === 'roles'
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                     }`}
                   >
                     Role Configuration
                   </button>
                   <button
                     onClick={() => setActiveTab('updates')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                       activeTab === 'updates'
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                     }`}
                   >
                     {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
@@ -304,14 +315,14 @@ export default function ManagerDashboard() {
         {activeTab === 'tasks' && (
           <>
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="glass rounded-2xl p-6 mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <label className="block text-sm font-medium text-slate-700 mb-3">Department</label>
               <select
                 value={filters.department}
                 onChange={(e) => setFilters(prev => ({ ...prev, department: e.target.value as Department | 'all' }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
               >
                 <option value="all">All Departments</option>
                 {departmentPermissions.map((dept: Department) => (
@@ -320,11 +331,11 @@ export default function ManagerDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-slate-700 mb-3">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as 'all' | 'pending' | 'completed' }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -332,19 +343,19 @@ export default function ManagerDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label className="block text-sm font-medium text-slate-700 mb-3">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 placeholder="Search tasks..."
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
               />
             </div>
             <div className="flex items-end">
               <button
                 onClick={() => setFilters({ department: 'all', status: 'all', search: '' })}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="bg-gradient-to-r from-slate-500 to-slate-600 text-white px-6 py-3 rounded-xl hover:from-slate-600 hover:to-slate-700 transition-all duration-200 font-medium shadow-lg shadow-slate-500/25"
               >
                 Clear Filters
               </button>

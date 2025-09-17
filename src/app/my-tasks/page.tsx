@@ -237,76 +237,92 @@ export default function MyTasks() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">{staticTranslations.loadingTasks[language]}</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-6 flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8 flex justify-between items-center animate-fade-in-up">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200 bg-white/70 hover:bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             {staticTranslations.backToDashboard[language]}
           </button>
           <LanguageToggleCompact />
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-center mb-6">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
-              <CheckCircle className="w-6 h-6 text-white" />
+        {/* Main Content */}
+        <div className="glass rounded-3xl p-8 animate-fade-in-scale">
+          {/* Hero Section */}
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <CheckCircle className="w-8 h-8 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{staticTranslations.myTasks[language]}</h1>
-              <p className="text-gray-600">{staticTranslations.viewCompleteAssignedTasks[language]}</p>
-            </div>
+            <h1 className="text-3xl font-black mb-3 brand-header">
+              <span className="gradient-text">{staticTranslations.myTasks[language]}</span>
+            </h1>
+            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto brand-subtitle">
+              {staticTranslations.viewCompleteAssignedTasks[language]}
+            </p>
           </div>
 
+          {/* Error Alert */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-              <div className="flex">
-                <div className="text-red-600 text-sm">{error}</div>
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-8 animate-fade-in-up">
+              <div className="flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+                <p className="text-red-700 font-medium">{error}</p>
               </div>
             </div>
           )}
 
           {/* Filter Tabs */}
-          <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-8 p-2 bg-white/30 rounded-2xl border border-white/20 backdrop-blur-sm">
             {[
-              { key: 'all', label: staticTranslations.all[language] },
-              { key: 'pending', label: staticTranslations.pendingTasks[language] },
-              { key: 'completed', label: staticTranslations.completed[language] },
-              { key: 'overdue', label: staticTranslations.overdue[language] }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilter(tab.key as 'all' | 'pending' | 'completed' | 'overdue')}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  filter === tab.key
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { key: 'all', label: staticTranslations.all[language], icon: CheckCircle },
+              { key: 'pending', label: staticTranslations.pendingTasks[language], icon: Clock },
+              { key: 'completed', label: staticTranslations.completed[language], icon: CheckCircle },
+              { key: 'overdue', label: staticTranslations.overdue[language], icon: AlertCircle }
+            ].map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setFilter(tab.key as 'all' | 'pending' | 'completed' | 'overdue')}
+                  className={`flex-1 min-w-0 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                    filter === tab.key
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Tasks List */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {filteredAssignments.length === 0 ? (
-              <div className="text-center py-12">
-                <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <div className="text-center py-16 animate-fade-in-up">
+                <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-12 h-12 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 brand-header">
                   {filter === 'all' ? 'No tasks assigned' : `No ${filter} tasks`}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-slate-600 brand-subtitle">
                   {filter === 'all' 
                     ? 'You don\'t have any tasks assigned yet.' 
                     : `You don't have any ${filter} tasks.`
@@ -314,71 +330,79 @@ export default function MyTasks() {
                 </p>
               </div>
             ) : (
-              filteredAssignments.map((assignment) => (
+              filteredAssignments.map((assignment, index) => (
                 <div
                   key={assignment.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="group bg-white/50 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/70 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center mb-2">
-                        <h3 className="text-lg font-medium text-gray-900 mr-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                        <h3 className="text-xl font-bold text-slate-900 brand-header group-hover:text-blue-600 transition-colors">
                           {assignment.task.title}
                         </h3>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(getTaskStatus(assignment))}`}>
+                        <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          getTaskStatus(assignment) === 'completed' 
+                            ? 'bg-green-100 text-green-700 border border-green-200' 
+                            : getTaskStatus(assignment) === 'overdue'
+                            ? 'bg-red-100 text-red-700 border border-red-200'
+                            : 'bg-amber-100 text-amber-700 border border-amber-200'
+                        }`}>
                           {getStatusIcon(getTaskStatus(assignment))}
-                          <span className="ml-1 capitalize">{getTaskStatus(assignment)}</span>
+                          <span className="ml-2 capitalize">{getTaskStatus(assignment)}</span>
                         </span>
                       </div>
                       
                       {assignment.task.description && (
-                        <p className="text-gray-600 mb-3">{assignment.task.description}</p>
+                        <p className="text-slate-600 mb-4 leading-relaxed">{assignment.task.description}</p>
                       )}
 
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {formatDueDate(assignment.due_date)}
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                        <div className="flex items-center bg-slate-100 px-3 py-1.5 rounded-lg">
+                          <Calendar className="w-4 h-4 mr-2 text-slate-400" />
+                          <span className="font-medium">{formatDueDate(assignment.due_date)}</span>
                         </div>
-                        <div className="flex items-center">
-                          <span className="capitalize">{assignment.recurrence}</span>
+                        <div className="flex items-center bg-slate-100 px-3 py-1.5 rounded-lg">
+                          <RefreshCw className="w-4 h-4 mr-2 text-slate-400" />
+                          <span className="capitalize font-medium">{assignment.recurrence}</span>
                         </div>
                         {assignment.task.requires_notes && (
-                          <div className="flex items-center">
-                            <FileText className="w-4 h-4 mr-1" />
-                            Notes required
+                          <div className="flex items-center bg-blue-100 px-3 py-1.5 rounded-lg">
+                            <FileText className="w-4 h-4 mr-2 text-blue-500" />
+                            <span className="text-blue-700 font-medium">Notes required</span>
                           </div>
                         )}
                         {assignment.task.requires_photo && (
-                          <div className="flex items-center">
-                            <Camera className="w-4 h-4 mr-1" />
-                            Photo required
+                          <div className="flex items-center bg-purple-100 px-3 py-1.5 rounded-lg">
+                            <Camera className="w-4 h-4 mr-2 text-purple-500" />
+                            <span className="text-purple-700 font-medium">Photo required</span>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="ml-4 flex flex-col space-y-2">
+                    <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:w-48">
                       {(getTaskStatus(assignment) === 'pending' || getTaskStatus(assignment) === 'overdue') ? (
                         <>
                           <button
                             onClick={() => router.push(`/complete-task/${assignment.id}`)}
-                            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5"
                           >
                             Complete Task
                           </button>
                           <button
                             onClick={() => openTransferModal(assignment.id)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2"
                           >
-                            <RefreshCw className="w-4 h-4 mr-2" />
+                            <RefreshCw className="w-4 h-4" />
                             Transfer
                           </button>
                         </>
                       ) : (
                         <button
                           onClick={() => router.push(`/view-task/${assignment.id}`)}
-                          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                          className="bg-white/70 text-slate-700 px-6 py-3 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-white/50 hover:border-slate-200"
                         >
                           View Details
                         </button>
@@ -392,15 +416,15 @@ export default function MyTasks() {
 
           {/* Load More Button */}
           {pagination.hasMore && (
-            <div className="mt-8 text-center">
+            <div className="mt-10 text-center animate-fade-in-up">
               <button
                 onClick={loadMoreTasks}
                 disabled={loadingMore}
-                className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5"
               >
                 {loadingMore ? (
                   <>
-                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
                     Loading more...
                   </>
                 ) : (
@@ -411,36 +435,40 @@ export default function MyTasks() {
           )}
 
           {/* Summary */}
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Showing {assignments.length} of {pagination.total} tasks
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center bg-white/50 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/20">
+              <span className="text-slate-600 font-medium">
+                Showing <span className="text-slate-900 font-bold">{assignments.length}</span> of <span className="text-slate-900 font-bold">{pagination.total}</span> tasks
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Transfer Modal */}
       {showTransferModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Transfer Task</h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="glass rounded-3xl max-w-lg w-full p-8 animate-scale-in">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-slate-900 brand-header">Transfer Task</h3>
               <button
                 onClick={closeTransferModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all duration-200"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="transferUser" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="transferUser" className="block text-sm font-medium text-slate-700 mb-3">
                   Transfer to:
                 </label>
                 <select
                   id="transferUser"
                   value={selectedTransferUser}
                   onChange={(e) => setSelectedTransferUser(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
                   required
                 >
                   <option value="">Select a team member</option>
@@ -453,7 +481,7 @@ export default function MyTasks() {
               </div>
 
               <div>
-                <label htmlFor="transferReason" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="transferReason" className="block text-sm font-medium text-slate-700 mb-3">
                   Reason for transfer (optional):
                 </label>
                 <textarea
@@ -461,34 +489,34 @@ export default function MyTasks() {
                   value={transferReason}
                   onChange={(e) => setTransferReason(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white resize-none"
                   placeholder="Why are you transferring this task?"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex gap-4 mt-8">
               <button
                 onClick={closeTransferModal}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                 disabled={transferSubmitting}
+                className="flex-1 px-6 py-3 text-slate-700 bg-white/70 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-white/50"
               >
                 Cancel
               </button>
               <button
                 onClick={submitTransfer}
                 disabled={!selectedTransferUser || transferSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center justify-center gap-2"
               >
                 {transferSubmitting ? (
                   <>
-                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Submitting...
+                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Submitting...</span>
                   </>
                 ) : (
                   <>
-                    <Users className="w-4 h-4 mr-2" />
-                    Submit Transfer
+                    <Users className="w-4 h-4" />
+                    <span>Submit Transfer</span>
                   </>
                 )}
               </button>

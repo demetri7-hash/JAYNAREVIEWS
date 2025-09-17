@@ -279,7 +279,7 @@ export default function CreateTask() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white resize-none"
-                    placeholder={staticTranslations.taskDescriptionPlaceholder[language]}
+                    placeholder={staticTranslations.descriptionPlaceholder[language]}
                   />
                 </div>
 
@@ -292,7 +292,7 @@ export default function CreateTask() {
                     <select
                       id="frequency"
                       value={formData.frequency}
-                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'daily' | 'weekly' | 'monthly' | 'one-time' })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
                     >
                       <option value="daily">{staticTranslations.daily[language]}</option>

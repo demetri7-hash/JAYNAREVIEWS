@@ -171,17 +171,17 @@ export default function TeamActivity() {
   }
 
   const getPerformanceColor = (rate: number) => {
-    if (rate >= 80) return 'text-green-600 bg-green-100'
-    if (rate >= 60) return 'text-yellow-600 bg-yellow-100'
-    return 'text-red-600 bg-red-100'
+    if (rate >= 80) return 'bg-green-100 text-green-700 border border-green-200'
+    if (rate >= 60) return 'bg-gold-100 text-gold-700 border border-gold-200'
+    return 'bg-red-100 text-red-700 border border-red-200'
   }
 
   const getUpdatePriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200'
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200'
-      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+      case 'high': return 'bg-red-100 text-red-700 border border-red-200'
+      case 'medium': return 'bg-gold-100 text-gold-700 border border-gold-200'
+      case 'low': return 'bg-blue-100 text-blue-700 border border-blue-200'
+      default: return 'bg-slate-100 text-slate-700 border border-slate-200'
     }
   }
 
@@ -203,10 +203,10 @@ export default function TeamActivity() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading team activity...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading team activity...</p>
         </div>
       </div>
     )
@@ -214,18 +214,18 @@ export default function TeamActivity() {
 
   if (userProfile?.role !== 'manager') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="max-w-md w-full glass rounded-3xl p-8 text-center animate-fade-in-up">
+          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Manager Access Required</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3 brand-header">Manager Access Required</h2>
+          <p className="text-slate-600 mb-6 brand-subtitle">
             Only managers can access the team activity dashboard.
           </p>
           <button
             onClick={() => router.push('/')}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25"
           >
             Return to Dashboard
           </button>
@@ -235,34 +235,36 @@ export default function TeamActivity() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-8 animate-fade-in-up">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center text-slate-600 hover:text-blue-600 transition-all duration-200 mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center mb-6">
-            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mr-4">
-              <Users className="w-6 h-6 text-white" />
+        <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-100">
+          <div className="flex items-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg shadow-purple-500/25">
+              <Users className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Team Activity Dashboard</h1>
-              <p className="text-gray-600">Overview of team performance and recent activity</p>
+              <h1 className="text-3xl font-bold gradient-text brand-title mb-2">Team Activity Dashboard</h1>
+              <p className="text-slate-600 brand-subtitle text-lg">THE PASS Team Performance Overview</p>
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-              <div className="flex">
-                <AlertTriangle className="w-5 h-5 text-red-400 mr-2" />
-                <div className="text-red-600 text-sm">{error}</div>
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 animate-fade-in-up animation-delay-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                </div>
+                <div className="text-red-700 font-medium">{error}</div>
               </div>
             </div>
           )}
@@ -270,23 +272,27 @@ export default function TeamActivity() {
           {/* Enhanced Team Stats Overview */}
           {teamStats && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200 group">
                 <div className="flex items-center">
-                  <Activity className="w-8 h-8 text-blue-600 mr-3" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-blue-600">Total Tasks</p>
-                    <p className="text-2xl font-bold text-blue-900">{teamStats.totalTasks}</p>
-                    <p className="text-xs text-blue-600 mt-1">All time</p>
+                    <p className="text-sm font-medium text-blue-600 brand-subtitle">Total Tasks</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">All time</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300 group">
                 <div className="flex items-center">
-                  <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-green-600">Completed Today</p>
-                    <p className="text-2xl font-bold text-green-900">{teamStats.completedToday}</p>
+                    <p className="text-sm font-medium text-green-600 brand-subtitle">Completed Today</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.completedToday}</p>
                     <div className="flex items-center mt-1">
                       <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
                       <p className="text-xs text-green-600">+12% vs yesterday</p>
@@ -295,34 +301,40 @@ export default function TeamActivity() {
                 </div>
               </div>
 
-              <div className="bg-yellow-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400 group">
                 <div className="flex items-center">
-                  <Clock className="w-8 h-8 text-yellow-600 mr-3" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-yellow-600">Pending</p>
-                    <p className="text-2xl font-bold text-yellow-900">{teamStats.pendingTasks}</p>
-                    <p className="text-xs text-yellow-600 mt-1">In progress</p>
+                    <p className="text-sm font-medium text-gold-600 brand-subtitle">Pending</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.pendingTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">In progress</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-red-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-500 group">
                 <div className="flex items-center">
-                  <AlertTriangle className="w-8 h-8 text-red-600 mr-3" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <AlertTriangle className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-red-600">Overdue</p>
-                    <p className="text-2xl font-bold text-red-900">{teamStats.overdueTasks}</p>
-                    <p className="text-xs text-red-600 mt-1">Needs attention</p>
+                    <p className="text-sm font-medium text-red-600 brand-subtitle">Overdue</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.overdueTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">Needs attention</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-600 group">
                 <div className="flex items-center">
-                  <Users className="w-8 h-8 text-purple-600 mr-3" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-purple-600">Team Members</p>
-                    <p className="text-2xl font-bold text-purple-900">{teamStats.totalUsers}</p>
+                    <p className="text-sm font-medium text-purple-600 brand-subtitle">Team Members</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalUsers}</p>
                     <div className="flex items-center mt-1">
                       <Target className="w-3 h-3 text-purple-600 mr-1" />
                       <p className="text-xs text-purple-600">Active today</p>
@@ -334,37 +346,43 @@ export default function TeamActivity() {
           )}
 
           {/* Manager Updates Box */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-8 border border-blue-200">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <Bell className="w-5 h-5 text-white" />
+          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-700">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
+                <Bell className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Manager Updates</h3>
-                <p className="text-sm text-gray-600">Live notifications and announcements</p>
+                <h3 className="text-xl font-bold text-slate-900 brand-header">Manager Updates</h3>
+                <p className="text-slate-600 brand-subtitle">Live notifications and announcements</p>
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               {managerUpdates.length === 0 ? (
-                <p className="text-gray-500 text-sm">No recent updates</p>
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Bell className="w-6 h-6 text-slate-400" />
+                  </div>
+                  <p className="text-slate-500 brand-subtitle">No recent updates</p>
+                </div>
               ) : (
-                managerUpdates.map((update) => (
+                managerUpdates.map((update, index) => (
                   <div
                     key={update.id}
-                    className={`border rounded-lg p-4 ${getUpdatePriorityColor(update.priority)}`}
+                    className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                    style={{ animationDelay: `${800 + index * 100}ms` }}
                   >
                     <div className="flex items-start">
-                      <div className="mr-3 mt-0.5">
+                      <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
                         {getUpdateIcon(update.type)}
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm mb-1">{update.title}</h4>
-                        <p className="text-sm mb-2">{update.message}</p>
-                        <div className="flex items-center text-xs opacity-75">
-                          <Calendar className="w-3 h-3 mr-1" />
+                        <h4 className="font-semibold text-slate-900 brand-header mb-2">{update.title}</h4>
+                        <p className="text-slate-600 brand-subtitle mb-4">{update.message}</p>
+                        <div className="flex items-center text-sm text-slate-500">
+                          <Calendar className="w-4 h-4 mr-2" />
                           <span>{formatDate(update.timestamp)}</span>
-                          <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-50 font-medium">
+                          <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(update.priority)}`}>
                             {update.priority.toUpperCase()}
                           </span>
                         </div>
@@ -377,35 +395,47 @@ export default function TeamActivity() {
           </div>
 
           {/* Achievements & Gamification */}
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 mb-8 border border-yellow-200">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-yellow-600 rounded-lg flex items-center justify-center mr-3">
-                <Trophy className="w-5 h-5 text-white" />
+          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-800">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-gold-500/25">
+                <Trophy className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Team Achievements</h3>
-                <p className="text-sm text-gray-600">Recent milestones and badges earned</p>
+                <h3 className="text-xl font-bold text-slate-900 brand-header">Team Achievements</h3>
+                <p className="text-slate-600 brand-subtitle">Recent milestones and badges earned</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="bg-white rounded-lg p-4 border border-yellow-200">
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">{achievement.icon}</div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">{achievement.name}</h4>
-                    <p className="text-xs text-gray-600 mb-3">{achievement.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {achievements.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <div className="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Trophy className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-slate-900 brand-header mb-2">No Achievements Yet</h4>
+                  <p className="text-slate-600 brand-subtitle">Complete tasks to unlock team achievements!</p>
+                </div>
+              ) : (
+                achievements.map((achievement, index) => (
+                  <div 
+                    key={achievement.id} 
+                    className="glass rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                    style={{ animationDelay: `${900 + index * 100}ms` }}
+                  >
+                    <div className="text-3xl mb-4">{achievement.icon}</div>
+                    <h4 className="font-bold text-slate-900 brand-header mb-2">{achievement.name}</h4>
+                    <p className="text-sm text-slate-600 brand-subtitle mb-4">{achievement.description}</p>
                     {achievement.earnedBy.length > 0 && (
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium text-yellow-700">Earned by:</p>
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold text-gold-600 uppercase tracking-wide">Earned by:</p>
                         <div className="flex flex-wrap gap-1">
                           {achievement.earnedBy.slice(0, 3).map((name, index) => (
-                            <span key={index} className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                            <span key={index} className="px-2 py-1 bg-gold-100 text-gold-700 rounded-full text-xs font-medium">
                               {name}
                             </span>
                           ))}
                           {achievement.earnedBy.length > 3 && (
-                            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                            <span className="px-2 py-1 bg-gold-100 text-gold-700 rounded-full text-xs font-medium">
                               +{achievement.earnedBy.length - 3} more
                             </span>
                           )}
@@ -413,57 +443,72 @@ export default function TeamActivity() {
                       </div>
                     )}
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Completions with Enhanced Visuals */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                Recent Completions
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                  Live Feed
-                </span>
-              </h3>
+            <div className="glass rounded-3xl p-8 animate-fade-in-up animation-delay-900">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-slate-900 brand-header">Recent Completions</h3>
+                  <div className="flex items-center">
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                      Live Feed
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
               <div className="space-y-4">
                 {recentCompletions.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No recent completions</p>
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <p className="text-slate-500 brand-subtitle">No recent completions</p>
+                  </div>
                 ) : (
-                  recentCompletions.map((completion) => (
+                  recentCompletions.map((completion, index) => (
                     <div
                       key={completion.id}
-                      className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+                      className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                      style={{ animationDelay: `${1000 + index * 100}ms` }}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{completion.task_title}</h4>
-                          <div className="flex items-center mt-1 text-sm text-gray-600">
-                            <User className="w-4 h-4 mr-1" />
-                            <span>{completion.completed_by_name}</span>
-                            <Star className="w-4 h-4 ml-2 text-yellow-500" />
+                          <h4 className="font-semibold text-slate-900 brand-header mb-2">{completion.task_title}</h4>
+                          <div className="flex items-center mb-2 text-sm text-slate-600">
+                            <User className="w-4 h-4 mr-2" />
+                            <span className="brand-subtitle">{completion.completed_by_name}</span>
+                            <Star className="w-4 h-4 ml-3 text-gold-500" />
                           </div>
-                          <div className="flex items-center mt-1 text-sm text-gray-600">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            <span>{formatDate(completion.completed_at)}</span>
+                          <div className="flex items-center mb-3 text-sm text-slate-600">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            <span className="brand-subtitle">{formatDate(completion.completed_at)}</span>
                           </div>
                           {completion.notes && (
-                            <div className="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-700">
-                              <span className="font-medium">Note: </span>
-                              {completion.notes}
+                            <div className="mt-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+                              <span className="font-medium text-slate-700">Note: </span>
+                              <span className="text-slate-600 brand-subtitle">{completion.notes}</span>
                             </div>
                           )}
                         </div>
-                        <div className="ml-4 flex items-center space-x-2">
-                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        <div className="ml-6 flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          </div>
                           {completion.has_photo && (
-                            <div className="w-6 h-6 bg-blue-100 rounded text-blue-600 text-xs flex items-center justify-center">
-                              📷
+                            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                              <span className="text-lg">📷</span>
                             </div>
                           )}
-                          <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                          <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                             +10 XP
                           </div>
                         </div>
@@ -475,14 +520,24 @@ export default function TeamActivity() {
             </div>
 
             {/* User Performance with Gamification */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                Team Performance Leaderboard
-              </h3>
+            <div className="glass rounded-3xl p-8 animate-fade-in-up animation-delay-1000">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 brand-header">Team Performance Leaderboard</h3>
+                </div>
+              </div>
+              
               <div className="space-y-4">
                 {userActivity.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No team activity data</p>
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Users className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <p className="text-slate-500 brand-subtitle">No team activity data</p>
+                  </div>
                 ) : (
                   userActivity
                     .sort((a, b) => b.completion_rate - a.completion_rate)
@@ -493,55 +548,71 @@ export default function TeamActivity() {
                       return (
                         <div
                           key={user.user_id}
-                          className={`border rounded-lg p-4 ${
+                          className={`glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up ${
                             isTopPerformer 
-                              ? 'border-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50' 
-                              : 'border-gray-200 bg-white'
+                              ? 'ring-2 ring-gold-200 bg-gradient-to-br from-gold-50 to-gold-100' 
+                              : ''
                           }`}
+                          style={{ animationDelay: `${1100 + index * 100}ms` }}
                         >
-                          <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center">
-                              {isTopPerformer && <Trophy className="w-4 h-4 text-yellow-600 mr-2" />}
-                              <h4 className="font-medium text-gray-900">{user.user_name}</h4>
+                              {isTopPerformer && (
+                                <div className="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center mr-3">
+                                  <Trophy className="w-4 h-4 text-white" />
+                                </div>
+                              )}
+                              <h4 className="font-bold text-slate-900 brand-header">{user.user_name}</h4>
                               {streak && (
-                                <span className={`ml-2 text-sm ${streak.color} flex items-center`}>
+                                <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-100 to-red-100 ${streak.color} flex items-center`}>
                                   {streak.emoji} {streak.text}
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(user.completion_rate)}`}>
+                            <div className="flex items-center space-x-3">
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPerformanceColor(user.completion_rate)}`}>
                                 {user.completion_rate}% Complete
                               </span>
                               {index < 3 && (
-                                <span className="text-lg">
+                                <span className="text-2xl">
                                   {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                                 </span>
                               )}
                             </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
+                          
+                          <div className="grid grid-cols-3 gap-6 mb-4">
                             <div className="text-center">
-                              <p className="font-medium text-green-600">{user.completed_today}</p>
-                              <p className="text-gray-600">Today</p>
+                              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <span className="text-lg font-bold text-green-600">{user.completed_today}</span>
+                              </div>
+                              <p className="text-sm text-slate-600 brand-subtitle">Today</p>
                             </div>
                             <div className="text-center">
-                              <p className="font-medium text-yellow-600">{user.pending_tasks}</p>
-                              <p className="text-gray-600">Pending</p>
+                              <div className="w-12 h-12 bg-gold-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <span className="text-lg font-bold text-gold-600">{user.pending_tasks}</span>
+                              </div>
+                              <p className="text-sm text-slate-600 brand-subtitle">Pending</p>
                             </div>
                             <div className="text-center">
-                              <p className="font-medium text-red-600">{user.overdue_tasks}</p>
-                              <p className="text-gray-600">Overdue</p>
+                              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <span className="text-lg font-bold text-red-600">{user.overdue_tasks}</span>
+                              </div>
+                              <p className="text-sm text-slate-600 brand-subtitle">Overdue</p>
                             </div>
                           </div>
                           
-                          {/* Progress Bar */}
-                          <div className="mt-3">
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                          {/* Enhanced Progress Bar */}
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-slate-600 brand-subtitle">Completion Rate</span>
+                              <span className="font-semibold text-slate-900">{user.completion_rate}%</span>
+                            </div>
+                            <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                               <div 
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                  user.completion_rate >= 80 ? 'bg-green-500' :
-                                  user.completion_rate >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                                className={`h-3 rounded-full transition-all duration-500 ${
+                                  user.completion_rate >= 80 ? 'bg-gradient-to-r from-green-400 to-green-500' :
+                                  user.completion_rate >= 60 ? 'bg-gradient-to-r from-gold-400 to-gold-500' : 'bg-gradient-to-r from-red-400 to-red-500'
                                 }`}
                                 style={{ width: `${user.completion_rate}%` }}
                               ></div>

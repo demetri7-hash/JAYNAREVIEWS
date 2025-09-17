@@ -185,7 +185,7 @@ export default function CreateTask() {
             <Shield className="w-8 h-8 text-red-500" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">{staticTranslations.accessDenied[language]}</h1>
-          <p className="text-slate-600 mb-6">{staticTranslations.managerOnlyAccess[language]}</p>
+          <p className="text-slate-600 mb-6">{staticTranslations.managersOnlyAccess[language]}</p>
           <button
             onClick={() => router.push('/')}
             className="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-all duration-200 font-medium"
@@ -271,7 +271,7 @@ export default function CreateTask() {
                 {/* Description */}
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
-                    {staticTranslations.taskDescription[language]}
+                    {staticTranslations.description[language]}
                   </label>
                   <textarea
                     id="description"
@@ -279,7 +279,7 @@ export default function CreateTask() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white resize-none"
-                    placeholder={staticTranslations.taskDescriptionPlaceholder[language]}
+                    placeholder={staticTranslations.descriptionPlaceholder[language]}
                   />
                 </div>
 
@@ -292,7 +292,7 @@ export default function CreateTask() {
                     <select
                       id="frequency"
                       value={formData.frequency}
-                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'daily' | 'weekly' | 'monthly' | 'one-time' })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
                     >
                       <option value="daily">{staticTranslations.daily[language]}</option>

@@ -67,9 +67,9 @@ export const useLanguage = () => {
 export const staticTranslations = {
   // Navigation
   taskManagement: {
-    en: 'Task Management',
-    es: 'Gestión de Tareas',
-    tr: 'Görev Yönetimi'
+    en: 'THE PASS',
+    es: 'THE PASS',
+    tr: 'THE PASS'
   },
   userManagement: {
     en: 'User Management',
@@ -150,14 +150,14 @@ export const staticTranslations = {
 
   // Homepage translations
   appTitle: {
-    en: 'Jayna Gyro Task Manager',
-    es: 'Administrador de Tareas Jayna Gyro',
-    tr: 'Jayna Gyro Görev Yöneticisi'
+    en: 'THE PASS',
+    es: 'THE PASS',
+    tr: 'THE PASS'
   },
   appDescription: {
-    en: 'Simple task management for restaurant staff',
-    es: 'Gestión simple de tareas para el personal del restaurante',
-    tr: 'Restoran personeli için basit görev yönetimi'
+    en: 'The Recipe for Restaurant Success',
+    es: 'La Receta para el Éxito Restaurantero',
+    tr: 'Restoran Başarısının Reçetesi'
   },
   signInWithGoogle: {
     en: 'Sign in with Google',

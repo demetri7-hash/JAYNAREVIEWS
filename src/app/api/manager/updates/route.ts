@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
     try {
       console.log('Attempting translation for title:', title);
       console.log('OpenAI API Key configured:', !!process.env.OPENAI_API_KEY);
+      console.log('NEXTAUTH_URL environment:', process.env.NEXTAUTH_URL);
       titleTranslations = await translateText(title);
       messageTranslations = await translateText(message);
       console.log('Translation successful');

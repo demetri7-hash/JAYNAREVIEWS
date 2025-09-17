@@ -174,6 +174,88 @@ export const staticTranslations = {
     es: 'Cerrar sesión',
     tr: 'Çıkış Yap'
   },
+  
+  // User Management - Additional translations
+  manageStaffAccess: {
+    en: 'Manage staff access and permissions',
+    es: 'Gestionar acceso y permisos del personal',
+    tr: 'Personel erişim ve izinlerini yönetin'
+  },
+  activeUsers: {
+    en: 'Active Users',
+    es: 'Usuarios Activos',
+    tr: 'Aktif Kullanıcılar'
+  },
+  archivedUsers: {
+    en: 'Archived Users',
+    es: 'Usuarios Archivados',
+    tr: 'Arşivlenmiş Kullanıcılar'
+  },
+  loadingUsers: {
+    en: 'Loading users...',
+    es: 'Cargando usuarios...',
+    tr: 'Kullanıcılar yükleniyor...'
+  },
+  manager: {
+    en: 'Manager',
+    es: 'Gerente',
+    tr: 'Yönetici'
+  },
+  employee: {
+    en: 'Employee',
+    es: 'Empleado',
+    tr: 'Çalışan'
+  },
+  archived: {
+    en: 'Archived',
+    es: 'Archivado',
+    tr: 'Arşivlenmiş'
+  },
+  joinedOn: {
+    en: 'Joined on',
+    es: 'Se unió el',
+    tr: 'Katıldığı tarih'
+  },
+  archive: {
+    en: 'Archive',
+    es: 'Archivar',
+    tr: 'Arşivle'
+  },
+  reactivate: {
+    en: 'Reactivate',
+    es: 'Reactivar',
+    tr: 'Yeniden Etkinleştir'
+  },
+  noActiveUsers: {
+    en: 'No active users found',
+    es: 'No se encontraron usuarios activos',
+    tr: 'Aktif kullanıcı bulunamadı'
+  },
+  noArchivedUsers: {
+    en: 'No archived users found',
+    es: 'No se encontraron usuarios archivados',
+    tr: 'Arşivlenmiş kullanıcı bulunamadı'
+  },
+  accessDenied: {
+    en: 'Access Denied',
+    es: 'Acceso Denegado',
+    tr: 'Erişim Engellendi'
+  },
+  managerAccessRequired: {
+    en: 'Manager access is required to view this page.',
+    es: 'Se requiere acceso de gerente para ver esta página.',
+    tr: 'Bu sayfayı görüntülemek için yönetici erişimi gereklidir.'
+  },
+  backToHome: {
+    en: 'Back to Home',
+    es: 'Volver al Inicio',
+    tr: 'Ana Sayfaya Dön'
+  },
+  errorUpdatingUser: {
+    en: 'Error updating user. Please try again.',
+    es: 'Error al actualizar usuario. Inténtalo de nuevo.',
+    tr: 'Kullanıcı güncellenirken hata oluştu. Lütfen tekrar deneyin.'
+  },
   myTasks: {
     en: 'My Tasks',
     es: 'Mis Tareas',
@@ -410,11 +492,6 @@ export const staticTranslations = {
     en: 'Assign To (Select Staff)',
     es: 'Asignar a (Seleccionar Personal)',
     tr: 'Atama (Personel Seç)'
-  },
-  loadingUsers: {
-    en: 'Loading users...',
-    es: 'Cargando usuarios...',
-    tr: 'Kullanıcılar yükleniyor...'
   },
   noUsersFound: {
     en: 'No users found. You can assign later.',

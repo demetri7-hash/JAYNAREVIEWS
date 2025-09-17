@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@auth/supabase-adapter": "^1.10.0",
+    "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.57.4",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.2",

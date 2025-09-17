@@ -43,13 +43,27 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       console.log('NextAuth signIn callback:', { user: user?.email, account: account?.provider });
       if (user?.email) {
+        // Check if user is archived before allowing signin
+        const { data: existingProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('archived, role')
+          .eq('email', user.email)
+          .single()
+
+        // Block signin for archived users
+        if (existingProfile?.archived) {
+          console.log('Blocked signin for archived user:', user.email);
+          return false
+        }
+
         // Create or update user profile
         const { error } = await supabaseAdmin
           .from('profiles')
           .upsert({
             email: user.email,
             name: user.name || user.email,
-            role: 'employee' // Default role, managers can be updated manually
+            role: existingProfile?.role || 'employee', // Preserve existing role
+            archived: false // Ensure active users are not archived
           }, {
             onConflict: 'email'
           })

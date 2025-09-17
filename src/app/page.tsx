@@ -227,6 +227,27 @@ export default function Home() {
             </div>
           )}
 
+          {/* User Management - Only for Managers */}
+          {userProfile?.role === 'manager' && (
+            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium text-gray-900">
+                  {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
+                </h2>
+                <Users className="w-6 h-6 text-green-500" />
+              </div>
+              <p className="text-gray-600 mb-4">
+                {getText(staticTranslations.manageStaffAccess.en, staticTranslations.manageStaffAccess.es, staticTranslations.manageStaffAccess.tr)}
+              </p>
+              <button 
+                onClick={() => router.push('/user-management')}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+              >
+                {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
+              </button>
+            </div>
+          )}
+
           {/* Team Activity - Only for Managers */}
           {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">

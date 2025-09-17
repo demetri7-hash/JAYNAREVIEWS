@@ -258,6 +258,56 @@ export const staticTranslations = {
     en: 'View Weekly Reports',
     es: 'Ver Informes Semanales',
     tr: 'Haftalık Raporları Gör'
+  },
+  transferRequests: {
+    en: 'Transfer Requests',
+    es: 'Solicitudes de Transferencia',
+    tr: 'Transfer Talepleri'
+  },
+  recentCompletionsUpdates: {
+    en: 'Team performance insights and activity tracking',
+    es: 'Información sobre el rendimiento del equipo y seguimiento de actividades',
+    tr: 'Ekip performans bilgileri ve aktivite takibi'
+  },
+  viewAllActivity: {
+    en: 'View All Activity',
+    es: 'Ver Toda la Actividad',
+    tr: 'Tüm Aktiviteyi Gör'
+  },
+  viewArchivedWeeklyReports: {
+    en: 'View archived weekly performance reports',
+    es: 'Ver informes de rendimiento semanal archivados',
+    tr: 'Arşivlenmiş haftalık performans raporlarını görüntüle'
+  },
+  manageTaskTransfers: {
+    en: 'Manage task transfers and reassignments',
+    es: 'Gestionar transferencias de tareas y reasignaciones',
+    tr: 'Görev transferlerini ve yeniden atamalarını yönetin'
+  },
+  viewTransfers: {
+    en: 'View Transfers',
+    es: 'Ver Transferencias',
+    tr: 'Transferleri Gör'
+  },
+  reviewApproveTransfers: {
+    en: 'Review and approve transfer requests',
+    es: 'Revisar y aprobar solicitudes de transferencia',
+    tr: 'Transfer taleplerini inceleyin ve onaylayın'
+  },
+  viewTransferRequestsAssigned: {
+    en: 'View transfer requests assigned to you',
+    es: 'Ver solicitudes de transferencia asignadas a ti',
+    tr: 'Size atanan transfer taleplerini görüntüleyin'
+  },
+  pendingApproval: {
+    en: 'Pending approval',
+    es: 'Pendiente de aprobación',
+    tr: 'Onay bekliyor'
+  },
+  viewTransferRequests: {
+    en: 'View Transfer Requests',
+    es: 'Ver Solicitudes de Transferencia',
+    tr: 'Transfer Taleplerini Gör'
   }
 };
 

@@ -119,9 +119,12 @@ export default function Home() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <CheckCircle className="w-8 h-8 text-blue-600 mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">Task Manager</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                {getText(staticTranslations.taskManagement.en, staticTranslations.taskManagement.es, staticTranslations.taskManagement.tr)}
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageToggleCompact />
               <div className="flex items-center space-x-2">
                 {userProfile?.role && isManagerRole(userProfile.role) && (
                   <div className="flex items-center space-x-1 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
@@ -135,7 +138,7 @@ export default function Home() {
                 onClick={() => signOut()}
                 className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-200"
               >
-                Sign out
+                {getText(staticTranslations.signOut.en, staticTranslations.signOut.es, staticTranslations.signOut.tr)}
               </button>
             </div>
           </div>
@@ -146,17 +149,25 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-gray-900">My Tasks</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                {getText(staticTranslations.myTasks.en, staticTranslations.myTasks.es, staticTranslations.myTasks.tr)}
+              </h2>
               <CheckCircle className="w-6 h-6 text-green-500" />
             </div>
-            <p className="text-gray-600 mb-4">View and complete your assigned tasks</p>
+            <p className="text-gray-600 mb-4">
+              {getText(staticTranslations.viewCompleteAssignedTasks.en, staticTranslations.viewCompleteAssignedTasks.es, staticTranslations.viewCompleteAssignedTasks.tr)}
+            </p>
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Pending</span>
+                <span className="text-gray-600">
+                  {getText(staticTranslations.pendingTasks.en, staticTranslations.pendingTasks.es, staticTranslations.pendingTasks.tr)}
+                </span>
                 <span className="font-medium text-orange-600">3</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Completed today</span>
+                <span className="text-gray-600">
+                  {getText(staticTranslations.completedToday.en, staticTranslations.completedToday.es, staticTranslations.completedToday.tr)}
+                </span>
                 <span className="font-medium text-green-600">5</span>
               </div>
             </div>
@@ -164,7 +175,7 @@ export default function Home() {
               onClick={() => router.push('/my-tasks')}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
             >
-              View My Tasks
+              {getText(staticTranslations.viewMyTasks.en, staticTranslations.viewMyTasks.es, staticTranslations.viewMyTasks.tr)}
             </button>
           </div>
 
@@ -175,15 +186,19 @@ export default function Home() {
           })() && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Create Task</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {getText(staticTranslations.createTask.en, staticTranslations.createTask.es, staticTranslations.createTask.tr)}
+                </h2>
                 <Plus className="w-6 h-6 text-blue-500" />
               </div>
-              <p className="text-gray-600 mb-4">Create new tasks and assign to staff</p>
+              <p className="text-gray-600 mb-4">
+                {getText(staticTranslations.createNewTasksAssign.en, staticTranslations.createNewTasksAssign.es, staticTranslations.createNewTasksAssign.tr)}
+              </p>
               <button 
                 onClick={() => router.push('/create-task')}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
               >
-                Create New Task
+                {getText(staticTranslations.createNewTask.en, staticTranslations.createNewTask.es, staticTranslations.createNewTask.tr)}
               </button>
             </div>
           )}
@@ -192,12 +207,14 @@ export default function Home() {
           {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Manager Dashboard</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {getText(staticTranslations.managerDashboard.en, staticTranslations.managerDashboard.es, staticTranslations.managerDashboard.tr)}
+                </h2>
                 <Shield className="w-6 h-6 text-indigo-500" />
               </div>
               <p className="text-gray-600 mb-4">
                 {userProfile.role === 'manager' 
-                  ? 'Comprehensive task management and team oversight'
+                  ? getText(staticTranslations.comprehensiveTaskManagement.en, staticTranslations.comprehensiveTaskManagement.es, staticTranslations.comprehensiveTaskManagement.tr)
                   : `Department-specific task management for ${ROLE_LABELS[userProfile.role]}`
                 }
               </p>
@@ -205,7 +222,7 @@ export default function Home() {
                 onClick={() => router.push('/manager-dashboard')}
                 className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
               >
-                Open Manager Dashboard
+                {getText(staticTranslations.openManagerDashboard.en, staticTranslations.openManagerDashboard.es, staticTranslations.openManagerDashboard.tr)}
               </button>
             </div>
           )}
@@ -214,15 +231,19 @@ export default function Home() {
           {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Team Activity</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {getText(staticTranslations.teamActivity.en, staticTranslations.teamActivity.es, staticTranslations.teamActivity.tr)}
+                </h2>
                 <Users className="w-6 h-6 text-purple-500" />
               </div>
-              <p className="text-gray-600 mb-4">Recent completions and updates</p>
+              <p className="text-gray-600 mb-4">
+                {getText(staticTranslations.teamPerformanceInsights.en, staticTranslations.teamPerformanceInsights.es, staticTranslations.teamPerformanceInsights.tr)}
+              </p>
               <button 
                 onClick={() => router.push('/team-activity')}
                 className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
               >
-                View All Activity
+                {getText(staticTranslations.viewTeamActivity.en, staticTranslations.viewTeamActivity.es, staticTranslations.viewTeamActivity.tr)}
               </button>
             </div>
           )}
@@ -231,15 +252,19 @@ export default function Home() {
           {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Weekly Reports</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {getText(staticTranslations.weeklyReports.en, staticTranslations.weeklyReports.es, staticTranslations.weeklyReports.tr)}
+                </h2>
                 <Calendar className="w-6 h-6 text-indigo-500" />
               </div>
-              <p className="text-gray-600 mb-4">View archived weekly performance reports</p>
+              <p className="text-gray-600 mb-4">
+                {getText(staticTranslations.viewArchivedWeeklyReports.en, staticTranslations.viewArchivedWeeklyReports.es, staticTranslations.viewArchivedWeeklyReports.tr)}
+              </p>
               <button 
                 onClick={() => router.push('/weekly-reports')}
                 className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
               >
-                View Weekly Reports
+                {getText(staticTranslations.viewWeeklyReports.en, staticTranslations.viewWeeklyReports.es, staticTranslations.viewWeeklyReports.tr)}
               </button>
             </div>
           )}
@@ -247,7 +272,9 @@ export default function Home() {
           {/* Pending Transfers - For all users */}
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-gray-900">Transfer Requests</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                {getText(staticTranslations.transferRequests.en, staticTranslations.transferRequests.es, staticTranslations.transferRequests.tr)}
+              </h2>
               <div className="flex items-center">
                 <RefreshCw className="w-6 h-6 text-orange-500" />
                 {pendingTransfers > 0 && (
@@ -259,13 +286,15 @@ export default function Home() {
             </div>
             <p className="text-gray-600 mb-4">
               {userProfile?.role && isManagerRole(userProfile.role)
-                ? 'Review and approve transfer requests'
-                : 'View transfer requests assigned to you'
+                ? getText(staticTranslations.reviewApproveTransfers.en, staticTranslations.reviewApproveTransfers.es, staticTranslations.reviewApproveTransfers.tr)
+                : getText(staticTranslations.viewTransferRequestsAssigned.en, staticTranslations.viewTransferRequestsAssigned.es, staticTranslations.viewTransferRequestsAssigned.tr)
               }
             </p>
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Pending approval</span>
+                <span className="text-gray-600">
+                  {getText(staticTranslations.pendingApproval.en, staticTranslations.pendingApproval.es, staticTranslations.pendingApproval.tr)}
+                </span>
                 <span className="font-medium text-orange-600">{pendingTransfers}</span>
               </div>
             </div>
@@ -273,7 +302,7 @@ export default function Home() {
               onClick={() => router.push('/pending-transfers')}
               className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
             >
-              View Transfer Requests
+              {getText(staticTranslations.viewTransferRequests.en, staticTranslations.viewTransferRequests.es, staticTranslations.viewTransferRequests.tr)}
             </button>
           </div>
         </div>

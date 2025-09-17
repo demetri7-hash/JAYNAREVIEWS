@@ -12,27 +12,36 @@ const supabase = createClient(
 // GET: Fetch manager updates
 export async function GET(request: NextRequest) {
   try {
+    console.log('=== GET /api/manager/updates called ===');
     const session = await getServerSession(authOptions);
+    console.log('Session:', !!session, session?.user?.email);
     
     if (!session?.user) {
+      console.log('No session or user found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const url = new URL(request.url);
     const requiresAck = url.searchParams.get('requiresAck');
+    console.log('requiresAck param:', requiresAck);
 
     // Get user profile
-    const { data: userProfile } = await supabase
+    console.log('Getting user profile for:', session.user.email);
+    const { data: userProfile, error: profileError } = await supabase
       .from('profiles')
       .select('id, role')
       .eq('email', session.user.email)
       .single();
 
+    console.log('Profile query result:', { userProfile, profileError });
+
     if (!userProfile) {
+      console.log('User profile not found');
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
     // Fetch all active manager updates from database
+    console.log('Fetching manager updates from database...');
     const { data: updates, error } = await supabase
       .from('manager_updates')
       .select(`
@@ -56,6 +65,8 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
+    console.log('Database query result:', { updates: updates?.length, error });
+
     if (error) {
       console.error('Error fetching manager updates:', error);
       return NextResponse.json({ error: 'Failed to fetch updates' }, { status: 500 });
@@ -67,6 +78,7 @@ export async function GET(request: NextRequest) {
       filteredUpdates = filteredUpdates.filter(update => update.requires_acknowledgment);
     }
 
+    console.log('Returning updates:', filteredUpdates.length);
     return NextResponse.json({ updates: filteredUpdates });
   } catch (error) {
     console.error('Error in GET /api/manager/updates:', error);

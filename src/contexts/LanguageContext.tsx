@@ -146,6 +146,118 @@ export const staticTranslations = {
     en: 'Critical',
     es: 'Crítico',
     tr: 'Kritik'
+  },
+
+  // Homepage translations
+  appTitle: {
+    en: 'Jayna Gyro Task Manager',
+    es: 'Administrador de Tareas Jayna Gyro',
+    tr: 'Jayna Gyro Görev Yöneticisi'
+  },
+  appDescription: {
+    en: 'Simple task management for restaurant staff',
+    es: 'Gestión simple de tareas para el personal del restaurante',
+    tr: 'Restoran personeli için basit görev yönetimi'
+  },
+  signInWithGoogle: {
+    en: 'Sign in with Google',
+    es: 'Iniciar sesión con Google',
+    tr: 'Google ile Giriş Yap'
+  },
+  secureLogin: {
+    en: 'Secure login for restaurant staff only',
+    es: 'Inicio de sesión seguro solo para personal del restaurante',
+    tr: 'Sadece restoran personeli için güvenli giriş'
+  },
+  signOut: {
+    en: 'Sign out',
+    es: 'Cerrar sesión',
+    tr: 'Çıkış Yap'
+  },
+  myTasks: {
+    en: 'My Tasks',
+    es: 'Mis Tareas',
+    tr: 'Görevlerim'
+  },
+  viewCompleteAssignedTasks: {
+    en: 'View and complete your assigned tasks',
+    es: 'Ver y completar tus tareas asignadas',
+    tr: 'Atanan görevlerinizi görün ve tamamlayın'
+  },
+  pendingTasks: {
+    en: 'Pending',
+    es: 'Pendiente',
+    tr: 'Bekliyor'
+  },
+  completedToday: {
+    en: 'Completed today',
+    es: 'Completado hoy',
+    tr: 'Bugün tamamlanan'
+  },
+  viewMyTasks: {
+    en: 'View My Tasks',
+    es: 'Ver Mis Tareas',
+    tr: 'Görevlerimi Gör'
+  },
+  createTask: {
+    en: 'Create Task',
+    es: 'Crear Tarea',
+    tr: 'Görev Oluştur'
+  },
+  createNewTasksAssign: {
+    en: 'Create new tasks and assign to staff',
+    es: 'Crear nuevas tareas y asignar al personal',
+    tr: 'Yeni görevler oluşturun ve personele atayın'
+  },
+  createNewTask: {
+    en: 'Create New Task',
+    es: 'Crear Nueva Tarea',
+    tr: 'Yeni Görev Oluştur'
+  },
+  managerDashboard: {
+    en: 'Manager Dashboard',
+    es: 'Panel del Gerente',
+    tr: 'Yönetici Paneli'
+  },
+  comprehensiveTaskManagement: {
+    en: 'Comprehensive task management and team oversight',
+    es: 'Gestión integral de tareas y supervisión del equipo',
+    tr: 'Kapsamlı görev yönetimi ve ekip denetimi'
+  },
+  openManagerDashboard: {
+    en: 'Open Manager Dashboard',
+    es: 'Abrir Panel del Gerente',
+    tr: 'Yönetici Panelini Aç'
+  },
+  teamActivity: {
+    en: 'Team Activity',
+    es: 'Actividad del Equipo',
+    tr: 'Ekip Etkinliği'
+  },
+  teamPerformanceInsights: {
+    en: 'Team performance insights and activity tracking',
+    es: 'Información sobre el rendimiento del equipo y seguimiento de actividades',
+    tr: 'Ekip performans bilgileri ve aktivite takibi'
+  },
+  viewTeamActivity: {
+    en: 'View Team Activity',
+    es: 'Ver Actividad del Equipo',
+    tr: 'Ekip Etkinliğini Gör'
+  },
+  weeklyReports: {
+    en: 'Weekly Reports',
+    es: 'Informes Semanales',
+    tr: 'Haftalık Raporlar'
+  },
+  weeklyPerformanceReports: {
+    en: 'Weekly performance reports and analytics',
+    es: 'Informes de rendimiento semanal y análisis',
+    tr: 'Haftalık performans raporları ve analizler'
+  },
+  viewWeeklyReports: {
+    en: 'View Weekly Reports',
+    es: 'Ver Informes Semanales',
+    tr: 'Haftalık Raporları Gör'
   }
 };
 

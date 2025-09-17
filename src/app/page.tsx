@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { CheckCircle, Plus, Users, Shield, RefreshCw, Calendar } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { UserRole, isManagerRole, ROLE_LABELS } from '../types'
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
+import { LanguageToggleCompact } from '@/components/LanguageToggle'
 
 interface UserProfile {
   email: string;
@@ -16,6 +18,7 @@ interface UserProfile {
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { getText } = useLanguage()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [profileLoading, setProfileLoading] = useState(true)
   const [pendingTransfers, setPendingTransfers] = useState(0)
@@ -75,22 +78,35 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="absolute top-4 right-4">
+            <LanguageToggleCompact />
+          </div>
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Jayna Gyro Task Manager</h1>
-          <p className="text-gray-600 mb-8">Simple task management for restaurant staff</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {getText(staticTranslations.appTitle.en, staticTranslations.appTitle.es, staticTranslations.appTitle.tr)}
+          </h1>
+          <p className="text-gray-600 mb-8">
+            {getText(staticTranslations.appDescription.en, staticTranslations.appDescription.es, staticTranslations.appDescription.tr)}
+          </p>
           
           <button 
             onClick={() => signIn('google')}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
-            Sign in with Google
+            {getText(staticTranslations.signInWithGoogle.en, staticTranslations.signInWithGoogle.es, staticTranslations.signInWithGoogle.tr)}
           </button>
           
           <p className="text-sm text-gray-500 mt-4">
-            Secure login for restaurant staff only
+            {getText(staticTranslations.secureLogin.en, staticTranslations.secureLogin.es, staticTranslations.secureLogin.tr)}
           </p>
+          
+          <div className="mt-8 pt-4 border-t border-gray-200">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide font-sans">
+              APP CONCEPT AND DEVELOPMENT BY DEMETRI GREGORAKIS
+            </p>
+          </div>
         </div>
       </div>
     )

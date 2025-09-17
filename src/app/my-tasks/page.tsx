@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar, RefreshCw, Users, X } from 'lucide-react'
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
+import { LanguageToggleCompact } from '@/components/LanguageToggle'
 
 interface Task {
   id: string
@@ -31,6 +33,7 @@ interface User {
 
 export default function MyTasks() {
   const router = useRouter()
+  const { language, getText } = useLanguage()
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -243,14 +246,15 @@ export default function MyTasks() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <button
             onClick={() => router.back()}
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            {staticTranslations.backToDashboard[language]}
           </button>
+          <LanguageToggleCompact />
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -259,8 +263,8 @@ export default function MyTasks() {
               <CheckCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
-              <p className="text-gray-600">View and manage your assigned tasks</p>
+              <h1 className="text-2xl font-bold text-gray-900">{staticTranslations.myTasks[language]}</h1>
+              <p className="text-gray-600">{staticTranslations.viewCompleteAssignedTasks[language]}</p>
             </div>
           </div>
 
@@ -275,10 +279,10 @@ export default function MyTasks() {
           {/* Filter Tabs */}
           <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
             {[
-              { key: 'all', label: 'All Tasks' },
-              { key: 'pending', label: 'Pending' },
-              { key: 'completed', label: 'Completed' },
-              { key: 'overdue', label: 'Overdue' }
+              { key: 'all', label: staticTranslations.all[language] },
+              { key: 'pending', label: staticTranslations.pendingTasks[language] },
+              { key: 'completed', label: staticTranslations.completed[language] },
+              { key: 'overdue', label: staticTranslations.overdue[language] }
             ].map((tab) => (
               <button
                 key={tab.key}

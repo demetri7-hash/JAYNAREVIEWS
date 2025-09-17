@@ -525,6 +525,63 @@ export const staticTranslations = {
     en: 'An unexpected error occurred',
     es: 'Ocurrió un error inesperado',
     tr: 'Beklenmeyen bir hata oluştu'
+  },
+
+  // My Tasks Page translations
+  all: {
+    en: 'All',
+    es: 'Todos',
+    tr: 'Tümü'
+  },
+  overdue: {
+    en: 'Overdue',
+    es: 'Vencido',
+    tr: 'Gecikmiş'
+  },
+  loadingTasks: {
+    en: 'Loading tasks...',
+    es: 'Cargando tareas...',
+    tr: 'Görevler yükleniyor...'
+  },
+  noTasksFound: {
+    en: 'No tasks found',
+    es: 'No se encontraron tareas',
+    tr: 'Görev bulunamadı'
+  },
+  completeTask: {
+    en: 'Complete Task',
+    es: 'Completar Tarea',
+    tr: 'Görevi Tamamla'
+  },
+  transferTask: {
+    en: 'Transfer Task',
+    es: 'Transferir Tarea',
+    tr: 'Görevi Transfer Et'
+  },
+  due: {
+    en: 'Due',
+    es: 'Vence',
+    tr: 'Bitiş'
+  },
+  requiresNotes: {
+    en: 'Requires notes',
+    es: 'Requiere notas',
+    tr: 'Not gerektirir'
+  },
+  requiresPhoto: {
+    en: 'Requires photo',
+    es: 'Requiere foto',
+    tr: 'Fotoğraf gerektirir'
+  },
+  loadMore: {
+    en: 'Load More',
+    es: 'Cargar Más',
+    tr: 'Daha Fazla Yükle'
+  },
+  refresh: {
+    en: 'Refresh',
+    es: 'Actualizar',
+    tr: 'Yenile'
   }
 };
 

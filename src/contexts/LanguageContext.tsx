@@ -308,6 +308,223 @@ export const staticTranslations = {
     en: 'View Transfer Requests',
     es: 'Ver Solicitudes de Transferencia',
     tr: 'Transfer Taleplerini Gör'
+  },
+
+  // Create Task Page translations
+  createNewTaskPage: {
+    en: 'Create New Task',
+    es: 'Crear Nueva Tarea',
+    tr: 'Yeni Görev Oluştur'
+  },
+  createTaskTemplate: {
+    en: 'Create a task template for your restaurant staff',
+    es: 'Crear una plantilla de tarea para el personal del restaurante',
+    tr: 'Restoran personeli için görev şablonu oluşturun'
+  },
+  backToDashboard: {
+    en: 'Back to Dashboard',
+    es: 'Volver al Panel',
+    tr: 'Panele Dön'
+  },
+  returnToDashboard: {
+    en: 'Return to Dashboard',
+    es: 'Volver al Panel',
+    tr: 'Panele Dön'
+  },
+  accessRestricted: {
+    en: 'Access Restricted',
+    es: 'Acceso Restringido',
+    tr: 'Erişim Kısıtlı'
+  },
+  managersOnlyAccess: {
+    en: 'Only managers can create tasks. You need manager privileges to access this page.',
+    es: 'Solo los gerentes pueden crear tareas. Necesitas privilegios de gerente para acceder a esta página.',
+    tr: 'Sadece yöneticiler görev oluşturabilir. Bu sayfaya erişmek için yönetici yetkilerine ihtiyacınız var.'
+  },
+  loading: {
+    en: 'Loading...',
+    es: 'Cargando...',
+    tr: 'Yükleniyor...'
+  },
+  taskTitle: {
+    en: 'Task Title',
+    es: 'Título de la Tarea',
+    tr: 'Görev Başlığı'
+  },
+  taskTitlePlaceholder: {
+    en: 'e.g., Clean prep tables',
+    es: 'ej., Limpiar mesas de preparación',
+    tr: 'örn., Hazırlık masalarını temizle'
+  },
+  description: {
+    en: 'Description',
+    es: 'Descripción',
+    tr: 'Açıklama'
+  },
+  descriptionPlaceholder: {
+    en: 'Detailed instructions for completing this task...',
+    es: 'Instrucciones detalladas para completar esta tarea...',
+    tr: 'Bu görevi tamamlamak için ayrıntılı talimatlar...'
+  },
+  frequency: {
+    en: 'Frequency',
+    es: 'Frecuencia',
+    tr: 'Sıklık'
+  },
+  once: {
+    en: 'Once',
+    es: 'Una vez',
+    tr: 'Bir kez'
+  },
+  daily: {
+    en: 'Daily',
+    es: 'Diario',
+    tr: 'Günlük'
+  },
+  weekly: {
+    en: 'Weekly',
+    es: 'Semanal',
+    tr: 'Haftalık'
+  },
+  monthly: {
+    en: 'Monthly',
+    es: 'Mensual',
+    tr: 'Aylık'
+  },
+  yearly: {
+    en: 'Yearly',
+    es: 'Anual',
+    tr: 'Yıllık'
+  },
+  dueDate: {
+    en: 'Due Date',
+    es: 'Fecha de Vencimiento',
+    tr: 'Bitiş Tarihi'
+  },
+  dueTimePacific: {
+    en: 'Due Time (Pacific Time)',
+    es: 'Hora de Vencimiento (Hora del Pacífico)',
+    tr: 'Bitiş Saati (Pasifik Saati)'
+  },
+  assignTo: {
+    en: 'Assign To (Select Staff)',
+    es: 'Asignar a (Seleccionar Personal)',
+    tr: 'Atama (Personel Seç)'
+  },
+  loadingUsers: {
+    en: 'Loading users...',
+    es: 'Cargando usuarios...',
+    tr: 'Kullanıcılar yükleniyor...'
+  },
+  noUsersFound: {
+    en: 'No users found. You can assign later.',
+    es: 'No se encontraron usuarios. Puedes asignar más tarde.',
+    tr: 'Kullanıcı bulunamadı. Daha sonra atayabilirsiniz.'
+  },
+  requirements: {
+    en: 'Requirements',
+    es: 'Requisitos',
+    tr: 'Gereksinimler'
+  },
+  requireNotes: {
+    en: 'Require notes when completing this task',
+    es: 'Requerir notas al completar esta tarea',
+    tr: 'Bu görevi tamamlarken not gerektir'
+  },
+  requirePhotos: {
+    en: 'Require photos when completing this task',
+    es: 'Requerir fotos al completar esta tarea',
+    tr: 'Bu görevi tamamlarken fotoğraf gerektir'
+  },
+  departmentTags: {
+    en: 'Department Tags',
+    es: 'Etiquetas de Departamento',
+    tr: 'Departman Etiketleri'
+  },
+  departmentTagsDescription: {
+    en: 'Select one or more departments for this task. This helps organize tasks and allows department managers to filter their relevant tasks.',
+    es: 'Selecciona uno o más departamentos para esta tarea. Esto ayuda a organizar las tareas y permite a los gerentes de departamento filtrar sus tareas relevantes.',
+    tr: 'Bu görev için bir veya daha fazla departman seçin. Bu, görevleri düzenlemeye yardımcı olur ve departman yöneticilerinin ilgili görevlerini filtrelemesine olanak tanır.'
+  },
+  backOfHouse: {
+    en: 'Back of House',
+    es: 'Cocina',
+    tr: 'Mutfak'
+  },
+  frontOfHouse: {
+    en: 'Front of House',
+    es: 'Área de Servicio',
+    tr: 'Servis Alanı'
+  },
+  morningShift: {
+    en: 'Morning Shift',
+    es: 'Turno Mañana',
+    tr: 'Sabah Vardiyası'
+  },
+  eveningShift: {
+    en: 'Evening Shift',
+    es: 'Turno Noche',
+    tr: 'Akşam Vardiyası'
+  },
+  prepKitchen: {
+    en: 'Prep Kitchen',
+    es: 'Cocina de Preparación',
+    tr: 'Hazırlık Mutfağı'
+  },
+  cleaning: {
+    en: 'Cleaning',
+    es: 'Limpieza',
+    tr: 'Temizlik'
+  },
+  catering: {
+    en: 'Catering',
+    es: 'Catering',
+    tr: 'Catering'
+  },
+  specialTasks: {
+    en: 'Special Tasks',
+    es: 'Tareas Especiales',
+    tr: 'Özel Görevler'
+  },
+  shiftTransitions: {
+    en: 'Shift Transitions',
+    es: 'Transiciones de Turno',
+    tr: 'Vardiya Geçişleri'
+  },
+  selectAtLeastOneDepartment: {
+    en: 'Please select at least one department.',
+    es: 'Por favor selecciona al menos un departamento.',
+    tr: 'Lütfen en az bir departman seçin.'
+  },
+  createTaskButton: {
+    en: 'Create Task',
+    es: 'Crear Tarea',
+    tr: 'Görev Oluştur'
+  },
+  creating: {
+    en: 'Creating...',
+    es: 'Creando...',
+    tr: 'Oluşturuluyor...'
+  },
+  taskTitleRequired: {
+    en: 'Task title is required',
+    es: 'El título de la tarea es obligatorio',
+    tr: 'Görev başlığı gereklidir'
+  },
+  dueDateRequired: {
+    en: 'Due date is required',
+    es: 'La fecha de vencimiento es obligatoria',
+    tr: 'Bitiş tarihi gereklidir'
+  },
+  dueTimeRequired: {
+    en: 'Due time is required',
+    es: 'La hora de vencimiento es obligatoria',
+    tr: 'Bitiş saati gereklidir'
+  },
+  unexpectedError: {
+    en: 'An unexpected error occurred',
+    es: 'Ocurrió un error inesperado',
+    tr: 'Beklenmeyen bir hata oluştu'
   }
 };
 

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { ArrowLeft, Plus, Shield, AlertTriangle } from 'lucide-react'
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
+import { LanguageToggleCompact } from '@/components/LanguageToggle'
 
 interface User {
   id: string
@@ -21,6 +23,7 @@ interface UserProfile {
 export default function CreateTask() {
   const router = useRouter()
   const { data: session, status } = useSession()
+  const { language, getText } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [loadingUsers, setLoadingUsers] = useState(true)
@@ -91,19 +94,19 @@ export default function CreateTask() {
 
     // Additional validation
     if (!formData.title.trim()) {
-      setError('Task title is required');
+      setError(staticTranslations.taskTitleRequired[language]);
       setIsSubmitting(false);
       return;
     }
 
     if (!formData.due_date) {
-      setError('Due date is required');
+      setError(staticTranslations.dueDateRequired[language]);
       setIsSubmitting(false);
       return;
     }
 
     if (!formData.due_time) {
-      setError('Due time is required');
+      setError(staticTranslations.dueTimeRequired[language]);
       setIsSubmitting(false);
       return;
     }
@@ -115,7 +118,7 @@ export default function CreateTask() {
     }
 
     if (formData.departments.length === 0) {
-      setError('Please select at least one department');
+      setError(staticTranslations.selectAtLeastOneDepartment[language]);
       setIsSubmitting(false);
       return;
     }
@@ -158,7 +161,7 @@ export default function CreateTask() {
       router.push('/');
     } catch (error) {
       console.error('Error creating task:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      setError(error instanceof Error ? error.message : staticTranslations.unexpectedError[language]);
     } finally {
       setIsSubmitting(false);
     }
@@ -170,7 +173,7 @@ export default function CreateTask() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{staticTranslations.loading[language]}</p>
         </div>
       </div>
     )
@@ -184,15 +187,15 @@ export default function CreateTask() {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Restricted</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{staticTranslations.accessRestricted[language]}</h2>
           <p className="text-gray-600 mb-6">
-            Only managers can create tasks. You need manager privileges to access this page.
+            {staticTranslations.managersOnlyAccess[language]}
           </p>
           <button
             onClick={() => router.push('/')}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Return to Dashboard
+            {staticTranslations.returnToDashboard[language]}
           </button>
         </div>
       </div>
@@ -202,14 +205,15 @@ export default function CreateTask() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <button
             onClick={() => router.back()}
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            {staticTranslations.backToDashboard[language]}
           </button>
+          <LanguageToggleCompact />
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -218,8 +222,8 @@ export default function CreateTask() {
               <Plus className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Create New Task</h1>
-              <p className="text-gray-600">Create a task template for your restaurant staff</p>
+              <h1 className="text-2xl font-bold text-gray-900">{staticTranslations.createNewTaskPage[language]}</h1>
+              <p className="text-gray-600">{staticTranslations.createTaskTemplate[language]}</p>
             </div>
           </div>
 
@@ -234,7 +238,7 @@ export default function CreateTask() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Task Title *
+                {staticTranslations.taskTitle[language]} *
               </label>
               <input
                 type="text"
@@ -243,13 +247,13 @@ export default function CreateTask() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Clean prep tables"
+                placeholder={staticTranslations.taskTitlePlaceholder[language]}
               />
             </div>
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                {staticTranslations.description[language]}
               </label>
               <textarea
                 id="description"
@@ -257,13 +261,13 @@ export default function CreateTask() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Detailed instructions for completing this task..."
+                placeholder={staticTranslations.descriptionPlaceholder[language]}
               />
             </div>
 
             <div>
               <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-2">
-                Frequency *
+                {staticTranslations.frequency[language]} *
               </label>
               <select
                 id="frequency"
@@ -272,18 +276,18 @@ export default function CreateTask() {
                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="once">Once</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
+                <option value="once">{staticTranslations.once[language]}</option>
+                <option value="daily">{staticTranslations.daily[language]}</option>
+                <option value="weekly">{staticTranslations.weekly[language]}</option>
+                <option value="monthly">{staticTranslations.monthly[language]}</option>
+                <option value="yearly">{staticTranslations.yearly[language]}</option>
               </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Due Date *
+                  {staticTranslations.dueDate[language]} *
                 </label>
                 <input
                   type="date"
@@ -298,7 +302,7 @@ export default function CreateTask() {
 
               <div>
                 <label htmlFor="due_time" className="block text-sm font-medium text-gray-700 mb-2">
-                  Due Time (Pacific Time) *
+                  {staticTranslations.dueTimePacific[language]} *
                 </label>
                 <input
                   type="time"
@@ -314,11 +318,11 @@ export default function CreateTask() {
 
             <div>
               <label htmlFor="assigned_users" className="block text-sm font-medium text-gray-700 mb-2">
-                Assign To (Select Staff)
+                {staticTranslations.assignTo[language]}
               </label>
               {loadingUsers ? (
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  Loading users...
+                  {staticTranslations.loadingUsers[language]}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -343,14 +347,14 @@ export default function CreateTask() {
                     </div>
                   ))}
                   {users.length === 0 && (
-                    <div className="text-sm text-gray-500">No users found. You can assign later.</div>
+                    <div className="text-sm text-gray-500">{staticTranslations.noUsersFound[language]}</div>
                   )}
                 </div>
               )}
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Requirements</h3>
+              <h3 className="text-lg font-medium text-gray-900">{staticTranslations.requirements[language]}</h3>
               
               <div className="flex items-center">
                 <input
@@ -361,7 +365,7 @@ export default function CreateTask() {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="requires_notes" className="ml-2 text-sm text-gray-700">
-                  Require notes when completing this task
+                  {staticTranslations.requireNotes[language]}
                 </label>
               </div>
 
@@ -374,7 +378,7 @@ export default function CreateTask() {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="requires_photo" className="ml-2 text-sm text-gray-700">
-                  Require photos when completing this task
+                  {staticTranslations.requirePhotos[language]}
                 </label>
               </div>
             </div>
@@ -382,23 +386,23 @@ export default function CreateTask() {
             {/* Department Tags Selection */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
-                Department Tags
+                {staticTranslations.departmentTags[language]}
                 <span className="text-red-500 ml-1">*</span>
               </label>
               <p className="text-sm text-gray-600">
-                Select one or more departments for this task. This helps organize tasks and allows department managers to filter their relevant tasks.
+                {staticTranslations.departmentTagsDescription[language]}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { value: 'BOH', label: 'Back of House', color: 'bg-red-100 text-red-800 border-red-200' },
-                  { value: 'FOH', label: 'Front of House', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-                  { value: 'AM', label: 'Morning Shift', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-                  { value: 'PM', label: 'Evening Shift', color: 'bg-purple-100 text-purple-800 border-purple-200' },
-                  { value: 'PREP', label: 'Prep Kitchen', color: 'bg-green-100 text-green-800 border-green-200' },
-                  { value: 'CLEAN', label: 'Cleaning', color: 'bg-gray-100 text-gray-800 border-gray-200' },
-                  { value: 'CATERING', label: 'Catering', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
-                  { value: 'SPECIAL', label: 'Special Tasks', color: 'bg-pink-100 text-pink-800 border-pink-200' },
-                  { value: 'TRANSITION', label: 'Shift Transitions', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+                  { value: 'BOH', labelKey: 'backOfHouse', color: 'bg-red-100 text-red-800 border-red-200' },
+                  { value: 'FOH', labelKey: 'frontOfHouse', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+                  { value: 'AM', labelKey: 'morningShift', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
+                  { value: 'PM', labelKey: 'eveningShift', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+                  { value: 'PREP', labelKey: 'prepKitchen', color: 'bg-green-100 text-green-800 border-green-200' },
+                  { value: 'CLEAN', labelKey: 'cleaning', color: 'bg-gray-100 text-gray-800 border-gray-200' },
+                  { value: 'CATERING', labelKey: 'catering', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+                  { value: 'SPECIAL', labelKey: 'specialTasks', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+                  { value: 'TRANSITION', labelKey: 'shiftTransitions', color: 'bg-orange-100 text-orange-800 border-orange-200' },
                 ].map((dept) => (
                   <label
                     key={dept.value}
@@ -428,13 +432,13 @@ export default function CreateTask() {
                     />
                     <div className="text-center w-full">
                       <div className="text-xs font-medium">{dept.value}</div>
-                      <div className="text-xs opacity-75">{dept.label}</div>
+                      <div className="text-xs opacity-75">{staticTranslations[dept.labelKey as keyof typeof staticTranslations][language]}</div>
                     </div>
                   </label>
                 ))}
               </div>
               {formData.departments.length === 0 && (
-                <p className="text-sm text-red-600">Please select at least one department.</p>
+                <p className="text-sm text-red-600">{staticTranslations.selectAtLeastOneDepartment[language]}</p>
               )}
             </div>
 
@@ -444,14 +448,14 @@ export default function CreateTask() {
                 onClick={() => router.back()}
                 className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors"
               >
-                Cancel
+                {staticTranslations.cancel[language]}
               </button>
               <button
                 type="submit"
                 disabled={loading}
                 className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
               >
-                {loading ? 'Creating...' : 'Create Task'}
+                {loading ? staticTranslations.creating[language] : staticTranslations.createTaskButton[language]}
               </button>
             </div>
           </form>

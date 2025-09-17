@@ -112,7 +112,7 @@ export default function CreateTask() {
     }
 
     if (selectedUsers.length === 0) {
-      setError('Please assign this task to at least one person');
+      setError(staticTranslations.pleaseAssignTask[language]);
       setIsSubmitting(false);
       return;
     }
@@ -143,7 +143,7 @@ export default function CreateTask() {
       if (!response.ok) {
         const data = await response.json();
         console.error('API Error:', data);
-        throw new Error(data.error || 'Failed to create task');
+        throw new Error(data.error || staticTranslations.failedToCreateTask[language]);
       }
 
       // Reset form and redirect to dashboard

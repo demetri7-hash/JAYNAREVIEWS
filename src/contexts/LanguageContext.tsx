@@ -582,6 +582,16 @@ export const staticTranslations = {
     en: 'Refresh',
     es: 'Actualizar',
     tr: 'Yenile'
+  },
+  pleaseAssignTask: {
+    en: 'Please assign this task to at least one person',
+    es: 'Por favor asigna esta tarea a al menos una persona',
+    tr: 'Lütfen bu görevi en az bir kişiye atayın'
+  },
+  failedToCreateTask: {
+    en: 'Failed to create task',
+    es: 'Error al crear la tarea',
+    tr: 'Görev oluşturulamadı'
   }
 };
 

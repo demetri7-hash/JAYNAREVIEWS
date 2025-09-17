@@ -363,90 +363,136 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        {/* Bulk Operations */}
+        {/* Enhanced Bulk Operations */}
         {selectedTasks.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-4 mb-6">
+          <div className="glass rounded-2xl p-6 mb-8 animate-fade-in-up animation-delay-400 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">
-                {selectedTasks.length} task(s) selected
-              </span>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">{selectedTasks.length}</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 brand-header">Bulk Operations</h3>
+                  <p className="text-sm text-slate-600 brand-subtitle">
+                    {selectedTasks.length} task{selectedTasks.length !== 1 ? 's' : ''} selected
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => handleBulkOperation('complete')}
-                  className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                  className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-lg shadow-green-500/25 flex items-center gap-2"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                   Mark Complete
                 </button>
                 <button
                   onClick={() => handleBulkOperation('delete')}
-                  className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium shadow-lg shadow-red-500/25 flex items-center gap-2"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                   Delete
+                </button>
+                <select
+                  onChange={(e) => e.target.value && handleBulkOperation('reassign', e.target.value)}
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-xl font-medium shadow-lg shadow-purple-500/25 border-none"
+                  defaultValue=""
+                >
+                  <option value="">Bulk Reassign...</option>
+                  {(users || []).map(user => (
+                    <option key={user.id} value={user.id} className="text-slate-900">
+                      {user.name} ({ROLE_LABELS[user.role]})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => setSelectedTasks([])}
+                  className="bg-gradient-to-r from-slate-500 to-slate-600 text-white px-4 py-2 rounded-xl hover:from-slate-600 hover:to-slate-700 transition-all duration-200 font-medium shadow-lg shadow-slate-500/25"
+                >
+                  Clear Selection
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Tasks Table */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
+        {/* Enhanced Tasks Table */}
+        <div className="glass rounded-3xl overflow-hidden animate-fade-in-up animation-delay-500">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Tasks ({filteredTasks.length})
-              </h2>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm text-gray-600">Select All</span>
-              </label>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 brand-header">
+                  Task Management
+                </h2>
+                <p className="text-slate-600 brand-subtitle">
+                  {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <input
+                    type="checkbox"
+                    checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 text-blue-600 border-2 border-blue-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-blue-700">
+                    Select All ({filteredTasks.length})
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gradient-to-r from-slate-50 to-blue-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Select
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Task
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Departments
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Assignee
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Due Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {(filteredTasks || []).map((task) => (
-                  <tr key={task.id} className="hover:bg-gray-50">
+              <tbody className="divide-y divide-slate-200">
+                {(filteredTasks || []).map((task, index) => (
+                  <tr 
+                    key={task.id} 
+                    className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-200 ${
+                      selectedTasks.includes(task.id) ? 'bg-gradient-to-r from-blue-100 to-blue-50 border-l-4 border-blue-500' : ''
+                    }`}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
                         type="checkbox"
                         checked={selectedTasks.includes(task.id)}
                         onChange={(e) => handleTaskSelection(task.id, e.target.checked)}
-                        className="rounded border-gray-300"
+                        className="w-4 h-4 text-blue-600 border-2 border-slate-300 rounded focus:ring-blue-500"
                       />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{task.task}</div>
+                      <div className="text-sm font-semibold text-slate-900 brand-header">{task.task}</div>
                       {task.notes && (
                         <div className="text-sm text-gray-500 mt-1">{task.notes}</div>
                       )}

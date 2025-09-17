@@ -14,6 +14,10 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     })
   ],
+  debug: process.env.NODE_ENV === 'development',
+  session: {
+    strategy: 'jwt',
+  },
   callbacks: {
     async session({ session }) {
       // Add user role to session
@@ -51,7 +55,9 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/',
-  }
+    error: '/', // Redirect errors back to homepage
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 export default NextAuth(authOptions)

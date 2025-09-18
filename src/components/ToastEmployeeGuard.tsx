@@ -90,7 +90,7 @@ export default function ToastEmployeeGuard({
             <h3 className="font-semibold text-blue-900 mb-2">What happens next:</h3>
             <ul className="text-sm text-blue-800 text-left space-y-1">
               <li>• A manager will link your account to your TOAST employee profile</li>
-              <li>• Once linked, you'll have access to all personalized features</li>
+              <li>• Once linked, you&apos;ll have access to all personalized features</li>
               <li>• This is a one-time setup process</li>
             </ul>
           </div>

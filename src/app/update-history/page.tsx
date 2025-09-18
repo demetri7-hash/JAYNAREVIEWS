@@ -179,7 +179,7 @@ export default function UpdateHistory() {
               <Bell className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="text-lg font-semibold text-slate-900 brand-header mb-2">No Update History</h3>
-            <p className="text-slate-600 brand-subtitle">You haven't read any manager updates yet.</p>
+            <p className="text-slate-600 brand-subtitle">You haven&apos;t read any manager updates yet.</p>
           </div>
         ) : (
           <div className="space-y-4">

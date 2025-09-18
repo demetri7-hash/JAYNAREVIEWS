@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', session.user.email)
@@ -74,7 +74,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', session.user.email)

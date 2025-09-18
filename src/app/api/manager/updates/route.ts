@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     // Process updates to add read status and apply filtering
     let processedUpdates = (updates || []).map(update => {
       const userRead = update.manager_update_reads?.find(
-        (read: any) => read && Object.keys(read).length > 0
+        (read: { read_at?: string }) => read && Object.keys(read).length > 0
       );
       
       return {

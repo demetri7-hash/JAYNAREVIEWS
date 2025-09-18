@@ -52,10 +52,12 @@ interface ManagerUpdate {
   message_en?: string
   message_es?: string
   message_tr?: string
-  priority: 'low' | 'medium' | 'high'
+  priority: 'low' | 'medium' | 'high' | 'critical'
   timestamp: string
-  type: 'announcement' | 'alert' | 'achievement'
+  type: 'announcement' | 'alert' | 'policy' | 'emergency'
   photo_url?: string
+  isRead?: boolean
+  requires_acknowledgment?: boolean
 }
 
 interface UserProfile {
@@ -74,6 +76,13 @@ export default function TeamActivity() {
   const [userActivity, setUserActivity] = useState<UserActivity[]>([])
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [managerUpdates, setManagerUpdates] = useState<ManagerUpdate[]>([])
+  const [updatesPagination, setUpdatesPagination] = useState({
+    page: 1,
+    limit: 3,
+    total: 0,
+    hasMore: false,
+    totalPages: 0
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedUpdate, setSelectedUpdate] = useState<ManagerUpdate | null>(null)
@@ -137,9 +146,9 @@ export default function TeamActivity() {
     }
   }
 
-  const fetchManagerUpdates = async () => {
+  const fetchManagerUpdates = async (page = 1) => {
     try {
-      const response = await fetch('/api/manager/updates?requiresAck=false')
+      const response = await fetch(`/api/manager/updates?page=${page}&limit=3`)
       if (response.ok) {
         const data = await response.json()
         const formattedUpdates: ManagerUpdate[] = data.updates?.map((update: {
@@ -156,6 +165,8 @@ export default function TeamActivity() {
           created_at: string;
           type: string;
           photo_url?: string;
+          isRead?: boolean;
+          requires_acknowledgment?: boolean;
         }) => ({
           id: update.id,
           title: update.title,
@@ -169,14 +180,71 @@ export default function TeamActivity() {
           priority: update.priority,
           timestamp: update.created_at,
           type: update.type,
-          photo_url: update.photo_url
+          photo_url: update.photo_url,
+          isRead: update.isRead,
+          requires_acknowledgment: update.requires_acknowledgment
         })) || []
         setManagerUpdates(formattedUpdates)
+        setUpdatesPagination(data.pagination || {
+          page: 1,
+          limit: 3,
+          total: 0,
+          hasMore: false,
+          totalPages: 0
+        })
       }
     } catch (error) {
       console.error('Error fetching manager updates:', error)
       setManagerUpdates([])
     }
+  }
+
+  const markUpdateAsRead = async (updateId: string) => {
+    try {
+      const response = await fetch('/api/manager/updates/read-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ updateId }),
+      })
+
+      if (response.ok) {
+        // Refresh the updates list to remove the read update
+        fetchManagerUpdates(updatesPagination.page)
+      }
+    } catch (error) {
+      console.error('Error marking update as read:', error)
+    }
+  }
+
+  const markUpdateAsUnread = async (updateId: string) => {
+    try {
+      const response = await fetch(`/api/manager/updates/read-status?updateId=${updateId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // Close modal and refresh updates
+        setSelectedUpdate(null)
+        fetchManagerUpdates(updatesPagination.page)
+      }
+    } catch (error) {
+      console.error('Error marking update as unread:', error)
+    }
+  }
+
+  const openUpdateModal = async (update: ManagerUpdate) => {
+    setSelectedUpdate(update)
+    // Mark as read when opened (unless it requires acknowledgment)
+    if (!update.requires_acknowledgment && !update.isRead) {
+      await markUpdateAsRead(update.id)
+    }
+  }
+
+  const goToPage = (page: number) => {
+    setUpdatesPagination(prev => ({ ...prev, page }))
+    fetchManagerUpdates(page)
   }
 
   const formatDate = (dateString: string) => {
@@ -273,16 +341,24 @@ export default function TeamActivity() {
 
           {/* Manager Updates Box */}
           <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-200">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
-                <Bell className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
+                  <Bell className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 brand-header">
+                    {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
+                  </h3>
+                  <p className="text-slate-600 brand-subtitle">Unread notifications and announcements</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-900 brand-header">
-                  {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
-                </h3>
-                <p className="text-slate-600 brand-subtitle">Live notifications and announcements</p>
-              </div>
+              <button
+                onClick={() => router.push('/update-history')}
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline"
+              >
+                Full Update History
+              </button>
             </div>
             
             <div className="space-y-4">
@@ -291,61 +367,109 @@ export default function TeamActivity() {
                   <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Bell className="w-6 h-6 text-slate-400" />
                   </div>
-                  <p className="text-slate-500 brand-subtitle">No recent updates</p>
+                  <p className="text-slate-500 brand-subtitle">No unread updates</p>
+                  <button
+                    onClick={() => router.push('/update-history')}
+                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline mt-2"
+                  >
+                    View update history
+                  </button>
                 </div>
               ) : (
-                managerUpdates.map((update, index) => (
-                  <div
-                    key={update.id}
-                    className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up cursor-pointer"
-                    style={{ animationDelay: `${800 + index * 100}ms` }}
-                    onClick={() => setSelectedUpdate(update)}
-                  >
-                    <div className="flex items-start">
-                      <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
-                        {getUpdateIcon(update.type)}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-slate-900 brand-header mb-2">
-                          {getText(update.title_en || update.title, update.title_es, update.title_tr)}
-                        </h4>
-                        <p className="text-slate-600 brand-subtitle mb-4 line-clamp-3">
-                          {getText(update.message_en || update.message, update.message_es, update.message_tr)}
-                        </p>
-                        
-                        {/* Photo thumbnail if exists */}
-                        {update.photo_url && (
-                          <div className="mb-4">
-                            <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
-                              <img 
-                                src={update.photo_url} 
-                                alt="Update photo" 
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Fallback to camera icon if image fails to load
-                                  e.currentTarget.style.display = 'none';
-                                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                }}
-                              />
-                              <Camera className="w-8 h-8 text-slate-400 hidden" />
-                            </div>
+                <>
+                  {managerUpdates.map((update, index) => (
+                    <div
+                      key={update.id}
+                      className={`glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up cursor-pointer ${
+                        update.requires_acknowledgment 
+                          ? 'border-2 border-red-200 bg-red-50/50' 
+                          : ''
+                      }`}
+                      style={{ animationDelay: `${800 + index * 100}ms` }}
+                      onClick={() => openUpdateModal(update)}
+                    >
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
+                          {getUpdateIcon(update.type)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className={`font-semibold brand-header ${
+                              update.requires_acknowledgment ? 'text-red-800' : 'text-slate-900'
+                            }`}>
+                              {getText(update.title_en || update.title, update.title_es, update.title_tr)}
+                            </h4>
+                            {update.requires_acknowledgment && (
+                              <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200">
+                                🚨 SIGNATURE REQUIRED
+                              </span>
+                            )}
                           </div>
-                        )}
-                        
-                        <div className="flex items-center justify-between text-sm text-slate-500">
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            <span>{formatDate(update.timestamp)}</span>
-                            <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(update.priority)}`}>
-                              {update.priority.toUpperCase()}
+                          <p className="text-slate-600 brand-subtitle mb-4 line-clamp-3">
+                            {getText(update.message_en || update.message, update.message_es, update.message_tr)}
+                          </p>
+                          
+                          {/* Photo thumbnail if exists */}
+                          {update.photo_url && (
+                            <div className="mb-4">
+                              <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+                                <img 
+                                  src={update.photo_url} 
+                                  alt="Update photo" 
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to camera icon if image fails to load
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                  }}
+                                />
+                                <Camera className="w-8 h-8 text-slate-400 hidden" />
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center justify-between text-sm text-slate-500">
+                            <div className="flex items-center">
+                              <Calendar className="w-4 h-4 mr-2" />
+                              <span>{formatDate(update.timestamp)}</span>
+                              <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(update.priority)}`}>
+                                {update.priority.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="text-xs text-slate-400">
+                              {update.requires_acknowledgment ? 'Click to acknowledge' : 'Click to view details'}
                             </span>
                           </div>
-                          <span className="text-xs text-slate-400">Click to view details</span>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                  
+                  {/* Pagination controls */}
+                  {updatesPagination.totalPages > 1 && (
+                    <div className="flex items-center justify-center space-x-4 pt-4">
+                      <button
+                        onClick={() => goToPage(updatesPagination.page - 1)}
+                        disabled={updatesPagination.page === 1}
+                        className="flex items-center px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        ← Prev
+                      </button>
+                      
+                      <span className="text-sm text-slate-600">
+                        {updatesPagination.page} of {updatesPagination.totalPages}
+                      </span>
+                      
+                      <button
+                        onClick={() => goToPage(updatesPagination.page + 1)}
+                        disabled={updatesPagination.page === updatesPagination.totalPages}
+                        className="flex items-center px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Next →
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -662,9 +786,9 @@ export default function TeamActivity() {
 
       {/* Update Details Popup Modal */}
       {selectedUpdate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in-up">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="glass max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl animate-scale-in">
+            <div className="p-8">
               {/* Header with close button */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center">
@@ -672,7 +796,9 @@ export default function TeamActivity() {
                     {getUpdateIcon(selectedUpdate.type)}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 brand-header">
+                    <h3 className={`text-xl font-bold brand-header ${
+                      selectedUpdate.requires_acknowledgment ? 'text-red-800' : 'text-slate-900'
+                    }`}>
                       {getText(selectedUpdate.title_en || selectedUpdate.title, selectedUpdate.title_es, selectedUpdate.title_tr)}
                     </h3>
                     <div className="flex items-center text-sm text-slate-500 mt-1">
@@ -681,6 +807,11 @@ export default function TeamActivity() {
                       <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(selectedUpdate.priority)}`}>
                         {selectedUpdate.priority.toUpperCase()}
                       </span>
+                      {selectedUpdate.requires_acknowledgment && (
+                        <span className="ml-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200">
+                          🚨 SIGNATURE REQUIRED
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -698,7 +829,7 @@ export default function TeamActivity() {
                   <img 
                     src={selectedUpdate.photo_url} 
                     alt="Update photo" 
-                    className="w-full max-h-80 object-contain rounded-xl bg-slate-50"
+                    className="w-full max-h-80 object-contain rounded-xl bg-slate-50 shadow-md"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -707,10 +838,31 @@ export default function TeamActivity() {
               )}
 
               {/* Full message content */}
-              <div className="prose prose-slate max-w-none">
+              <div className="prose prose-slate max-w-none mb-6">
                 <p className="text-slate-700 brand-subtitle leading-relaxed whitespace-pre-wrap">
                   {getText(selectedUpdate.message_en || selectedUpdate.message, selectedUpdate.message_es, selectedUpdate.message_tr)}
                 </p>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+                <div className="flex items-center space-x-4">
+                  {selectedUpdate.requires_acknowledgment ? (
+                    <button className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium">
+                      Sign & Acknowledge
+                    </button>
+                  ) : (
+                    <span className="text-sm text-green-600 font-medium">✓ Marked as read</span>
+                  )}
+                </div>
+                {!selectedUpdate.requires_acknowledgment && (
+                  <button
+                    onClick={() => markUpdateAsUnread(selectedUpdate.id)}
+                    className="text-sm text-slate-500 hover:text-slate-700 transition-colors underline"
+                  >
+                    Mark as unread
+                  </button>
+                )}
               </div>
             </div>
           </div>

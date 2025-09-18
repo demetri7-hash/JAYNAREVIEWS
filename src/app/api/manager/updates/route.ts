@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
 
     const url = new URL(request.url);
     const requiresAck = url.searchParams.get('requiresAck');
-    console.log('requiresAck param:', requiresAck);
+    const showRead = url.searchParams.get('showRead'); // 'true' for history page
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '3');
+    console.log('Query params:', { requiresAck, showRead, page, limit });
 
     // Get user profile
     console.log('Getting user profile for:', session.user.email);
@@ -40,8 +43,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    // Fetch all active manager updates from database
-    console.log('Fetching manager updates from database...');
+    // Fetch all active manager updates with read status
+    console.log('Fetching manager updates with read status...');
     const { data: updates, error } = await supabase
       .from('manager_updates')
       .select(`
@@ -60,9 +63,16 @@ export async function GET(request: NextRequest) {
         created_at,
         expires_at,
         is_active,
-        created_by
+        created_by,
+        photo_url,
+        manager_update_reads!left(
+          id,
+          read_at,
+          user_id
+        )
       `)
       .eq('is_active', true)
+      .eq('manager_update_reads.user_id', userProfile.id)
       .order('created_at', { ascending: false });
 
     console.log('Database query result:', { updates: updates?.length, error });
@@ -72,14 +82,74 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch updates' }, { status: 500 });
     }
 
-    // Filter by requires acknowledgment if specified
-    let filteredUpdates = updates || [];
-    if (requiresAck === 'true') {
-      filteredUpdates = filteredUpdates.filter(update => update.requires_acknowledgment);
+    // Process updates to add read status and apply filtering
+    let processedUpdates = (updates || []).map(update => {
+      const userRead = update.manager_update_reads?.find(
+        (read: any) => read && Object.keys(read).length > 0
+      );
+      
+      return {
+        ...update,
+        isRead: !!userRead,
+        readAt: userRead?.read_at || null,
+        manager_update_reads: undefined // Remove from response
+      };
+    });
+
+    // Apply filtering logic
+    if (showRead === 'true') {
+      // History page: show only read updates
+      processedUpdates = processedUpdates.filter(update => update.isRead);
+    } else {
+      // Main page: show unread updates, with required acknowledgment floating to top
+      processedUpdates = processedUpdates.filter(update => !update.isRead);
+      
+      // Sort: required acknowledgment first, then by priority, then by date
+      processedUpdates.sort((a, b) => {
+        // Required acknowledgment always first
+        if (a.requires_acknowledgment && !b.requires_acknowledgment) return -1;
+        if (!a.requires_acknowledgment && b.requires_acknowledgment) return 1;
+        
+        // Then by priority (critical, high, medium, low)
+        const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+        const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 4;
+        const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 4;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        
+        // Then by creation date (newest first)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
     }
 
-    console.log('Returning updates:', filteredUpdates.length);
-    return NextResponse.json({ updates: filteredUpdates });
+    // Apply additional filters
+    if (requiresAck === 'true') {
+      processedUpdates = processedUpdates.filter(update => update.requires_acknowledgment);
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUpdates = processedUpdates.slice(startIndex, endIndex);
+    const hasMore = endIndex < processedUpdates.length;
+
+    console.log('Returning updates:', { 
+      total: processedUpdates.length, 
+      page, 
+      limit, 
+      returned: paginatedUpdates.length,
+      hasMore 
+    });
+
+    return NextResponse.json({ 
+      updates: paginatedUpdates,
+      pagination: {
+        page,
+        limit,
+        total: processedUpdates.length,
+        hasMore,
+        totalPages: Math.ceil(processedUpdates.length / limit)
+      }
+    });
   } catch (error) {
     console.error('Error in GET /api/manager/updates:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

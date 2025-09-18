@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { ArrowLeft, Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, User, Calendar, Trophy, Star, Target, Bell, Megaphone } from 'lucide-react'
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
+import { LanguageToggleCompact } from '@/components/LanguageToggle'
 
 interface TeamStats {
   totalTasks: number
@@ -44,6 +46,12 @@ interface ManagerUpdate {
   id: string
   title: string
   message: string
+  title_en?: string
+  title_es?: string
+  title_tr?: string
+  message_en?: string
+  message_es?: string
+  message_tr?: string
   priority: 'low' | 'medium' | 'high'
   timestamp: string
   type: 'announcement' | 'alert' | 'achievement'
@@ -58,6 +66,7 @@ interface UserProfile {
 export default function TeamActivity() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { language, getText } = useLanguage()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
   const [recentCompletions, setRecentCompletions] = useState<RecentCompletion[]>([])
@@ -139,6 +148,12 @@ export default function TeamActivity() {
           id: string;
           title: string;
           message: string;
+          title_en?: string;
+          title_es?: string;
+          title_tr?: string;
+          message_en?: string;
+          message_es?: string;
+          message_tr?: string;
           priority: string;
           created_at: string;
           type: string;
@@ -146,6 +161,12 @@ export default function TeamActivity() {
           id: update.id,
           title: update.title,
           message: update.message,
+          title_en: update.title_en,
+          title_es: update.title_es,
+          title_tr: update.title_tr,
+          message_en: update.message_en,
+          message_es: update.message_es,
+          message_tr: update.message_tr,
           priority: update.priority,
           timestamp: update.created_at,
           type: update.type
@@ -238,13 +259,16 @@ export default function TeamActivity() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in-up">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center text-slate-600 hover:text-blue-600 transition-all duration-200 mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </button>
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-slate-600 hover:text-blue-600 transition-all duration-200"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {getText(staticTranslations.backToDashboard.en, staticTranslations.backToDashboard.es, staticTranslations.backToDashboard.tr)}
+            </button>
+            <LanguageToggleCompact />
+          </div>
         </div>
 
         <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-100">
@@ -352,7 +376,9 @@ export default function TeamActivity() {
                 <Bell className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 brand-header">Manager Updates</h3>
+                <h3 className="text-xl font-bold text-slate-900 brand-header">
+                  {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
+                </h3>
                 <p className="text-slate-600 brand-subtitle">Live notifications and announcements</p>
               </div>
             </div>
@@ -377,8 +403,12 @@ export default function TeamActivity() {
                         {getUpdateIcon(update.type)}
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-slate-900 brand-header mb-2">{update.title}</h4>
-                        <p className="text-slate-600 brand-subtitle mb-4">{update.message}</p>
+                        <h4 className="font-semibold text-slate-900 brand-header mb-2">
+                          {getText(update.title_en || update.title, update.title_es, update.title_tr)}
+                        </h4>
+                        <p className="text-slate-600 brand-subtitle mb-4">
+                          {getText(update.message_en || update.message, update.message_es, update.message_tr)}
+                        </p>
                         <div className="flex items-center text-sm text-slate-500">
                           <Calendar className="w-4 h-4 mr-2" />
                           <span>{formatDate(update.timestamp)}</span>

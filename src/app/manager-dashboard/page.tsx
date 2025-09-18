@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
+import { supabase } from '@/lib/supabase';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -615,7 +616,8 @@ function ManagerUpdatesTab() {
     priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     type: 'announcement' as 'announcement' | 'alert' | 'policy' | 'emergency',
     requiresAcknowledgment: false,
-    expiresAt: ''
+    expiresAt: '',
+    photo: null as File | null
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -627,7 +629,8 @@ function ManagerUpdatesTab() {
   const loadUpdates = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/manager/updates');
+      // For manager dashboard, get all updates regardless of read status
+      const response = await fetch('/api/manager/updates?showRead=true&limit=50');
       if (response.ok) {
         const data = await response.json();
         setUpdates(data.updates || []);
@@ -642,6 +645,33 @@ function ManagerUpdatesTab() {
     }
   };
 
+  const uploadPhotoToStorage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `manager-updates/${fileName}`
+
+      const { data, error } = await supabase.storage
+        .from('task-photos')
+        .upload(filePath, file)
+
+      if (error) {
+        console.error('Error uploading photo:', error)
+        return null
+      }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('task-photos')
+        .getPublicUrl(filePath)
+
+      return urlData.publicUrl
+    } catch (error) {
+      console.error('Error in photo upload:', error)
+      return null
+    }
+  };
+
   const createUpdate = async () => {
     if (!newUpdate.title.trim() || !newUpdate.message.trim()) {
       setError('Title and message are required');
@@ -652,6 +682,18 @@ function ManagerUpdatesTab() {
       setSaving(true);
       setError('');
       
+      let photoUrl = null;
+      
+      // Upload photo to Supabase Storage if provided
+      if (newUpdate.photo) {
+        photoUrl = await uploadPhotoToStorage(newUpdate.photo);
+        if (!photoUrl) {
+          setError('Failed to upload photo. Please try again.');
+          setSaving(false);
+          return;
+        }
+      }
+      
       const response = await fetch('/api/manager/updates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -661,7 +703,8 @@ function ManagerUpdatesTab() {
           priority: newUpdate.priority,
           type: newUpdate.type,
           requiresAcknowledgment: newUpdate.requiresAcknowledgment,
-          expiresAt: newUpdate.expiresAt || null
+          expiresAt: newUpdate.expiresAt || null,
+          photoUrl: photoUrl
         })
       });
 
@@ -673,7 +716,8 @@ function ManagerUpdatesTab() {
           priority: 'medium',
           type: 'announcement',
           requiresAcknowledgment: false,
-          expiresAt: ''
+          expiresAt: '',
+          photo: null
         });
         setCreating(false);
       } else {
@@ -820,6 +864,34 @@ function ManagerUpdatesTab() {
               </div>
             </div>
 
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Photo (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setNewUpdate(prev => ({ ...prev, photo: file }));
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {newUpdate.photo && (
+                <div className="mt-2 flex items-center text-sm text-gray-600">
+                  <span>📷 {newUpdate.photo.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setNewUpdate(prev => ({ ...prev, photo: null }))}
+                    className="ml-2 text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -858,7 +930,8 @@ function ManagerUpdatesTab() {
                     priority: 'medium',
                     type: 'announcement',
                     requiresAcknowledgment: false,
-                    expiresAt: ''
+                    expiresAt: '',
+                    photo: null
                   });
                   setError('');
                 }}

@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { title, message, priority, type, requiresAcknowledgment, expiresAt } = await request.json();
+    const { title, message, priority, type, requiresAcknowledgment, expiresAt, photoUrl } = await request.json();
 
     if (!title || !message || !priority || !type) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -237,7 +237,8 @@ export async function POST(request: NextRequest) {
         type,
         requires_acknowledgment: requiresAcknowledgment || priority === 'critical',
         expires_at: expiresAt || null,
-        created_by: creatorProfile.id
+        created_by: creatorProfile.id,
+        photo_url: photoUrl || null
       })
       .select()
       .single();

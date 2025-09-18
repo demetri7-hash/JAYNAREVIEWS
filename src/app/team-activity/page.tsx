@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { ArrowLeft, Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, User, Calendar, Trophy, Star, Target, Bell, Megaphone } from 'lucide-react'
+import { ArrowLeft, Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, User, Calendar, Trophy, Star, Target, Bell, Megaphone, X, Camera } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
 
@@ -55,6 +55,7 @@ interface ManagerUpdate {
   priority: 'low' | 'medium' | 'high'
   timestamp: string
   type: 'announcement' | 'alert' | 'achievement'
+  photo_url?: string
 }
 
 interface UserProfile {
@@ -75,6 +76,7 @@ export default function TeamActivity() {
   const [managerUpdates, setManagerUpdates] = useState<ManagerUpdate[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedUpdate, setSelectedUpdate] = useState<ManagerUpdate | null>(null)
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -89,12 +91,8 @@ export default function TeamActivity() {
         const data = await response.json()
         if (data.success) {
           setUserProfile(data.user)
-          if (data.user.role === 'manager') {
-            fetchTeamActivity()
-          } else {
-            // Redirect non-managers
-            router.push('/')
-          }
+          // Allow all users to access team activity page
+          fetchTeamActivity()
         }
       }
     } catch (error) {
@@ -157,6 +155,7 @@ export default function TeamActivity() {
           priority: string;
           created_at: string;
           type: string;
+          photo_url?: string;
         }) => ({
           id: update.id,
           title: update.title,
@@ -169,7 +168,8 @@ export default function TeamActivity() {
           message_tr: update.message_tr,
           priority: update.priority,
           timestamp: update.created_at,
-          type: update.type
+          type: update.type,
+          photo_url: update.photo_url
         })) || []
         setManagerUpdates(formattedUpdates)
       }
@@ -228,28 +228,6 @@ export default function TeamActivity() {
         <div className="text-center animate-fade-in-up">
           <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600 font-medium">Loading team activity...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (userProfile?.role !== 'manager') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
-        <div className="max-w-md w-full glass rounded-3xl p-8 text-center animate-fade-in-up">
-          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-3 brand-header">Manager Access Required</h2>
-          <p className="text-slate-600 mb-6 brand-subtitle">
-            Only managers can access the team activity dashboard.
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25"
-          >
-            Return to Dashboard
-          </button>
         </div>
       </div>
     )
@@ -395,8 +373,9 @@ export default function TeamActivity() {
                 managerUpdates.map((update, index) => (
                   <div
                     key={update.id}
-                    className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                    className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up cursor-pointer"
                     style={{ animationDelay: `${800 + index * 100}ms` }}
+                    onClick={() => setSelectedUpdate(update)}
                   >
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
@@ -406,15 +385,38 @@ export default function TeamActivity() {
                         <h4 className="font-semibold text-slate-900 brand-header mb-2">
                           {getText(update.title_en || update.title, update.title_es, update.title_tr)}
                         </h4>
-                        <p className="text-slate-600 brand-subtitle mb-4">
+                        <p className="text-slate-600 brand-subtitle mb-4 line-clamp-3">
                           {getText(update.message_en || update.message, update.message_es, update.message_tr)}
                         </p>
-                        <div className="flex items-center text-sm text-slate-500">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          <span>{formatDate(update.timestamp)}</span>
-                          <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(update.priority)}`}>
-                            {update.priority.toUpperCase()}
-                          </span>
+                        
+                        {/* Photo thumbnail if exists */}
+                        {update.photo_url && (
+                          <div className="mb-4">
+                            <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+                              <img 
+                                src={update.photo_url} 
+                                alt="Update photo" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback to camera icon if image fails to load
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                              <Camera className="w-8 h-8 text-slate-400 hidden" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between text-sm text-slate-500">
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            <span>{formatDate(update.timestamp)}</span>
+                            <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(update.priority)}`}>
+                              {update.priority.toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="text-xs text-slate-400">Click to view details</span>
                         </div>
                       </div>
                     </div>
@@ -657,6 +659,63 @@ export default function TeamActivity() {
           </div>
         </div>
       </div>
+
+      {/* Update Details Popup Modal */}
+      {selectedUpdate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in-up">
+            <div className="p-6">
+              {/* Header with close button */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4">
+                    {getUpdateIcon(selectedUpdate.type)}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 brand-header">
+                      {getText(selectedUpdate.title_en || selectedUpdate.title, selectedUpdate.title_es, selectedUpdate.title_tr)}
+                    </h3>
+                    <div className="flex items-center text-sm text-slate-500 mt-1">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span>{formatDate(selectedUpdate.timestamp)}</span>
+                      <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(selectedUpdate.priority)}`}>
+                        {selectedUpdate.priority.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedUpdate(null)}
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Photo display if exists */}
+              {selectedUpdate.photo_url && (
+                <div className="mb-6">
+                  <img 
+                    src={selectedUpdate.photo_url} 
+                    alt="Update photo" 
+                    className="w-full max-h-80 object-contain rounded-xl bg-slate-50"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Full message content */}
+              <div className="prose prose-slate max-w-none">
+                <p className="text-slate-700 brand-subtitle leading-relaxed whitespace-pre-wrap">
+                  {getText(selectedUpdate.message_en || selectedUpdate.message, selectedUpdate.message_es, selectedUpdate.message_tr)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

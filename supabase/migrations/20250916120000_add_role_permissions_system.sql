@@ -60,7 +60,8 @@ INSERT INTO role_permissions (role, department) VALUES
   ('manager', 'CLEAN'),
   ('manager', 'CATERING'),
   ('manager', 'SPECIAL'),
-  ('manager', 'TRANSITION');
+  ('manager', 'TRANSITION')
+ON CONFLICT (role, department) DO NOTHING;
 
 -- Enable RLS (Row Level Security)
 ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;

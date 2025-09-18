@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-09-17T20:40:31.989Z",
+  "environment": "development",
+  "configuration": {
+    "toast": {
+      "enabled": true,
+      "apiKeyConfigured": true,
+      "restaurantIdConfigured": true,
+      "baseUrl": "https://ws-api.toasttab.com"
+    },
+    "homebase": {
+      "enabled": false,
+      "apiKeyConfigured": true,
+      "companyIdConfigured": true,
+      "baseUrl": "https://api.joinhomebase.com"
+    },
+    "features": {
+      "smartPrepLists": true,
+      "intelligentTaskAssignment": false,
+      "rushPeriodDetection": true,
+      "automatedWorkflows": false
+    }
+  }
+}

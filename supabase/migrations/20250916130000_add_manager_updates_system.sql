@@ -27,32 +27,43 @@ CREATE TABLE update_acknowledgments (
   UNIQUE(update_id, user_id)
 );
 
--- Insert some sample manager updates
-INSERT INTO manager_updates (title, message, priority, type, requires_acknowledgment, created_by) VALUES
-  (
-    'New Team Member Roles Available',
-    'FOH and BOH Team Member roles have been added for better department management. Please review the updated role assignments.',
-    'medium',
-    'announcement',
-    FALSE,
-    (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
-  ),
-  (
-    'Updated Safety Protocols - MANDATORY ACKNOWLEDGMENT',
-    'New safety protocols are now in effect. All team members must read and acknowledge these changes before their next shift. Failure to acknowledge will result in shift suspension.',
-    'critical',
-    'policy',
-    TRUE,
-    (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
-  ),
-  (
-    'Outstanding Team Performance!',
-    'Team completion rate is above 85% this week! Keep up the great work! Pizza party scheduled for Friday.',
-    'high',
-    'announcement',
-    FALSE,
-    (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
-  );
+-- Insert some sample manager updates (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM manager_updates WHERE title = 'New Team Member Roles Available') THEN
+    INSERT INTO manager_updates (title, message, priority, type, requires_acknowledgment, created_by) VALUES
+      (
+        'New Team Member Roles Available',
+        'FOH and BOH Team Member roles have been added for better department management. Please review the updated role assignments.',
+        'medium',
+        'announcement',
+        FALSE,
+        (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
+      );
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM manager_updates WHERE title = 'Updated Safety Protocols - MANDATORY ACKNOWLEDGMENT') THEN
+    INSERT INTO manager_updates (title, message, priority, type, requires_acknowledgment, created_by) VALUES
+      (
+        'Updated Safety Protocols - MANDATORY ACKNOWLEDGMENT',
+        'New safety protocols are now in effect. All team members must read and acknowledge these changes before their next shift. Failure to acknowledge will result in shift suspension.',
+        'critical',
+        'policy',
+        TRUE,
+        (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
+      );
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM manager_updates WHERE title = 'Outstanding Team Performance!') THEN
+    INSERT INTO manager_updates (title, message, priority, type, requires_acknowledgment, created_by) VALUES
+      (
+        'Outstanding Team Performance!',
+        'Team completion rate is above 85% this week! Keep up the great work! Pizza party scheduled for Friday.',
+        'high',
+        'announcement',
+        FALSE,
+        (SELECT id FROM profiles WHERE role = 'manager' LIMIT 1)
+      );
+  END IF;
+END $$;
 
 -- Enable RLS (Row Level Security)
 ALTER TABLE manager_updates ENABLE ROW LEVEL SECURITY;

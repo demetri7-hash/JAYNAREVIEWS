@@ -364,39 +364,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* User Management - Only for Managers */}
-          {userProfile?.role === 'manager' && (
-            <div className="group bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-sm hover:shadow-xl hover:bg-white/90 transition-all duration-300 card-hover animate-fade-in-scale" style={{ animationDelay: '300ms' }}>
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-slate-900">👥</div>
-                  <div className="text-sm text-slate-500">Staff</div>
-                </div>
-              </div>
-              
-              <h3 className="text-xl font-bold text-slate-900 mb-3">
-                {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
-              </h3>
-              
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                {getText(staticTranslations.manageStaffAccess.en, staticTranslations.manageStaffAccess.es, staticTranslations.manageStaffAccess.tr)}
-              </p>
-              
-              <button 
-                onClick={() => router.push('/user-management')}
-                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium group btn-ripple"
-              >
-                <span className="flex items-center justify-center">
-                  {getText(staticTranslations.userManagement.en, staticTranslations.userManagement.es, staticTranslations.userManagement.tr)}
-                  <Users className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" />
-                </span>
-              </button>
-            </div>
-          )}
-
           {/* Team Activity - Only for Managers */}
           {userProfile?.role && isManagerRole(userProfile.role) && (
             <div className="group bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-sm hover:shadow-xl hover:bg-white/90 transition-all duration-300 card-hover animate-fade-in-scale" style={{ animationDelay: '400ms' }}>

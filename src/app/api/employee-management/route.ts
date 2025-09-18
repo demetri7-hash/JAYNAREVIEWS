@@ -64,29 +64,93 @@ export async function POST(request: NextRequest) {
           .from('profiles')
           .update({ 
             toast_employee_id: data.toastEmployeeId,
-            // Store employee data in a JSONB column if it exists, or we can add it later
           })
           .eq('id', userId)
 
         if (linkError) throw linkError
 
+        // Log the linking activity
+        await supabase
+          .from('employee_activity_log')
+          .insert({
+            user_id: userId,
+            action_type: 'link_employee',
+            action_details: { toast_employee_id: data.toastEmployeeId },
+            performed_by: userId // In a real scenario, this would be the manager's ID
+          })
+
+        return NextResponse.json({ success: true })
+
+      case 'archive_user':
+        const { error: archiveError } = await supabase
+          .from('profiles')
+          .update({ 
+            employee_status: 'archived',
+            archived_at: new Date().toISOString(),
+            archived_by: userId // In a real scenario, this would be the manager's ID
+          })
+          .eq('id', userId)
+
+        if (archiveError) throw archiveError
+
+        // Log the archiving activity
+        await supabase
+          .from('employee_activity_log')
+          .insert({
+            user_id: userId,
+            action_type: 'archive',
+            action_details: { reason: 'User archived by manager' },
+            performed_by: userId // In a real scenario, this would be the manager's ID
+          })
+
+        return NextResponse.json({ success: true })
+
+      case 'restore_user':
+        const { error: restoreError } = await supabase
+          .from('profiles')
+          .update({ 
+            employee_status: 'active',
+            archived_at: null,
+            archived_by: null
+          })
+          .eq('id', userId)
+
+        if (restoreError) throw restoreError
+
+        // Log the restoration activity
+        await supabase
+          .from('employee_activity_log')
+          .insert({
+            user_id: userId,
+            action_type: 'restore',
+            action_details: { reason: 'User restored by manager' },
+            performed_by: userId // In a real scenario, this would be the manager's ID
+          })
+
         return NextResponse.json({ success: true })
 
       case 'update_permissions':
-        // Handle permission updates for existing tables
-        const { error: permError } = await supabase
-          .from('user_permission_overrides')
-          .upsert({
-            user_id: userId,
-            department: data.department,
-            access_granted: data.accessGranted,
-            granted_by: data.performedBy,
-            granted_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,department'
-          })
+        // Handle permission updates - store as array of departments
+        if (data.departments && Array.isArray(data.departments)) {
+          // Delete existing overrides
+          await supabase
+            .from('user_permission_overrides')
+            .delete()
+            .eq('user_id', userId)
 
-        if (permError) throw permError
+          // Insert new overrides
+          const overrides = data.departments.map((department: string) => ({
+            user_id: userId,
+            department: department,
+            access_granted: true
+          }))
+
+          const { error: permError } = await supabase
+            .from('user_permission_overrides')
+            .insert(overrides)
+
+          if (permError) throw permError
+        }
 
         return NextResponse.json({ success: true })
 

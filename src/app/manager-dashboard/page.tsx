@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
+import EnhancedUserManagement from '@/components/EnhancedUserManagement';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -25,6 +26,10 @@ interface User {
   name: string;
   email: string;
   role: UserRole;
+  employee_status?: string;
+  toast_employee_id?: string;
+  archived_at?: string;
+  archived_by?: string;
 }
 
 export default function ManagerDashboard() {
@@ -562,7 +567,7 @@ export default function ManagerDashboard() {
 
         {/* User Management Tab */}
         {activeTab === 'users' && userRole === 'manager' && (
-          <UserManagementTab users={users} setUsers={setUsers} />
+          <EnhancedUserManagement users={users} setUsers={setUsers} />
         )}
 
         {/* Role Configuration Tab */}

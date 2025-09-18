@@ -6,48 +6,39 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function GET(request: NextRequest) {
-  try {
-    // Get all users with basic info
-    const { data: users, error: usersError } = await supabase
+export async function GET() {
+  try {    
+    // Get all users
+    const { data: users, error } = await supabase
       .from('profiles')
-      .select(`
-        id,
-        email,
-        name,
-        role,
-        created_at
-      `)
-      .order('created_at', { ascending: false })
-
-    if (usersError) {
-      console.error('Users fetch error:', usersError)
+      .select('*')
+      .order('name')
+    
+    if (error) {
+      console.error('Error fetching users:', error)
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
     }
 
     // Get department permissions
-    const { data: permissions, error: permError } = await supabase
+    const { data: permissions } = await supabase
       .from('role_permissions')
       .select('*')
 
     // Get user permission overrides
-    const { data: overrides, error: overrideError } = await supabase
+    const { data: overrides } = await supabase
       .from('user_permission_overrides')
-      .select(`
-        *,
-        user:profiles!user_permission_overrides_user_id_fkey(name, email),
-        granted_by_user:profiles!user_permission_overrides_granted_by_fkey(name)
-      `)
+      .select('*')
 
     return NextResponse.json({
+      success: true,
       users: users || [],
       permissions: permissions || [],
       overrides: overrides || []
     })
 
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('GET error:', error)
+    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 })
   }
 }
 

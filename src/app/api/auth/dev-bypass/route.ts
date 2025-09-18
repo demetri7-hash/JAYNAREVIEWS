@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // TEMPORARY DEV BYPASS - REMOVE IN PRODUCTION
     if (process.env.NODE_ENV !== 'production') {

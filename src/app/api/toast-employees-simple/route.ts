@@ -1,7 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { ToastAPIClient } from '../../../lib/integrations/toast-api-working'
 
-export async function GET(request: NextRequest) {
+interface ToastEmployee {
+  guid: string
+  firstName?: string
+  lastName?: string
+  email?: string
+  jobTitle?: string
+  phoneNumber?: string
+  externalId?: string
+  deleted?: boolean
+}
+
+interface TransformedEmployee {
+  id: string
+  name: string
+  email: string
+  jobTitle: string
+  phoneNumber: string
+  externalId: string
+  isActive: boolean
+}
+
+export async function GET() {
   try {
     console.log('🔄 Fetching TOAST employees for linking...')
     
@@ -21,7 +42,7 @@ export async function GET(request: NextRequest) {
     console.log(`✅ Found ${employees.length} TOAST employees`)
     
     // Transform the data for easier use in dropdowns
-    const employeeList = employees.map((emp: any) => ({
+    const employeeList: TransformedEmployee[] = employees.map((emp: ToastEmployee) => ({
       id: emp.guid,
       name: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
       email: emp.email || '',
@@ -29,7 +50,7 @@ export async function GET(request: NextRequest) {
       phoneNumber: emp.phoneNumber || '',
       externalId: emp.externalId || '',
       isActive: !emp.deleted
-    })).filter((emp: any) => emp.name && emp.isActive)
+    })).filter((emp: TransformedEmployee) => emp.name && emp.isActive)
 
     // Sort by name for better UX
     employeeList.sort((a, b) => a.name.localeCompare(b.name))

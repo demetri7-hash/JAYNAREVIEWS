@@ -9,9 +9,7 @@ import {
   ArchiveBoxIcon, 
   ArrowPathIcon,
   LinkIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
 
 interface User {
@@ -111,7 +109,7 @@ export default function EmployeeManagementPage() {
     }
   }
 
-  const performAction = async (action: string, userId: string, data: any) => {
+  const performAction = async (action: string, userId: string, data: Record<string, unknown>) => {
     try {
       setActionLoading(`${action}-${userId}`)
       
@@ -293,7 +291,6 @@ export default function EmployeeManagementPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => {
                   const linkedEmployee = getLinkedEmployee(user)
-                  const userPermissions = getUserPermissions(user.id)
                   
                   return (
                     <tr key={user.id} className={user.employee_status === 'archived' ? 'bg-gray-50' : ''}>

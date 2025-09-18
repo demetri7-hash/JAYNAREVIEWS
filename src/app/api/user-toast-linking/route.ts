@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get all users from the profiles table
     const { data: users, error } = await supabase
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         // We'll add the toast_employee_id column through the Supabase UI if needed
         
         // For now, let's store it as JSON in an existing column or create a simple approach
-        const updateData: any = {}
+        const updateData: Record<string, unknown> = {}
         
         // Try to add a simple field for TOAST linking
         if (data.toastEmployeeId) {

@@ -9,7 +9,7 @@ const supabase = createClient(
 );
 
 // GET: Check which updates user needs to acknowledge
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     

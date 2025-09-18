@@ -12,12 +12,22 @@ export interface TranslationResult {
 
 export async function translateText(text: string, detectedLanguage?: string): Promise<TranslationResult> {
   try {
+    console.log('=== TRANSLATION FUNCTION START ===');
+    console.log('Input text:', text);
+    console.log('Detected language:', detectedLanguage);
+    
     // Quick validation
     if (!text || text.trim().length === 0) {
+      console.log('Empty text, returning as-is');
       return { en: text, es: text, tr: text };
     }
 
     // Check if OpenAI API key is configured
+    console.log('Checking OpenAI API key...');
+    console.log('API key exists:', !!process.env.OPENAI_API_KEY);
+    console.log('API key length:', process.env.OPENAI_API_KEY?.length || 0);
+    console.log('API key starts with:', process.env.OPENAI_API_KEY?.substring(0, 7) || 'N/A');
+    
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
       console.warn('OpenAI API key not configured, returning original text for all languages');
       return { en: text, es: text, tr: text };
@@ -43,6 +53,10 @@ Requirements:
 - If original is already in one of the target languages, keep it unchanged for that language
 - Maintain the tone and context (workplace/restaurant management)
 `;
+
+    console.log('Making OpenAI API call...');
+    console.log('Model: gpt-3.5-turbo');
+    console.log('Prompt preview:', prompt.substring(0, 100) + '...');
 
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",  // Changed from gpt-4 to more reliable model

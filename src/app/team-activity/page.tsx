@@ -271,84 +271,8 @@ export default function TeamActivity() {
             </div>
           )}
 
-          {/* Enhanced Team Stats Overview */}
-          {teamStats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Activity className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-blue-600 brand-subtitle">Total Tasks</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalTasks}</p>
-                    <p className="text-xs text-slate-500 mt-1">All time</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-green-600 brand-subtitle">Completed Today</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.completedToday}</p>
-                    <div className="flex items-center mt-1">
-                      <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
-                      <p className="text-xs text-green-600">+12% vs yesterday</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Clock className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gold-600 brand-subtitle">Pending</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.pendingTasks}</p>
-                    <p className="text-xs text-slate-500 mt-1">In progress</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-500 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <AlertTriangle className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-red-600 brand-subtitle">Overdue</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.overdueTasks}</p>
-                    <p className="text-xs text-slate-500 mt-1">Needs attention</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-600 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-purple-600 brand-subtitle">Team Members</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalUsers}</p>
-                    <div className="flex items-center mt-1">
-                      <Target className="w-3 h-3 text-purple-600 mr-1" />
-                      <p className="text-xs text-purple-600">Active today</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Manager Updates Box */}
-          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-700">
+          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-200">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
                 <Bell className="w-6 h-6 text-white" />
@@ -425,6 +349,82 @@ export default function TeamActivity() {
               )}
             </div>
           </div>
+
+          {/* Enhanced Team Stats Overview */}
+          {teamStats && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200 group">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-blue-600 brand-subtitle">Total Tasks</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">All time</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300 group">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-green-600 brand-subtitle">Completed Today</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.completedToday}</p>
+                    <div className="flex items-center mt-1">
+                      <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
+                      <p className="text-xs text-green-600">+12% vs yesterday</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400 group">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gold-600 brand-subtitle">Pending</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.pendingTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">In progress</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-500 group">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <AlertTriangle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-red-600 brand-subtitle">Overdue</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.overdueTasks}</p>
+                    <p className="text-xs text-slate-500 mt-1">Needs attention</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-600 group">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-purple-600 brand-subtitle">Team Members</p>
+                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalUsers}</p>
+                    <div className="flex items-center mt-1">
+                      <Target className="w-3 h-3 text-purple-600 mr-1" />
+                      <p className="text-xs text-purple-600">Active today</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Achievements & Gamification */}
           <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-800">

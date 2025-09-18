@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar, RefreshCw, Users, X } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
@@ -33,6 +34,7 @@ interface User {
 
 export default function MyTasks() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const { language, getText } = useLanguage()
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
@@ -55,8 +57,13 @@ export default function MyTasks() {
   const [transferSubmitting, setTransferSubmitting] = useState(false)
 
   useEffect(() => {
+    if (status === 'loading') return
+    if (!session) {
+      router.push('/')
+      return
+    }
     fetchMyTasks()
-  }, [])
+  }, [session, status])
 
   const fetchMyTasks = async (page = 1, append = false) => {
     try {
@@ -244,6 +251,23 @@ export default function MyTasks() {
         </div>
       </div>
     )
+  }
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ocean-500 mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect if not authenticated
+  if (!session) {
+    return null
   }
 
   return (

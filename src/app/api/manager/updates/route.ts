@@ -126,17 +126,29 @@ export async function POST(request: NextRequest) {
     // Auto-translate title and message with error handling
     let titleTranslations, messageTranslations;
     try {
+      console.log('=== TRANSLATION DEBUG ===');
       console.log('Attempting translation for title:', title);
+      console.log('Attempting translation for message:', message);
       console.log('OpenAI API Key configured:', !!process.env.OPENAI_API_KEY);
-      console.log('NEXTAUTH_URL environment:', process.env.NEXTAUTH_URL);
+      console.log('OpenAI API Key preview:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) + '...' : 'Not set');
+      
       titleTranslations = await translateText(title);
+      console.log('Title translations result:', titleTranslations);
+      
       messageTranslations = await translateText(message);
-      console.log('Translation successful');
+      console.log('Message translations result:', messageTranslations);
+      
+      console.log('Translation completed successfully');
     } catch (error) {
-      console.error('Translation failed, using original text:', error);
+      console.error('=== TRANSLATION ERROR ===');
+      console.error('Translation failed:', error instanceof Error ? error.message : String(error));
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      
       // Fallback to original text for all languages
       titleTranslations = { en: title, es: title, tr: title };
       messageTranslations = { en: message, es: message, tr: message };
+      
+      console.log('Using fallback translations:', { titleTranslations, messageTranslations });
     }
 
     // Create the update in the database with translations

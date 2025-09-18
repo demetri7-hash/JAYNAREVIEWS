@@ -45,7 +45,7 @@ Requirements:
 `;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",  // Changed from gpt-4 to more reliable model
       messages: [
         {
           role: "system",
@@ -60,18 +60,23 @@ Requirements:
       temperature: 0.3,
     });
 
+    console.log('OpenAI response received, parsing...');
     const translationText = response.choices[0]?.message?.content;
+    console.log('Translation response text:', translationText);
+    
     if (!translationText) {
       throw new Error('No translation received from OpenAI');
     }
 
     const translations = JSON.parse(translationText);
+    console.log('Parsed translations:', translations);
     
     // Validate the response has all required fields
     if (!translations.en || !translations.es || !translations.tr) {
       throw new Error('Invalid translation response format');
     }
 
+    console.log('Translation successful:', translations);
     return translations;
   } catch (error) {
     console.error('Translation error:', error);

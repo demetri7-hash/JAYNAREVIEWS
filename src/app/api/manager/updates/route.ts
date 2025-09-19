@@ -72,7 +72,6 @@ export async function GET(request: NextRequest) {
         )
       `)
       .eq('is_active', true)
-      .eq('manager_update_reads.user_id', userProfile.id)
       .order('created_at', { ascending: false });
 
     console.log('Database query result:', { updates: updates?.length, error });
@@ -85,7 +84,8 @@ export async function GET(request: NextRequest) {
     // Process updates to add read status and apply filtering
     let processedUpdates = (updates || []).map(update => {
       const userRead = update.manager_update_reads?.find(
-        (read: { read_at?: string }) => read && Object.keys(read).length > 0
+        (read: { read_at?: string; user_id?: string }) => 
+          read && read.user_id === userProfile.id
       );
       
       return {

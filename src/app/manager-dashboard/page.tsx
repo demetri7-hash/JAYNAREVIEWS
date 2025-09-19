@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
-import { supabase } from '@/lib/supabase';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -647,28 +646,25 @@ function ManagerUpdatesTab() {
 
   const uploadPhotoToStorage = async (file: File): Promise<string | null> => {
     try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-      const filePath = `manager-updates/${fileName}`
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'manager-updates');
 
-      const { data, error } = await supabase.storage
-        .from('task-photos')
-        .upload(filePath, file)
+      const response = await fetch('/api/upload-photo', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (error) {
-        console.error('Error uploading photo:', error)
-        return null
+      if (!response.ok) {
+        console.error('Photo upload failed:', response.statusText);
+        return null;
       }
 
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('task-photos')
-        .getPublicUrl(filePath)
-
-      return urlData.publicUrl
+      const result = await response.json();
+      return result.publicUrl;
     } catch (error) {
-      console.error('Error in photo upload:', error)
-      return null
+      console.error('Error in photo upload:', error);
+      return null;
     }
   };
 

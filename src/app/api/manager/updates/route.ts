@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
-import { translateText } from '@/lib/translation';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -193,33 +192,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    // Auto-translate title and message with error handling
-    let titleTranslations, messageTranslations;
-    try {
-      console.log('=== TRANSLATION DEBUG ===');
-      console.log('Attempting translation for title:', title);
-      console.log('Attempting translation for message:', message);
-      console.log('OpenAI API Key configured:', !!process.env.OPENAI_API_KEY);
-      console.log('OpenAI API Key preview:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) + '...' : 'Not set');
-      
-      titleTranslations = await translateText(title);
-      console.log('Title translations result:', titleTranslations);
-      
-      messageTranslations = await translateText(message);
-      console.log('Message translations result:', messageTranslations);
-      
-      console.log('Translation completed successfully');
-    } catch (error) {
-      console.error('=== TRANSLATION ERROR ===');
-      console.error('Translation failed:', error instanceof Error ? error.message : String(error));
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      
-      // Fallback to original text for all languages
-      titleTranslations = { en: title, es: title, tr: title };
-      messageTranslations = { en: message, es: message, tr: message };
-      
-      console.log('Using fallback translations:', { titleTranslations, messageTranslations });
-    }
+    // Use original text for all languages (translation disabled for now)
+    const titleTranslations = { en: title, es: title, tr: title };
+    const messageTranslations = { en: message, es: message, tr: message };
 
     // Create the update in the database with translations
     const { data: newUpdate, error } = await supabase
@@ -237,8 +212,7 @@ export async function POST(request: NextRequest) {
         type,
         requires_acknowledgment: requiresAcknowledgment || priority === 'critical',
         expires_at: expiresAt || null,
-        created_by: creatorProfile.id,
-        photo_url: photoUrl || null
+        created_by: creatorProfile.id
       })
       .select()
       .single();

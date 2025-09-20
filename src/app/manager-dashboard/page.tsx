@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
+import { WorkflowManagementTab } from '@/components/WorkflowManagementTab';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -36,11 +37,12 @@ export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { getText } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates' | 'workflows'>('tasks');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     department: 'all' as Department | 'all',
@@ -111,6 +113,17 @@ export default function ManagerDashboard() {
 
     fetchData();
   }, [session?.user?.email, userRole]);
+
+  const handleMessage = (message: { type: 'success' | 'error'; text: string }) => {
+    if (message.type === 'success') {
+      setSuccessMessage(message.text);
+      setError(null);
+      setTimeout(() => setSuccessMessage(null), 5000); // Clear after 5 seconds
+    } else {
+      setError(message.text);
+      setSuccessMessage(null);
+    }
+  };
 
   // Filter tasks based on manager's department permissions and current filters
   const filteredTasks = tasks.filter(task => {
@@ -264,6 +277,33 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="mb-6 glass rounded-2xl p-4 border border-green-200 bg-green-50/50 animate-fade-in-up">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-green-700 font-medium">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 glass rounded-2xl p-4 border border-red-200 bg-red-50/50 animate-fade-in-up">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-red-700 font-medium">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Tabs */}
         <div className="glass rounded-2xl mb-8 border border-white/20 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <div className="p-2">
@@ -309,6 +349,16 @@ export default function ManagerDashboard() {
                     }`}
                   >
                     {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('workflows')}
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      activeTab === 'workflows'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    Workflow Management
                   </button>
                 </>
               )}
@@ -578,6 +628,11 @@ export default function ManagerDashboard() {
         {/* Manager Updates Tab */}
         {activeTab === 'updates' && userRole === 'manager' && (
           <ManagerUpdatesTab />
+        )}
+
+        {/* Workflow Management Tab */}
+        {activeTab === 'workflows' && userRole === 'manager' && (
+          <WorkflowManagementTab onMessage={handleMessage} />
         )}
       </div>
     </div>

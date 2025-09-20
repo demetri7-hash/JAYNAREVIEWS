@@ -533,312 +533,335 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
 
       {/* Create/Edit Form */}
       {(showCreateForm || editingWorkflow) && (
-        <div className="bg-white border rounded-lg p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">
-            {editingWorkflow ? 'Edit Workflow' : 'Create New Workflow'}
-          </h3>
+        <div className="fixed inset-0 z-50 md:relative md:inset-auto md:z-auto">
+          {/* Mobile overlay */}
+          <div className="fixed inset-0 bg-black bg-opacity-50 md:hidden" />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Workflow Name *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter workflow name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Due Date
-              </label>
-              <input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => handleInputChange('due_date', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={3}
-                placeholder="Describe this workflow..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Departments
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {departments.map(dept => (
-                  <button
-                    key={dept}
-                    type="button"
-                    onClick={() => handleArrayToggle('departments', dept)}
-                    className={`px-3 py-1 text-sm rounded ${
-                      formData.departments.includes(dept)
-                        ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                        : 'bg-gray-100 text-gray-700 border border-gray-300'
-                    }`}
-                  >
-                    {DEPARTMENT_LABELS[dept]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Roles
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {roles.map(role => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => handleArrayToggle('roles', role)}
-                    className={`px-3 py-1 text-sm rounded ${
-                      formData.roles.includes(role)
-                        ? 'bg-green-100 text-green-800 border border-green-300'
-                        : 'bg-gray-100 text-gray-700 border border-gray-300'
-                    }`}
-                  >
-                    {ROLE_LABELS[role as UserRole]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.is_repeatable}
-                  onChange={(e) => handleInputChange('is_repeatable', e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm font-medium text-gray-700">Repeatable Workflow</span>
-              </label>
-            </div>
-
-            {formData.is_repeatable && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Recurrence
-                </label>
-                <select
-                  value={formData.recurrence_type}
-                  onChange={(e) => handleInputChange('recurrence_type', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="once">One Time</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
-            )}
-          </div>
-
-          {/* Task Management Section */}
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-lg font-medium text-gray-900">Workflow Tasks</h4>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setShowTaskCreator(true)}
-                  className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 flex items-center gap-1"
-                >
-                  <Plus className="h-3 w-3" />
-                  New Task
-                </button>
-              </div>
-            </div>
-
-            {/* Available Tasks Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Add Existing Tasks
-              </label>
-              <div className="max-h-32 overflow-y-auto border rounded p-2 bg-gray-50">
-                {availableTasks.filter(task => !workflowTasks.some(wt => wt.task_id === task.id)).map(task => (
-                  <div key={task.id} className="flex items-center justify-between p-2 hover:bg-white rounded">
-                    <div>
-                      <div className="font-medium text-sm">{task.title}</div>
-                      {task.description && (
-                        <div className="text-xs text-gray-600">{task.description}</div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => addTaskToWorkflow(task)}
-                      className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700"
-                    >
-                      Add
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Selected Tasks with Drag and Drop */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Selected Tasks ({workflowTasks.length})
-              </label>
-              <DndContext
-                sensors={sensors}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
+          {/* Form container */}
+          <div className="fixed inset-x-4 top-4 bottom-4 md:relative md:inset-auto bg-white border rounded-lg shadow-lg md:shadow-sm overflow-y-auto">
+            {/* Mobile header */}
+            <div className="sticky top-0 bg-white border-b p-4 md:p-6 flex items-center justify-between md:block">
+              <h3 className="text-lg font-semibold">
+                {editingWorkflow ? 'Edit Workflow' : 'Create New Workflow'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setEditingWorkflow(null);
+                  resetForm();
+                }}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-full"
               >
-                <SortableContext
-                  items={workflowTasks.map(task => task.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-2">
-                    {workflowTasks.map((task) => (
-                      <SortableTaskItem
-                        key={task.id}
-                        task={task}
-                        onRemove={removeTaskFromWorkflow}
-                        onToggleRequired={toggleTaskRequired}
-                      />
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            {/* Form content */}
+            <div className="p-4 md:p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Workflow Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    placeholder="Enter workflow name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.due_date}
+                    onChange={(e) => handleInputChange('due_date', e.target.value)}
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    rows={3}
+                    placeholder="Describe this workflow..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Departments
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {departments.map(dept => (
+                      <button
+                        key={dept}
+                        type="button"
+                        onClick={() => handleArrayToggle('departments', dept)}
+                        className={`px-3 py-2 text-sm rounded-lg border-2 transition-colors ${
+                          formData.departments.includes(dept)
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        {DEPARTMENT_LABELS[dept]}
+                      </button>
                     ))}
                   </div>
-                </SortableContext>
-                <DragOverlay>
-                  {draggedTask && (
-                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg shadow-lg">
-                      <GripVertical className="h-4 w-4 text-gray-400" />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{draggedTask.task?.title}</div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Roles
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {roles.map(role => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => handleArrayToggle('roles', role)}
+                        className={`px-3 py-2 text-sm rounded-lg border-2 transition-colors ${
+                          formData.roles.includes(role)
+                            ? 'bg-green-500 text-white border-green-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        {ROLE_LABELS[role as UserRole]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_repeatable}
+                      onChange={(e) => handleInputChange('is_repeatable', e.target.checked)}
+                      className="rounded border-gray-300 h-4 w-4"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Repeatable Workflow</span>
+                  </label>
+                </div>
+
+                {formData.is_repeatable && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Recurrence
+                    </label>
+                    <select
+                      value={formData.recurrence_type}
+                      onChange={(e) => handleInputChange('recurrence_type', e.target.value)}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    >
+                      <option value="once">One Time</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Task Management Section */}
+              <div className="mt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-lg font-medium text-gray-900">Workflow Tasks</h4>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setShowTaskCreator(true)}
+                      className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700 flex items-center gap-1"
+                    >
+                      <Plus className="h-3 w-3" />
+                      New Task
+                    </button>
+                  </div>
+                </div>
+
+                {/* Available Tasks Selection */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Add Existing Tasks
+                  </label>
+                  <div className="max-h-32 overflow-y-auto border-2 rounded-lg p-3 bg-gray-50">
+                    {availableTasks.filter(task => !workflowTasks.some(wt => wt.task_id === task.id)).map(task => (
+                      <div key={task.id} className="flex items-center justify-between p-3 hover:bg-white rounded-lg mb-2 last:mb-0">
+                        <div>
+                          <div className="font-medium text-sm">{task.title}</div>
+                          {task.description && (
+                            <div className="text-xs text-gray-600">{task.description}</div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => addTaskToWorkflow(task)}
+                          className="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-blue-700"
+                        >
+                          Add
+                        </button>
                       </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected Tasks with Drag and Drop */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Selected Tasks ({workflowTasks.length})
+                  </label>
+                  <DndContext
+                    sensors={sensors}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={workflowTasks.map(task => task.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-2">
+                        {workflowTasks.map((task) => (
+                          <SortableTaskItem
+                            key={task.id}
+                            task={task}
+                            onRemove={removeTaskFromWorkflow}
+                            onToggleRequired={toggleTaskRequired}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                    <DragOverlay>
+                      {draggedTask && (
+                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg shadow-lg">
+                          <GripVertical className="h-4 w-4 text-gray-400" />
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{draggedTask.task?.title}</div>
+                          </div>
+                        </div>
+                      )}
+                    </DragOverlay>
+                  </DndContext>
+                  {workflowTasks.length === 0 && (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed">
+                      No tasks selected. Add tasks from the list above or create new ones.
                     </div>
                   )}
-                </DragOverlay>
-              </DndContext>
-              {workflowTasks.length === 0 && (
-                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded border-2 border-dashed">
-                  No tasks selected. Add tasks from the list above or create new ones.
+                </div>
+
+                {/* User Assignment Section */}
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assign to Users
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableUsers.map(user => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        onClick={() => handleArrayToggle('assigned_users', user.id)}
+                        className={`px-3 py-2 text-sm rounded-lg border-2 transition-colors ${
+                          formData.assigned_users.includes(user.id)
+                            ? 'bg-purple-500 text-white border-purple-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        {user.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Task Creator Modal */}
+              {showTaskCreator && (
+                <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                  <h5 className="font-medium text-blue-900 mb-3">Create New Task</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <input
+                        type="text"
+                        value={newTask.title}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                        className="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                        placeholder="Task title"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        value={newTask.description}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                        className="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                        placeholder="Task description"
+                      />
+                    </div>
+                    <div className="md:col-span-2 flex flex-wrap gap-4">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={newTask.requires_notes}
+                          onChange={(e) => setNewTask(prev => ({ ...prev, requires_notes: e.target.checked }))}
+                          className="rounded border-blue-300 h-4 w-4"
+                        />
+                        <span className="text-sm text-blue-700">Requires Notes</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={newTask.requires_photo}
+                          onChange={(e) => setNewTask(prev => ({ ...prev, requires_photo: e.target.checked }))}
+                          className="rounded border-blue-300 h-4 w-4"
+                        />
+                        <span className="text-sm text-blue-700">Requires Photo</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2 mt-3">
+                    <button
+                      onClick={() => setShowTaskCreator(false)}
+                      className="px-4 py-2 text-blue-600 hover:text-blue-800 text-sm border border-blue-300 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleCreateTask}
+                      disabled={!newTask.title.trim()}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      Create Task
+                    </button>
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* User Assignment Section */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assign to Users
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {availableUsers.map(user => (
-                  <button
-                    key={user.id}
-                    type="button"
-                    onClick={() => handleArrayToggle('assigned_users', user.id)}
-                    className={`px-3 py-1 text-sm rounded ${
-                      formData.assigned_users.includes(user.id)
-                        ? 'bg-purple-100 text-purple-800 border border-purple-300'
-                        : 'bg-gray-100 text-gray-700 border border-gray-300'
-                    }`}
-                  >
-                    {user.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Task Creator Modal */}
-          {showTaskCreator && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-              <h5 className="font-medium text-blue-900 mb-3">Create New Task</h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <input
-                    type="text"
-                    value={newTask.title}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full p-2 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                    placeholder="Task title"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    value={newTask.description}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full p-2 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                    placeholder="Task description"
-                  />
-                </div>
-                <div className="flex space-x-4">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={newTask.requires_notes}
-                      onChange={(e) => setNewTask(prev => ({ ...prev, requires_notes: e.target.checked }))}
-                      className="rounded border-blue-300"
-                    />
-                    <span className="text-sm text-blue-700">Requires Notes</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={newTask.requires_photo}
-                      onChange={(e) => setNewTask(prev => ({ ...prev, requires_photo: e.target.checked }))}
-                      className="rounded border-blue-300"
-                    />
-                    <span className="text-sm text-blue-700">Requires Photo</span>
-                  </label>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-2 mt-3">
+              {/* Form Actions */}
+              <div className="sticky bottom-0 bg-white border-t p-4 mt-6 flex justify-end space-x-3">
                 <button
-                  onClick={() => setShowTaskCreator(false)}
-                  className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setEditingWorkflow(null);
+                    resetForm();
+                  }}
+                  className="px-6 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleCreateTask}
-                  disabled={!newTask.title.trim()}
-                  className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+                  onClick={editingWorkflow ? handleUpdateWorkflow : handleCreateWorkflow}
+                  disabled={!formData.name.trim()}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Create Task
+                  {editingWorkflow ? 'Update' : 'Create'} Workflow
                 </button>
               </div>
             </div>
-          )}
-
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              onClick={() => {
-                setShowCreateForm(false);
-                setEditingWorkflow(null);
-                resetForm();
-              }}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={editingWorkflow ? handleUpdateWorkflow : handleCreateWorkflow}
-              disabled={!formData.name.trim()}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {editingWorkflow ? 'Update' : 'Create'} Workflow
-            </button>
           </div>
         </div>
       )}

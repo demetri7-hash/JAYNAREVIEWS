@@ -70,15 +70,15 @@ export function Navigation({ currentPage }: NavigationProps) {
   const commonNavItems = [
     {
       icon: Home,
-      label: getText('nav.home', 'Team Activity'),
+      label: 'Home',
       path: '/',
       id: 'home'
     },
     {
       icon: CheckSquare,
-      label: getText('nav.my_tasks', 'My Tasks'),
-      path: '/my-tasks',
-      id: 'my-tasks'
+      label: 'My Workflows',
+      path: '/my-workflows',
+      id: 'my-workflows'
     }
   ]
 
@@ -86,37 +86,37 @@ export function Navigation({ currentPage }: NavigationProps) {
   const managerNavItems = [
     {
       icon: Settings,
-      label: getText('nav.manager_dashboard', 'Manager Dashboard'),
+      label: 'Manager Dashboard',
       path: '/manager-dashboard',
       id: 'manager-dashboard'
     },
     {
       icon: ClipboardList,
-      label: getText('nav.create_task', 'Create Task'),
+      label: 'Create Task',
       path: '/create-task',
       id: 'create-task'
     },
     {
       icon: UserCog,
-      label: getText('nav.employee_management', 'Employee Management'),
+      label: 'Employee Management',
       path: '/employee-management',
       id: 'employee-management'
     },
     {
       icon: ArrowRightLeft,
-      label: getText('nav.pending_transfers', 'Pending Transfers'),
+      label: 'Pending Transfers',
       path: '/pending-transfers',
       id: 'pending-transfers'
     },
     {
       icon: BarChart3,
-      label: getText('nav.weekly_reports', 'Weekly Reports'),
+      label: 'Weekly Reports',
       path: '/weekly-reports',
       id: 'weekly-reports'
     },
     {
       icon: Bell,
-      label: getText('nav.update_history', 'Update History'),
+      label: 'Update History',
       path: '/update-history',
       id: 'update-history'
     }
@@ -180,7 +180,7 @@ export function Navigation({ currentPage }: NavigationProps) {
               className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut className="w-5 h-5 mr-3" />
-              {getText('nav.sign_out', 'Sign Out')}
+              Sign Out
             </button>
           </div>
         </div>
@@ -235,7 +235,7 @@ export function Navigation({ currentPage }: NavigationProps) {
                   className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <LogOut className="w-5 h-5 mr-3" />
-                  {getText('nav.sign_out', 'Sign Out')}
+                  Sign Out
                 </button>
               </div>
             </div>

@@ -7,7 +7,7 @@ import { CreateWorkflowRequest } from '@/types/workflow';
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('email', session.user.email)
       .single();
 
     if (!profile || !['manager', 'admin'].includes(profile.role)) {
@@ -50,17 +50,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const supabase = supabaseAdmin;
     
-    // Check if user has manager permissions
+    // Check if user has manager permissions and get user ID
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
+      .select('id, role')
+      .eq('email', session.user.email)
       .single();
 
     if (!profile || !['manager', 'admin'].includes(profile.role)) {
@@ -69,10 +69,10 @@ export async function POST(request: NextRequest) {
 
     const body: CreateWorkflowRequest = await request.json();
     
-    // Validate required fields
-    if (!body.name || !body.tasks || body.tasks.length === 0) {
+    // For now, remove the tasks requirement since we'll handle it differently
+    if (!body.name) {
       return NextResponse.json({ 
-        error: 'Missing required fields: name and tasks are required' 
+        error: 'Missing required fields: name is required' 
       }, { status: 400 });
     }
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         due_date: body.due_date,
         due_time: body.due_time,
         is_active: true,
-        created_by: session.user.id
+        created_by: profile.id
       })
       .select()
       .single();

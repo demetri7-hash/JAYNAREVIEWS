@@ -215,7 +215,10 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
         body: JSON.stringify(formData)
       });
 
-      if (!workflowResponse.ok) throw new Error('Failed to create workflow');
+      if (!workflowResponse.ok) {
+        const errorData = await workflowResponse.json();
+        throw new Error(errorData.error || 'Failed to create workflow');
+      }
       
       const workflowData = await workflowResponse.json();
       const workflowId = workflowData.workflow?.id;
@@ -223,7 +226,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       // Then add tasks to the workflow if any are selected
       if (workflowId && workflowTasks.length > 0) {
         for (const workflowTask of workflowTasks) {
-          await fetch('/api/workflow-tasks', {
+          const taskResponse = await fetch('/api/workflow-tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -233,6 +236,10 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
               is_required: workflowTask.is_required
             })
           });
+
+          if (!taskResponse.ok) {
+            console.error('Failed to add task to workflow:', workflowTask.task?.title);
+          }
         }
       }
       
@@ -242,7 +249,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       fetchWorkflows();
     } catch (error) {
       console.error('Error creating workflow:', error);
-      onMessage({ type: 'error', text: 'Failed to create workflow' });
+      onMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to create workflow' });
     }
   };
 
@@ -261,7 +268,10 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
         })
       });
 
-      if (!response.ok) throw new Error('Failed to create task');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create task');
+      }
       
       const data = await response.json();
       const createdTask = data.task;
@@ -281,7 +291,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       onMessage({ type: 'success', text: 'Task created successfully' });
     } catch (error) {
       console.error('Error creating task:', error);
-      onMessage({ type: 'error', text: 'Failed to create task' });
+      onMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to create task' });
     }
   };
 

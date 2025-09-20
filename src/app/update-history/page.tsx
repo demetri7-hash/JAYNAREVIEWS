@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { ArrowLeft, Bell, Calendar, Camera, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
+import Navigation from '@/components/Navigation'
 
 interface ManagerUpdate {
   id: string
@@ -142,29 +143,19 @@ export default function UpdateHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center animate-fade-in-up">
-          <button
-            onClick={() => router.push('/team-activity')}
-            className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200 bg-white/70 hover:bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Team Activity
-          </button>
-          <LanguageToggleCompact />
-        </div>
-
-        {/* Title */}
-        <div className="mb-8 text-center animate-fade-in-up animation-delay-200">
-          <h1 className="text-3xl font-bold text-slate-900 brand-header mb-2">
-            Full Update History
-          </h1>
-          <p className="text-slate-600 brand-subtitle">
-            Previously read manager updates and announcements
-          </p>
-        </div>
+    <>
+      <Navigation currentPage="update-history" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Title */}
+          <div className="mb-8 text-center animate-fade-in-up animation-delay-200">
+            <h1 className="text-3xl font-bold text-slate-900 brand-header mb-2">
+              Full Update History
+            </h1>
+            <p className="text-slate-600 brand-subtitle">
+              Previously read manager updates and announcements
+            </p>
+          </div>
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
@@ -333,6 +324,7 @@ export default function UpdateHistory() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

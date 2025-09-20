@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar, RefreshCw, Users, X } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
+import Navigation from '@/components/Navigation'
 
 interface Task {
   id: string
@@ -271,22 +272,12 @@ export default function MyTasks() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center animate-fade-in-up">
-          <button
-            onClick={() => router.back()}
-            className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200 bg-white/70 hover:bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            {staticTranslations.backToDashboard[language]}
-          </button>
-          <LanguageToggleCompact />
-        </div>
-
-        {/* Main Content */}
-        <div className="glass rounded-3xl p-8 animate-fade-in-scale">
+    <>
+      <Navigation currentPage="my-tasks" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
+        <div className="max-w-5xl mx-auto px-4 py-8">
+          {/* Main Content */}
+          <div className="glass rounded-3xl p-8 animate-fade-in-scale">
           {/* Hero Section */}
           <div className="text-center mb-10">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -548,6 +539,7 @@ export default function MyTasks() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

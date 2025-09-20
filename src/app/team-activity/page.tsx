@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { ArrowLeft, Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, User, Calendar, Trophy, Star, Target, Bell, Megaphone, X, Camera } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
+import Navigation from '@/components/Navigation'
 
 interface TeamStats {
   totalTasks: number
@@ -302,20 +303,10 @@ export default function TeamActivity() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8 animate-fade-in-up">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-slate-600 hover:text-blue-600 transition-all duration-200"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {getText(staticTranslations.backToDashboard.en, staticTranslations.backToDashboard.es, staticTranslations.backToDashboard.tr)}
-            </button>
-            <LanguageToggleCompact />
-          </div>
-        </div>
+    <>
+      <Navigation currentPage="home" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
+        <div className="max-w-7xl mx-auto px-4 py-8">
 
         <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-100">
           <div className="flex items-center mb-8">
@@ -868,6 +859,7 @@ export default function TeamActivity() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

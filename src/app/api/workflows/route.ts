@@ -24,14 +24,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Get all workflows with task counts
+    // Get all workflows with task counts - use simpler query to avoid join issues
     const { data: workflows, error } = await supabase
       .from('workflows')
-      .select(`
-        *,
-        workflow_tasks(count),
-        workflow_assignments(count)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -81,14 +77,14 @@ export async function POST(request: NextRequest) {
       .from('workflows')
       .insert({
         name: body.name,
-        description: body.description,
+        description: body.description || null,
         departments: body.departments || [],
         roles: body.roles || [],
         assigned_users: body.assigned_users || [],
-        is_repeatable: body.is_repeatable,
-        recurrence_type: body.recurrence_type,
-        due_date: body.due_date,
-        due_time: body.due_time,
+        is_repeatable: body.is_repeatable || false,
+        recurrence_type: body.recurrence_type || null,
+        due_date: body.due_date || null,
+        due_time: body.due_time || null,
         is_active: true,
         created_by: profile.id
       })
@@ -97,7 +93,18 @@ export async function POST(request: NextRequest) {
 
     if (workflowError) {
       console.error('Error creating workflow:', workflowError);
-      return NextResponse.json({ error: 'Failed to create workflow' }, { status: 500 });
+      console.error('Workflow data:', {
+        name: body.name,
+        description: body.description,
+        departments: body.departments,
+        roles: body.roles,
+        assigned_users: body.assigned_users,
+        profile_id: profile.id
+      });
+      return NextResponse.json({ 
+        error: 'Failed to create workflow', 
+        details: workflowError.message 
+      }, { status: 500 });
     }
 
     // Create workflow tasks if they are provided

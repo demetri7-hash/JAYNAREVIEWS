@@ -39,6 +39,7 @@ export async function GET() {
       return NextResponse.json({ transfers: [] });
     }
 
+    // Try a simpler query first to avoid join issues
     let query = supabase
       .from('task_transfers')
       .select(`
@@ -50,28 +51,7 @@ export async function GET() {
         transfer_reason,
         requested_at,
         transferee_responded_at,
-        manager_responded_at,
-        from_user:from_user_id (
-          id,
-          name,
-          email
-        ),
-        to_user:to_user_id (
-          id,
-          name,
-          email
-        ),
-        assignment:assignment_id (
-          id,
-          due_date,
-          task:task_id (
-            id,
-            title,
-            description,
-            requires_notes,
-            requires_photo
-          )
-        )
+        manager_responded_at
       `)
 
     // Filter based on user role and involvement

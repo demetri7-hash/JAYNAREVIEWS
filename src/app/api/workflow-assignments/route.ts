@@ -190,7 +190,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Permission denied' }, { status: 403 });
     }
 
-    const updateData: any = { status };
+    const updateData: {
+      status: string;
+      started_at?: string;
+      completed_at?: string;
+      next_due_date?: string;
+    } = { status };
     
     if (started_at) {
       updateData.started_at = started_at;
@@ -228,21 +233,22 @@ export async function PUT(request: NextRequest) {
 }
 
 // Helper function to calculate next due date based on recurrence
-function calculateNextDueDate(recurrenceType: string | undefined, dueTime?: string): string {
-  const now = new Date();
+function calculateNextDueDate(currentDate: Date, recurrenceType: string): Date {
+  const now = new Date(currentDate);
   
   switch (recurrenceType) {
     case 'daily':
-      return now.toISOString().split('T')[0];
+      now.setDate(now.getDate() + 1);
+      return now;
     case 'weekly':
       const nextWeek = new Date(now);
       nextWeek.setDate(now.getDate() + 7);
-      return nextWeek.toISOString().split('T')[0];
+      return nextWeek;
     case 'monthly':
       const nextMonth = new Date(now);
       nextMonth.setMonth(now.getMonth() + 1);
-      return nextMonth.toISOString().split('T')[0];
+      return nextMonth;
     default:
-      return now.toISOString().split('T')[0];
+      return now;
   }
 }

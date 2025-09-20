@@ -104,7 +104,10 @@ function generateRecurringAssignments({
   startDate,
   endDate
 }: {
-  workflow: any;
+  workflow: {
+    id: string;
+    recurrence_type?: string;
+  };
   userId: string;
   assignedBy: string;
   startDate: Date;
@@ -112,6 +115,7 @@ function generateRecurringAssignments({
 }) {
   const assignments = [];
   const maxAssignments = 100; // Safety limit
+  // eslint-disable-next-line prefer-const
   let currentDate = new Date(startDate);
   
   // Default end date to 6 months from start if not provided

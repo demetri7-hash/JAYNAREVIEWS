@@ -111,7 +111,7 @@ export interface CreateWorkflowRequest {
   departments: string[];
   roles: string[];
   assigned_users: string[];
-  tasks: {
+  tasks?: {
     task_id: string;
     order_index: number;
     is_required: boolean;

@@ -100,79 +100,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create workflow' }, { status: 500 });
     }
 
-    // Create workflow tasks
-    const workflowTasks = body.tasks.map((task, index) => ({
-      workflow_id: workflow.id,
-      task_id: task.task_id,
-      order_index: task.order_index ?? index,
-      is_required: task.is_required ?? true
-    }));
-
-    const { error: tasksError } = await supabase
-      .from('workflow_tasks')
-      .insert(workflowTasks);
-
-    if (tasksError) {
-      console.error('Error creating workflow tasks:', tasksError);
-      // Rollback workflow creation
-      await supabase.from('workflows').delete().eq('id', workflow.id);
-      return NextResponse.json({ error: 'Failed to create workflow tasks' }, { status: 500 });
-    }
-
-    // Create workflow assignments based on departments/roles/users
-    const assignments = [];
-    
-    // Get users for departments
-    if (body.departments && body.departments.length > 0) {
-      const { data: deptUsers } = await supabase
-        .from('profiles')
-        .select('id')
-        .in('department', body.departments);
-      
-      if (deptUsers) {
-        assignments.push(...deptUsers.map((user: { id: string }) => ({
-          workflow_id: workflow.id,
-          user_id: user.id
-        })));
-      }
-    }
-
-    // Get users for roles
-    if (body.roles && body.roles.length > 0) {
-      const { data: roleUsers } = await supabase
-        .from('profiles')
-        .select('id')
-        .in('role', body.roles);
-      
-      if (roleUsers) {
-        assignments.push(...roleUsers.map((user: { id: string }) => ({
-          workflow_id: workflow.id,
-          user_id: user.id
-        })));
-      }
-    }
-
-    // Add specific users
-    if (body.assigned_users && body.assigned_users.length > 0) {
-      assignments.push(...body.assigned_users.map(userId => ({
+    // Create workflow tasks if they are provided
+    if (body.tasks && body.tasks.length > 0) {
+      const workflowTasks = body.tasks.map((task, index) => ({
         workflow_id: workflow.id,
-        user_id: userId
-      })));
-    }
+        task_id: task.task_id,
+        order_index: task.order_index ?? index,
+        is_required: task.is_required ?? true
+      }));
 
-    // Remove duplicates and insert assignments
-    const uniqueAssignments = assignments.filter((assignment, index, self) => 
-      index === self.findIndex(a => a.user_id === assignment.user_id)
-    );
+      const { error: tasksError } = await supabase
+        .from('workflow_tasks')
+        .insert(workflowTasks);
 
-    if (uniqueAssignments.length > 0) {
-      const { error: assignmentsError } = await supabase
-        .from('workflow_assignments')
-        .insert(uniqueAssignments);
-
-      if (assignmentsError) {
-        console.error('Error creating workflow assignments:', assignmentsError);
-        // Don't rollback here as the workflow is still valid without assignments
+      if (tasksError) {
+        console.error('Error creating workflow tasks:', tasksError);
+        // Rollback workflow creation
+        await supabase.from('workflows').delete().eq('id', workflow.id);
+        return NextResponse.json({ error: 'Failed to create workflow tasks' }, { status: 500 });
       }
     }
 

@@ -23,10 +23,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  experimental: {
-    // Enable serverComponentsExternalPackages to help with RSC issues
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
-  },
+  serverExternalPackages: ['@supabase/supabase-js'],
 };
 
 export default nextConfig;

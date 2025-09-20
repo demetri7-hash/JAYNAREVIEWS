@@ -63,7 +63,6 @@ export async function GET(request: NextRequest) {
         expires_at,
         is_active,
         created_by,
-        photo_url,
         manager_update_reads!left(
           id,
           read_at,

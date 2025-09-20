@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
 
     // Apply filtering logic
     if (showRead === 'true') {
-      // History page: show only read updates
-      processedUpdates = processedUpdates.filter(update => update.isRead);
+      // Manager dashboard: show all updates regardless of read status
+      // No filtering needed - keep all updates
     } else {
-      // Main page: show unread updates, with required acknowledgment floating to top
+      // Team activity: show unread updates only, with required acknowledgment floating to top
       processedUpdates = processedUpdates.filter(update => !update.isRead);
       
       // Sort: required acknowledgment first, then by priority, then by date

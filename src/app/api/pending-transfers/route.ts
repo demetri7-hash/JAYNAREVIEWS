@@ -27,6 +27,18 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    // Check if task_transfers table exists by testing a simple query
+    console.log('Testing task_transfers table...');
+    const { data: testData, error: testError } = await supabase
+      .from('task_transfers')
+      .select('count', { count: 'exact', head: true });
+
+    if (testError) {
+      console.log('task_transfers table does not exist:', testError.message);
+      // Return empty result instead of error
+      return NextResponse.json({ transfers: [] });
+    }
+
     let query = supabase
       .from('task_transfers')
       .select(`

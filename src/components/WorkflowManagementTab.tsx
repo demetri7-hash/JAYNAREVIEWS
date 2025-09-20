@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Workflow, WorkflowTask, EnhancedTask } from '@/types/workflow';
+import { ROLE_LABELS, Department, UserRole } from '@/types';
 import { Plus, Edit2, Trash2, Play, Calendar, Users, Settings, GripVertical, X } from 'lucide-react';
 import {
   DndContext,
@@ -149,8 +150,21 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
     is_active: true
   });
 
-  const departments = ['Kitchen', 'Front of House', 'Management', 'Cleaning'];
-  const roles = ['Manager', 'Lead Cook', 'Line Cook', 'Prep Cook', 'Server', 'Host'];
+  const departments: Department[] = ['BOH', 'FOH', 'AM', 'PM', 'PREP', 'CLEAN', 'CATERING', 'SPECIAL', 'TRANSITION'];
+  const roles: UserRole[] = ['staff', 'manager', 'kitchen_manager', 'ordering_manager', 'lead_prep_cook', 'assistant_foh_manager', 'foh_team_member', 'boh_team_member'];
+
+  // Department labels for better UX
+  const DEPARTMENT_LABELS: Record<Department, string> = {
+    BOH: 'Back of House',
+    FOH: 'Front of House', 
+    AM: 'Morning Shift',
+    PM: 'Evening Shift',
+    PREP: 'Prep Kitchen',
+    CLEAN: 'Cleaning',
+    CATERING: 'Catering',
+    SPECIAL: 'Special Events',
+    TRANSITION: 'Shift Transition'
+  };
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -263,7 +277,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
           frequency: 'once', // Default for workflow tasks
           due_date: new Date().toISOString().split('T')[0],
           due_time: '09:00',
-          departments: formData.departments.length > 0 ? formData.departments : ['Kitchen'],
+          departments: formData.departments.length > 0 ? formData.departments : ['BOH'],
           assignees: []
         })
       });
@@ -487,7 +501,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
                         : 'bg-gray-100 text-gray-700 border border-gray-300'
                     }`}
                   >
-                    {dept}
+                    {DEPARTMENT_LABELS[dept]}
                   </button>
                 ))}
               </div>
@@ -509,7 +523,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
                         : 'bg-gray-100 text-gray-700 border border-gray-300'
                     }`}
                   >
-                    {role}
+                    {ROLE_LABELS[role as UserRole]}
                   </button>
                 ))}
               </div>
@@ -871,7 +885,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
                   <div className="flex flex-wrap gap-2">
                     {selectedWorkflow.roles.map(role => (
                       <span key={role} className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded">
-                        {role}
+                        {ROLE_LABELS[role as UserRole] || role}
                       </span>
                     ))}
                   </div>

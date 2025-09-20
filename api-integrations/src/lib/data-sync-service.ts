@@ -19,23 +19,42 @@ import type {
 } from './homebase-api'
 
 // Temporary Supabase mock for development
+interface SupabaseError {
+  message: string
+}
+
+interface SupabaseResponse<T = unknown> {
+  data?: T
+  error: SupabaseError | null
+}
+
+interface UpsertOptions {
+  onConflict?: string
+}
+
+interface OrderOptions {
+  ascending?: boolean
+}
+
+type SupabaseCallback<T> = (result: SupabaseResponse<T>) => void
+
 const supabase = {
   from: (table: string) => ({
-    upsert: async (data: any, options?: any) => ({ error: null }),
-    insert: async (data: any) => ({ error: null }),
+    upsert: async (data: Record<string, unknown> | Record<string, unknown>[], options?: UpsertOptions): Promise<SupabaseResponse> => ({ error: null }),
+    insert: async (data: Record<string, unknown> | Record<string, unknown>[]): Promise<SupabaseResponse> => ({ error: null }),
     select: (columns: string) => ({
-      order: (column: string, options?: any) => ({
+      order: (column: string, options?: OrderOptions) => ({
         limit: (limit: number) => ({
-          then: async (callback: any) => callback({ data: [], error: null })
+          then: async <T>(callback: SupabaseCallback<T[]>) => callback({ data: [], error: null })
         })
       }),
       lt: (column: string, value: string) => ({
-        then: async (callback: any) => callback({ data: [], error: null })
+        then: async <T>(callback: SupabaseCallback<T[]>) => callback({ data: [], error: null })
       })
     }),
     delete: () => ({
       lt: (column: string, value: string) => ({
-        then: async (callback: any) => callback({ error: null })
+        then: async (callback: SupabaseCallback<null>) => callback({ error: null })
       })
     })
   })
@@ -611,7 +630,7 @@ export class DataSyncService {
       throw new Error(`Failed to fetch sync history: ${error.message}`)
     }
 
-    return data || []
+    return (data as SyncLogEntry[]) || []
   }
 
   /**
@@ -659,12 +678,13 @@ export class DataSyncService {
       }
     }
 
-    const totalSyncs = data.length
-    const successfulSyncs = data.filter(log => log.success).length
+    const syncLogs = data as SyncLogEntry[]
+    const totalSyncs = syncLogs.length
+    const successfulSyncs = syncLogs.filter(log => log.success).length
     const failedSyncs = totalSyncs - successfulSyncs
     const successRate = (successfulSyncs / totalSyncs) * 100
-    const lastSyncTime = new Date(data[0].sync_timestamp)
-    const totalRecords = data.reduce((sum, log) => sum + log.records_processed, 0)
+    const lastSyncTime = new Date(syncLogs[0].sync_timestamp)
+    const totalRecords = syncLogs.reduce((sum, log) => sum + log.records_processed, 0)
     const averageRecordsPerSync = Math.round(totalRecords / totalSyncs)
 
     return {

@@ -258,7 +258,7 @@ export class ToastAPIClient {
   /**
    * Get menu information
    */
-  async getMenus(): Promise<any> {
+  async getMenus(): Promise<unknown> {
     return this.makeRequest('/menus/v2/menus')
   }
 
@@ -288,14 +288,14 @@ export class ToastAPIClient {
   /**
    * Get cash management entries for a specific business date
    */
-  async getCashEntries(businessDate: string): Promise<any> {
+  async getCashEntries(businessDate: string): Promise<unknown> {
     return this.makeRequest(`/cashmgmt/v1/entries?businessDate=${businessDate}`)
   }
 
   /**
    * Get today's cash entries
    */
-  async getTodaysCashEntries(): Promise<any> {
+  async getTodaysCashEntries(): Promise<unknown> {
     const today = new Date().toISOString().split('T')[0]
     return this.getCashEntries(today)
   }
@@ -303,7 +303,7 @@ export class ToastAPIClient {
   /**
    * Get kitchen orders
    */
-  async getKitchenOrders(): Promise<any> {
+  async getKitchenOrders(): Promise<unknown> {
     return this.makeRequest('/kitchen/v1/orders')
   }
 
@@ -313,9 +313,9 @@ export class ToastAPIClient {
   async getDashboardData(): Promise<{
     restaurant: ToastRestaurantInfo
     employees: ToastEmployee[]
-    menus: any
+    menus: unknown
     todaysOrders: ToastOrder[]
-    cashEntries: any
+    cashEntries: unknown
   }> {
     const [restaurant, employees, menus, todaysOrders, cashEntries] = await Promise.all([
       this.getRestaurantInfo(),

@@ -8,6 +8,99 @@
  * - HOMEBASE_BASE_URL: API base URL (defaults to production)
  */
 
+// Raw API response interfaces
+interface RawHomebaseEmployee {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone?: string
+  hourly_rate?: number
+  position?: string
+  department?: string
+  skills?: string[]
+  is_active?: boolean
+  hire_date?: string
+  avatar_url?: string
+}
+
+interface RawHomebaseEmployeeData {
+  employees?: RawHomebaseEmployee[]
+  employee?: RawHomebaseEmployee
+}
+
+interface RawHomebaseScheduleEntry {
+  id: string
+  employee_id: string
+  employee?: {
+    id: string
+    first_name: string
+    last_name: string
+    position?: string
+  }
+  start_time: string
+  end_time: string
+  department?: string
+  position?: string
+  scheduled_hours?: number
+  breaks?: HomebaseBreak[]
+  is_published?: boolean
+  notes?: string
+}
+
+interface RawHomebaseScheduleData {
+  schedule_entries?: RawHomebaseScheduleEntry[]
+  schedules?: RawHomebaseScheduleEntry[]
+}
+
+interface RawHomebaseTimeClockEntry {
+  id: string
+  employee_id: string
+  clock_in_time: string
+  clock_out_time?: string
+  scheduled_start_time: string
+  scheduled_end_time: string
+  total_hours?: number
+  regular_hours?: number
+  overtime_hours?: number
+  department?: string
+  position?: string
+  status?: 'CLOCKED_IN' | 'CLOCKED_OUT' | 'ON_BREAK'
+}
+
+interface RawHomebaseTimeClockData {
+  time_clock_entries?: RawHomebaseTimeClockEntry[]
+}
+
+interface RawHomebaseLaborCost {
+  date: string
+  total_scheduled_hours?: number
+  total_actual_hours?: number
+  total_scheduled_cost?: number
+  total_actual_cost?: number
+  overtime_hours?: number
+  overtime_cost?: number
+  by_department?: {
+    department: string
+    scheduledHours: number
+    actualHours: number
+    scheduledCost: number
+    actualCost: number
+  }[]
+  by_employee?: {
+    employeeId: string
+    name: string
+    scheduledHours: number
+    actualHours: number
+    scheduledCost: number
+    actualCost: number
+  }[]
+}
+
+interface RawHomebaseLaborCostData {
+  labor_costs?: RawHomebaseLaborCost[]
+}
+
 export interface HomebaseEmployee {
   id: string
   firstName: string
@@ -150,7 +243,7 @@ export class HomebaseAPIClient {
    * Get all employees
    */
   async getEmployees(): Promise<HomebaseEmployee[]> {
-    const response = await this.makeRequest('/v1/employees')
+    const response = await this.makeRequest<RawHomebaseEmployeeData>('/v1/employees')
     return this.transformEmployeeData(response)
   }
 
@@ -166,7 +259,7 @@ export class HomebaseAPIClient {
    * Get employee by ID
    */
   async getEmployee(employeeId: string): Promise<HomebaseEmployee> {
-    const response = await this.makeRequest(`/v1/employees/${employeeId}`)
+    const response = await this.makeRequest<RawHomebaseEmployeeData>(`/v1/employees/${employeeId}`)
     return this.transformSingleEmployeeData(response)
   }
 
@@ -184,7 +277,7 @@ export class HomebaseAPIClient {
       params.end_date = this.formatDate(startDate) // Same day if no end date
     }
 
-    const response = await this.makeRequest('/v1/schedules', params)
+    const response = await this.makeRequest<RawHomebaseScheduleData>('/v1/schedules', params)
     return this.transformScheduleData(response)
   }
 
@@ -227,7 +320,7 @@ export class HomebaseAPIClient {
    * Get time clock entries for a specific date
    */
   async getTimeClockEntries(date: Date): Promise<HomebaseTimeClockEntry[]> {
-    const response = await this.makeRequest('/v1/time_clock_entries', {
+    const response = await this.makeRequest<RawHomebaseTimeClockData>('/v1/time_clock_entries', {
       date: this.formatDate(date)
     })
     return this.transformTimeClockData(response)
@@ -247,7 +340,7 @@ export class HomebaseAPIClient {
    * Get labor costs for a date range
    */
   async getLaborCosts(startDate: Date, endDate: Date): Promise<HomebaseLaborCost[]> {
-    const response = await this.makeRequest('/v1/labor_costs', {
+    const response = await this.makeRequest<RawHomebaseLaborCostData>('/v1/labor_costs', {
       start_date: this.formatDate(startDate),
       end_date: this.formatDate(endDate)
     })
@@ -347,7 +440,11 @@ export class HomebaseAPIClient {
       ? (todayCosts.overtimeHours / todayCosts.totalActualHours) * 100
       : 0
 
-    const departmentBreakdown: Record<string, any> = {}
+    const departmentBreakdown: Record<string, {
+      scheduled: number;
+      actual: number;
+      efficiency: number;
+    }> = {}
     todayCosts.byDepartment.forEach(dept => {
       departmentBreakdown[dept.department] = {
         scheduled: dept.scheduledHours,
@@ -368,7 +465,7 @@ export class HomebaseAPIClient {
   /**
    * Make authenticated HTTP request to Homebase API
    */
-  private async makeRequest(endpoint: string, params?: Record<string, string>): Promise<any> {
+  private async makeRequest<T = unknown>(endpoint: string, params?: Record<string, string>): Promise<T> {
     const url = new URL(this.baseURL + endpoint)
     
     if (params) {
@@ -432,10 +529,10 @@ export class HomebaseAPIClient {
   /**
    * Transform employee data from Homebase API
    */
-  private transformEmployeeData(rawData: any): HomebaseEmployee[] {
+  private transformEmployeeData(rawData: RawHomebaseEmployeeData): HomebaseEmployee[] {
     const employees = rawData.employees || []
     
-    return employees.map((emp: any) => ({
+    return employees.map((emp: RawHomebaseEmployee) => ({
       id: emp.id,
       firstName: emp.first_name,
       lastName: emp.last_name,
@@ -454,8 +551,8 @@ export class HomebaseAPIClient {
   /**
    * Transform single employee data
    */
-  private transformSingleEmployeeData(rawData: any): HomebaseEmployee {
-    const emp = rawData.employee || rawData
+  private transformSingleEmployeeData(rawData: RawHomebaseEmployeeData | RawHomebaseEmployee): HomebaseEmployee {
+    const emp = 'employee' in rawData ? rawData.employee! : rawData as RawHomebaseEmployee
     
     return {
       id: emp.id,
@@ -476,10 +573,10 @@ export class HomebaseAPIClient {
   /**
    * Transform schedule data
    */
-  private transformScheduleData(rawData: any): HomebaseScheduleEntry[] {
+  private transformScheduleData(rawData: RawHomebaseScheduleData): HomebaseScheduleEntry[] {
     const scheduleEntries = rawData.schedule_entries || rawData.schedules || []
     
-    return scheduleEntries.map((entry: any) => ({
+    return scheduleEntries.map((entry: RawHomebaseScheduleEntry) => ({
       id: entry.id,
       employeeId: entry.employee_id,
       employee: {
@@ -502,10 +599,10 @@ export class HomebaseAPIClient {
   /**
    * Transform time clock data
    */
-  private transformTimeClockData(rawData: any): HomebaseTimeClockEntry[] {
+  private transformTimeClockData(rawData: RawHomebaseTimeClockData): HomebaseTimeClockEntry[] {
     const entries = rawData.time_clock_entries || []
     
-    return entries.map((entry: any) => ({
+    return entries.map((entry: RawHomebaseTimeClockEntry) => ({
       id: entry.id,
       employeeId: entry.employee_id,
       clockInTime: entry.clock_in_time,
@@ -524,10 +621,10 @@ export class HomebaseAPIClient {
   /**
    * Transform labor cost data
    */
-  private transformLaborCostData(rawData: any): HomebaseLaborCost[] {
+  private transformLaborCostData(rawData: RawHomebaseLaborCostData): HomebaseLaborCost[] {
     const laborCosts = rawData.labor_costs || []
     
-    return laborCosts.map((cost: any) => ({
+    return laborCosts.map((cost: RawHomebaseLaborCost) => ({
       date: cost.date,
       totalScheduledHours: cost.total_scheduled_hours || 0,
       totalActualHours: cost.total_actual_hours || 0,

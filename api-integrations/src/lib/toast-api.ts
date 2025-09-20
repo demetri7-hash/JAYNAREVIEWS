@@ -8,6 +8,78 @@
  * - TOAST_BASE_URL: API base URL (defaults to production)
  */
 
+// Raw API response interfaces
+interface RawToastSalesData {
+  grossSales?: number
+  netSales?: number
+  taxAmount?: number
+  discountAmount?: number
+  orderCount?: number
+  averageTicket?: number
+  hourlyBreakdown?: {
+    hour: number
+    sales: number
+    orders: number
+  }[]
+}
+
+interface RawToastMenuItem {
+  id: string
+  name: string
+  category?: string
+  price?: number
+  modifiers?: ToastModifier[]
+  inventoryLevel?: number
+  lowStockThreshold?: number
+}
+
+interface RawToastMenuData {
+  menuItems?: RawToastMenuItem[]
+}
+
+interface RawToastSalesItem {
+  menuItemId: string
+  soldToday?: number
+  soldYesterday?: number
+}
+
+interface RawToastSalesResponse {
+  itemSales?: RawToastSalesItem[]
+}
+
+interface RawToastInventoryItem {
+  id: string
+  name: string
+  currentLevel?: number
+  unit?: string
+  lowStockThreshold?: number
+  lastUpdated?: string
+  costPerUnit?: number
+}
+
+interface RawToastInventoryData {
+  inventoryItems?: RawToastInventoryItem[]
+}
+
+interface RawToastOrder {
+  id: string
+  orderNumber: string
+  createdDate: string
+  closedDate?: string
+  totalAmount?: number
+  status?: 'OPEN' | 'CLOSED' | 'VOIDED'
+  items?: ToastOrderItem[]
+  customer?: {
+    name: string
+    phone?: string
+    email?: string
+  }
+}
+
+interface RawToastOrderData {
+  orders?: RawToastOrder[]
+}
+
 export interface ToastSalesData {
   businessDate: string
   grossSales: number
@@ -128,7 +200,7 @@ export class ToastAPIClient {
   async getSalesData(businessDate: Date): Promise<ToastSalesData> {
     const dateStr = businessDate.toISOString().split('T')[0]
     
-    const response = await this.makeRequest('/reporting/v1/reports', {
+    const response = await this.makeRequest<RawToastSalesData>('/reporting/v1/reports', {
       reportType: 'SALES_SUMMARY',
       businessDate: dateStr
     })
@@ -155,8 +227,8 @@ export class ToastAPIClient {
    * Get all menu items with sales performance
    */
   async getMenuItems(): Promise<ToastMenuItem[]> {
-    const menuResponse = await this.makeRequest('/menus/v2/menus')
-    const salesResponse = await this.makeRequest('/reporting/v1/reports', {
+    const menuResponse = await this.makeRequest<RawToastMenuData>('/menus/v2/menus')
+    const salesResponse = await this.makeRequest<RawToastSalesResponse>('/reporting/v1/reports', {
       reportType: 'MENU_SALES'
     })
 
@@ -167,7 +239,7 @@ export class ToastAPIClient {
    * Get current inventory levels
    */
   async getInventoryLevels(): Promise<ToastInventoryItem[]> {
-    const response = await this.makeRequest('/stock/v1/inventory')
+    const response = await this.makeRequest<RawToastInventoryData>('/stock/v1/inventory')
     return this.transformInventoryData(response)
   }
 
@@ -175,7 +247,7 @@ export class ToastAPIClient {
    * Get orders for a specific time period
    */
   async getOrders(startTime: Date, endTime: Date): Promise<ToastOrder[]> {
-    const response = await this.makeRequest('/orders/v2/orders', {
+    const response = await this.makeRequest<RawToastOrderData>('/orders/v2/orders', {
       startDate: startTime.toISOString(),
       endDate: endTime.toISOString(),
       pageSize: 100
@@ -238,7 +310,7 @@ export class ToastAPIClient {
   /**
    * Make authenticated HTTP request to TOAST API
    */
-  private async makeRequest(endpoint: string, params?: Record<string, any>): Promise<any> {
+  private async makeRequest<T = unknown>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
     const url = new URL(this.baseURL + endpoint)
     
     if (params) {
@@ -295,7 +367,7 @@ export class ToastAPIClient {
   /**
    * Transform raw TOAST sales data into our format
    */
-  private transformSalesData(rawData: any, businessDate: string): ToastSalesData {
+  private transformSalesData(rawData: RawToastSalesData, businessDate: string): ToastSalesData {
     // This is a simplified transformation - actual TOAST API response structure may vary
     return {
       businessDate,
@@ -312,19 +384,19 @@ export class ToastAPIClient {
   /**
    * Transform menu data with sales performance
    */
-  private transformMenuData(menuData: any, salesData: any): ToastMenuItem[] {
+  private transformMenuData(menuData: RawToastMenuData, salesData: RawToastSalesResponse): ToastMenuItem[] {
     // Simplified transformation - combine menu items with sales performance
     const menuItems = menuData.menuItems || []
-    const salesByItem = new Map()
+    const salesByItem = new Map<string, RawToastSalesItem>()
     
     if (salesData.itemSales) {
-      salesData.itemSales.forEach((item: any) => {
+      salesData.itemSales.forEach((item: RawToastSalesItem) => {
         salesByItem.set(item.menuItemId, item)
       })
     }
 
-    return menuItems.map((item: any) => {
-      const sales = salesByItem.get(item.id) || {}
+    return menuItems.map((item: RawToastMenuItem) => {
+      const sales = salesByItem.get(item.id) || { soldToday: 0, soldYesterday: 0 }
       return {
         id: item.id,
         name: item.name,
@@ -342,10 +414,10 @@ export class ToastAPIClient {
   /**
    * Transform inventory data
    */
-  private transformInventoryData(rawData: any): ToastInventoryItem[] {
+  private transformInventoryData(rawData: RawToastInventoryData): ToastInventoryItem[] {
     const items = rawData.inventoryItems || []
     
-    return items.map((item: any) => ({
+    return items.map((item: RawToastInventoryItem) => ({
       id: item.id,
       name: item.name,
       currentLevel: item.currentLevel || 0,
@@ -359,10 +431,10 @@ export class ToastAPIClient {
   /**
    * Transform order data
    */
-  private transformOrderData(rawData: any): ToastOrder[] {
+  private transformOrderData(rawData: RawToastOrderData): ToastOrder[] {
     const orders = rawData.orders || []
     
-    return orders.map((order: any) => ({
+    return orders.map((order: RawToastOrder) => ({
       id: order.id,
       orderNumber: order.orderNumber,
       createdDate: order.createdDate,

@@ -125,6 +125,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [showTaskCreator, setShowTaskCreator] = useState(false);
   const [draggedTask, setDraggedTask] = useState<WorkflowTaskWithOrder | null>(null);
+  const [assignWorkflowId, setAssignWorkflowId] = useState<string | null>(null);
 
   // New task creation state
   const [newTask, setNewTask] = useState({
@@ -412,6 +413,37 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
         ? prev[field].filter(item => item !== value)
         : [...prev[field], value]
     }));
+  };
+
+  // Handle workflow assignment
+  const handleAssignWorkflow = async (assignmentData: {
+    workflow_id: string;
+    user_ids: string[];
+    start_date?: string;
+    end_date?: string;
+  }) => {
+    try {
+      const response = await fetch('/api/workflow-scheduling', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(assignmentData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to assign workflow');
+      }
+
+      const result = await response.json();
+      onMessage({ type: 'success', text: result.message });
+      setAssignWorkflowId(null);
+    } catch (error) {
+      console.error('Assignment error:', error);
+      onMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Failed to assign workflow' 
+      });
+    }
   };
 
   if (loading) {
@@ -823,12 +855,20 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
                 {workflow.is_active ? 'Active' : 'Inactive'}
               </span>
               
-              <button
-                onClick={() => setSelectedWorkflow(workflow)}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                View Details →
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setAssignWorkflowId(workflow.id)}
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                >
+                  Assign
+                </button>
+                <button
+                  onClick={() => setSelectedWorkflow(workflow)}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  View Details →
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -932,6 +972,151 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
           </div>
         </div>
       )}
+
+      {/* Assignment Modal */}
+      {assignWorkflowId && (
+        <WorkflowAssignmentModal
+          workflowId={assignWorkflowId}
+          availableUsers={availableUsers}
+          onAssign={handleAssignWorkflow}
+          onClose={() => setAssignWorkflowId(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Assignment Modal Component
+interface WorkflowAssignmentModalProps {
+  workflowId: string;
+  availableUsers: User[];
+  onAssign: (data: {
+    workflow_id: string;
+    user_ids: string[];
+    start_date?: string;
+    end_date?: string;
+  }) => void;
+  onClose: () => void;
+}
+
+function WorkflowAssignmentModal({ 
+  workflowId, 
+  availableUsers, 
+  onAssign, 
+  onClose 
+}: WorkflowAssignmentModalProps) {
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedUsers.length === 0) {
+      alert('Please select at least one user');
+      return;
+    }
+
+    onAssign({
+      workflow_id: workflowId,
+      user_ids: selectedUsers,
+      start_date: startDate || undefined,
+      end_date: endDate || undefined
+    });
+  };
+
+  const toggleUser = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Assign Workflow</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* User Selection */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Users *
+            </label>
+            <div className="max-h-40 overflow-y-auto border rounded p-2">
+              {availableUsers.map((user) => (
+                <label
+                  key={user.id}
+                  className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedUsers.includes(user.id)}
+                    onChange={() => toggleUser(user.id)}
+                    className="mr-3"
+                  />
+                  <div>
+                    <div className="font-medium">{user.name}</div>
+                    <div className="text-sm text-gray-500">{user.email}</div>
+                    <div className="text-xs text-gray-400">{ROLE_LABELS[user.role as UserRole] || user.role}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Date Range */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                End Date (for recurring)
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Assign Workflow
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

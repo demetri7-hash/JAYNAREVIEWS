@@ -121,15 +121,15 @@ export default function WorkflowCreator({
 
   // Add task to workflow
   const addTask = (task: TaskSearchResult) => {
-    if (formData.tasks.some(t => t.task_id === task.id)) {
+    if (formData.tasks?.some(t => t.task_id === task.id)) {
       return; // Task already added
     }
 
     setFormData(prev => ({
       ...prev,
-      tasks: [...prev.tasks, {
+      tasks: [...(prev.tasks || []), {
         task_id: task.id,
-        order_index: prev.tasks.length,
+        order_index: (prev.tasks || []).length,
         is_required: true
       }]
     }));
@@ -141,7 +141,7 @@ export default function WorkflowCreator({
   const removeTask = (taskId: string) => {
     setFormData(prev => ({
       ...prev,
-      tasks: prev.tasks
+      tasks: (prev.tasks || [])
         .filter(t => t.task_id !== taskId)
         .map((t, index) => ({ ...t, order_index: index }))
     }));
@@ -149,7 +149,7 @@ export default function WorkflowCreator({
 
   // Move task up/down
   const moveTask = (taskId: string, direction: 'up' | 'down') => {
-    const tasks = [...formData.tasks];
+    const tasks = [...(formData.tasks || [])];
     const currentIndex = tasks.findIndex(t => t.task_id === taskId);
     
     if (currentIndex === -1) return;
@@ -201,7 +201,7 @@ export default function WorkflowCreator({
 
   // Handle form submission
   const handleSubmit = () => {
-    if (!formData.name.trim() || formData.tasks.length === 0) {
+    if (!formData.name.trim() || (formData.tasks?.length || 0) === 0) {
       alert('Please provide a workflow name and at least one task.');
       return;
     }
@@ -381,7 +381,7 @@ export default function WorkflowCreator({
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <UserCheck className="h-5 w-5" />
-              Tasks ({formData.tasks.length})
+              Tasks ({formData.tasks?.length || 0})
             </h3>
 
             {/* Task Search */}
@@ -476,7 +476,7 @@ export default function WorkflowCreator({
 
             {/* Selected Tasks */}
             <div className="space-y-2">
-              {formData.tasks.map((workflowTask, index) => (
+              {(formData.tasks || []).map((workflowTask, index) => (
                 <div key={workflowTask.task_id} className="flex items-center gap-3 p-3 border rounded-lg">
                   <div className="flex flex-col gap-1">
                     <Button
@@ -493,7 +493,7 @@ export default function WorkflowCreator({
                       variant="ghost"
                       size="sm"
                       onClick={() => moveTask(workflowTask.task_id, 'down')}
-                      disabled={index === formData.tasks.length - 1}
+                      disabled={index === (formData.tasks?.length || 0) - 1}
                     >
                       ↓
                     </Button>
@@ -512,7 +512,7 @@ export default function WorkflowCreator({
                       onCheckedChange={(checked) => {
                         setFormData(prev => ({
                           ...prev,
-                          tasks: prev.tasks.map(t =>
+                          tasks: (prev.tasks || []).map(t =>
                             t.task_id === workflowTask.task_id
                               ? { ...t, is_required: checked as boolean }
                               : t

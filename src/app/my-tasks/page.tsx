@@ -8,6 +8,7 @@ import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
 import Navigation from '@/components/Navigation'
 import { Button, IconButton } from '@/components/buttons'
+import MyWorkflowCards from '@/components/workflows/MyWorkflowCards'
 
 interface Task {
   id: string
@@ -326,6 +327,14 @@ export default function MyTasks() {
                 </Button>
               );
             })}
+          </div>
+
+          {/* Workflow Assignments Section */}
+          <div className="mb-8">
+            <MyWorkflowCards 
+              userId={session.user.id || ''} 
+              userRole={session.user.role || 'staff'} 
+            />
           </div>
 
           {/* Tasks List */}

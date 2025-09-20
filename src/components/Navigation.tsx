@@ -17,7 +17,8 @@ import {
   Bell,
   ArrowRightLeft,
   Calendar,
-  FileText
+  FileText,
+  Workflow
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
@@ -77,9 +78,9 @@ export function Navigation({ currentPage }: NavigationProps) {
     },
     {
       icon: CheckSquare,
-      label: 'My Workflows',
-      path: '/my-workflows',
-      id: 'my-workflows'
+      label: 'My Tasks',
+      path: '/my-tasks',
+      id: 'my-tasks'
     }
   ]
 
@@ -90,6 +91,12 @@ export function Navigation({ currentPage }: NavigationProps) {
       label: 'Manager Dashboard',
       path: '/manager-dashboard',
       id: 'manager-dashboard'
+    },
+    {
+      icon: Workflow,
+      label: 'Workflows',
+      path: '/workflows',
+      id: 'workflows'
     },
     {
       icon: ClipboardList,

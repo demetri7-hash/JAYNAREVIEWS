@@ -106,7 +106,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
     setEditingWorkflow(null);
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | boolean | 'once' | 'daily' | 'weekly' | 'monthly') => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

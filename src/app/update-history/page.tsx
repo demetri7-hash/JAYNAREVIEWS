@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { ArrowLeft, Bell, Calendar, Camera, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Bell, Calendar, Camera, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
 import Navigation from '@/components/Navigation'
+import { Button, IconButton } from '@/components/buttons'
 
 interface ManagerUpdate {
   id: string
@@ -146,13 +147,14 @@ export default function UpdateHistory() {
     <>
       <Navigation currentPage="update-history" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 animate-fade-in-up animation-delay-100">
           {/* Title */}
-          <div className="mb-8 text-center animate-fade-in-up animation-delay-200">
-            <h1 className="text-3xl font-bold text-slate-900 brand-header mb-2">
+          <div className="mb-6 sm:mb-8 text-center animate-fade-in-up animation-delay-200">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 brand-header mb-2">
               Full Update History
             </h1>
-            <p className="text-slate-600 brand-subtitle">
+            <p className="text-slate-600 brand-subtitle text-sm sm:text-base">
               Previously read manager updates and announcements
             </p>
           </div>
@@ -230,30 +232,35 @@ export default function UpdateHistory() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="mt-8 flex items-center justify-center space-x-4 animate-fade-in-up">
-            <button
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 animate-fade-in-up">
+            <Button
               onClick={() => goToPage(pagination.page - 1)}
               disabled={pagination.page === 1}
-              className="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="secondary"
+              size="md"
+              className="w-full sm:w-auto"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
               Previous
-            </button>
+            </Button>
             
-            <span className="text-sm text-slate-600">
+            <span className="text-sm text-slate-600 order-first sm:order-none">
               Page {pagination.page} of {pagination.totalPages}
             </span>
             
-            <button
+            <Button
               onClick={() => goToPage(pagination.page + 1)}
               disabled={pagination.page === pagination.totalPages}
-              className="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="secondary"
+              size="md"
+              className="w-full sm:w-auto"
             >
               Next
               <ChevronRight className="w-4 h-4 ml-1" />
-            </button>
+            </Button>
           </div>
         )}
+      </div>
       </div>
 
       {/* Modal for full update details */}

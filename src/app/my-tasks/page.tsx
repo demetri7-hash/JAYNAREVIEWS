@@ -7,6 +7,7 @@ import { ArrowLeft, Clock, CheckCircle, AlertCircle, Camera, FileText, Calendar,
 import { useLanguage, staticTranslations } from '@/contexts/LanguageContext'
 import { LanguageToggleCompact } from '@/components/LanguageToggle'
 import Navigation from '@/components/Navigation'
+import { Button, IconButton } from '@/components/buttons'
 
 interface Task {
   id: string
@@ -275,34 +276,34 @@ export default function MyTasks() {
     <>
       <Navigation currentPage="my-tasks" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           {/* Main Content */}
-          <div className="glass rounded-3xl p-8 animate-fade-in-scale">
+          <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 animate-fade-in-scale">
           {/* Hero Section */}
-          <div className="text-center mb-10">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <CheckCircle className="w-8 h-8 text-white" />
+          <div className="text-center mb-6 sm:mb-10">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg">
+              <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-black mb-3 brand-header">
+            <h1 className="text-2xl sm:text-3xl font-black mb-3 brand-header">
               <span className="gradient-text">{staticTranslations.myTasks[language]}</span>
             </h1>
-            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto brand-subtitle">
+            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto brand-subtitle text-sm sm:text-base">
               {staticTranslations.viewCompleteAssignedTasks[language]}
             </p>
           </div>
 
           {/* Error Alert */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-8 animate-fade-in-up">
+            <div className="bg-red-50 border border-red-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-6 sm:mb-8 animate-fade-in-up">
               <div className="flex items-center">
-                <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
-                <p className="text-red-700 font-medium">{error}</p>
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 sm:mr-3 flex-shrink-0" />
+                <p className="text-red-700 font-medium text-sm sm:text-base">{error}</p>
               </div>
             </div>
           )}
 
           {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-2 mb-8 p-2 bg-white/30 rounded-2xl border border-white/20 backdrop-blur-sm">
+          <div className="grid grid-cols-2 sm:flex gap-2 mb-6 sm:mb-8 p-2 bg-white/30 rounded-xl sm:rounded-2xl border border-white/20 backdrop-blur-sm">
             {[
               { key: 'all', label: staticTranslations.all[language], icon: CheckCircle },
               { key: 'pending', label: staticTranslations.pendingTasks[language], icon: Clock },
@@ -311,33 +312,33 @@ export default function MyTasks() {
             ].map((tab) => {
               const IconComponent = tab.icon;
               return (
-                <button
+                <Button
                   key={tab.key}
                   onClick={() => setFilter(tab.key as 'all' | 'pending' | 'completed' | 'overdue')}
-                  className={`flex-1 min-w-0 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
-                    filter === tab.key
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                  variant={filter === tab.key ? 'primary' : 'ghost'}
+                  size="md"
+                  className={`flex-1 min-w-0 justify-center ${
+                    filter === tab.key ? 'shadow-lg' : ''
                   }`}
                 >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
+                  <IconComponent className="w-4 h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm truncate">{tab.label}</span>
+                </Button>
               );
             })}
           </div>
 
           {/* Tasks List */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {filteredAssignments.length === 0 ? (
-              <div className="text-center py-16 animate-fade-in-up">
-                <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-12 h-12 text-slate-400" />
+              <div className="text-center py-12 sm:py-16 animate-fade-in-up">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-slate-400" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3 brand-header">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 brand-header">
                   {filter === 'all' ? 'No tasks assigned' : `No ${filter} tasks`}
                 </h3>
-                <p className="text-slate-600 brand-subtitle">
+                <p className="text-slate-600 brand-subtitle text-sm sm:text-base">
                   {filter === 'all' 
                     ? 'You don\'t have any tasks assigned yet.' 
                     : `You don't have any ${filter} tasks.`
@@ -348,79 +349,87 @@ export default function MyTasks() {
               filteredAssignments.map((assignment, index) => (
                 <div
                   key={assignment.id}
-                  className="group bg-white/50 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/70 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 animate-fade-in-up"
+                  className="group bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/70 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 animate-fade-in-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="flex flex-col gap-4">
                     <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                        <h3 className="text-xl font-bold text-slate-900 brand-header group-hover:text-blue-600 transition-colors">
-                          {assignment.task.title}
-                        </h3>
-                        <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          getTaskStatus(assignment) === 'completed' 
-                            ? 'bg-green-100 text-green-700 border border-green-200' 
-                            : getTaskStatus(assignment) === 'overdue'
-                            ? 'bg-red-100 text-red-700 border border-red-200'
-                            : 'bg-amber-100 text-amber-700 border border-amber-200'
-                        }`}>
-                          {getStatusIcon(getTaskStatus(assignment))}
-                          <span className="ml-2 capitalize">{getTaskStatus(assignment)}</span>
-                        </span>
+                      <div className="flex flex-col gap-3 mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                          <h3 className="text-lg sm:text-xl font-bold text-slate-900 brand-header group-hover:text-blue-600 transition-colors">
+                            {assignment.task.title}
+                          </h3>
+                          <span className={`inline-flex items-center px-3 py-1.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 self-start ${
+                            getTaskStatus(assignment) === 'completed' 
+                              ? 'bg-green-100 text-green-700 border border-green-200' 
+                              : getTaskStatus(assignment) === 'overdue'
+                              ? 'bg-red-100 text-red-700 border border-red-200'
+                              : 'bg-amber-100 text-amber-700 border border-amber-200'
+                          }`}>
+                            {getStatusIcon(getTaskStatus(assignment))}
+                            <span className="ml-2 capitalize">{getTaskStatus(assignment)}</span>
+                          </span>
+                        </div>
                       </div>
                       
                       {assignment.task.description && (
-                        <p className="text-slate-600 mb-4 leading-relaxed">{assignment.task.description}</p>
+                        <p className="text-slate-600 mb-4 leading-relaxed text-sm sm:text-base">{assignment.task.description}</p>
                       )}
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                        <div className="flex items-center bg-slate-100 px-3 py-1.5 rounded-lg">
-                          <Calendar className="w-4 h-4 mr-2 text-slate-400" />
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-slate-500">
+                        <div className="flex items-center bg-slate-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-slate-400" />
                           <span className="font-medium">{formatDueDate(assignment.due_date)}</span>
                         </div>
-                        <div className="flex items-center bg-slate-100 px-3 py-1.5 rounded-lg">
-                          <RefreshCw className="w-4 h-4 mr-2 text-slate-400" />
+                        <div className="flex items-center bg-slate-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                          <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-slate-400" />
                           <span className="capitalize font-medium">{assignment.recurrence}</span>
                         </div>
                         {assignment.task.requires_notes && (
-                          <div className="flex items-center bg-blue-100 px-3 py-1.5 rounded-lg">
-                            <FileText className="w-4 h-4 mr-2 text-blue-500" />
-                            <span className="text-blue-700 font-medium">Notes required</span>
+                          <div className="flex items-center bg-blue-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                            <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-500" />
+                            <span className="text-blue-700 font-medium">Notes</span>
                           </div>
                         )}
                         {assignment.task.requires_photo && (
-                          <div className="flex items-center bg-purple-100 px-3 py-1.5 rounded-lg">
-                            <Camera className="w-4 h-4 mr-2 text-purple-500" />
-                            <span className="text-purple-700 font-medium">Photo required</span>
+                          <div className="flex items-center bg-purple-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                            <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-purple-500" />
+                            <span className="text-purple-700 font-medium">Photo</span>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:w-48">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200/50">
                       {(getTaskStatus(assignment) === 'pending' || getTaskStatus(assignment) === 'overdue') ? (
                         <>
-                          <button
+                          <Button
                             onClick={() => router.push(`/complete-task/${assignment.id}`)}
-                            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5"
+                            variant="success"
+                            size="md"
+                            className="flex-1 sm:flex-none"
                           >
                             Complete Task
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => openTransferModal(assignment.id)}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                            variant="primary"
+                            size="md"
+                            className="flex-1 sm:flex-none"
                           >
-                            <RefreshCw className="w-4 h-4" />
+                            <RefreshCw className="w-4 h-4 mr-2" />
                             Transfer
-                          </button>
+                          </Button>
                         </>
                       ) : (
-                        <button
+                        <Button
                           onClick={() => router.push(`/view-task/${assignment.id}`)}
-                          className="bg-white/70 text-slate-700 px-6 py-3 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-white/50 hover:border-slate-200"
+                          variant="secondary"
+                          size="md"
+                          className="flex-1 sm:flex-none"
                         >
                           View Details
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -431,21 +440,21 @@ export default function MyTasks() {
 
           {/* Load More Button */}
           {pagination.hasMore && (
-            <div className="mt-10 text-center animate-fade-in-up">
-              <button
+            <div className="mt-8 sm:mt-10 text-center animate-fade-in-up">
+              <Button
                 onClick={loadMoreTasks}
                 disabled={loadingMore}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5"
+                loading={loadingMore}
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto"
               >
                 {loadingMore ? (
-                  <>
-                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-                    Loading more...
-                  </>
+                  'Loading more...'
                 ) : (
                   `Load More Tasks (${pagination.total - assignments.length} remaining)`
                 )}
-              </button>
+              </Button>
             </div>
           )}
 
@@ -463,27 +472,28 @@ export default function MyTasks() {
       {/* Transfer Modal */}
       {showTransferModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="glass rounded-3xl max-w-lg w-full p-8 animate-scale-in">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-slate-900 brand-header">Transfer Task</h3>
-              <button
+          <div className="glass rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 lg:p-8 animate-scale-in">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">Transfer Task</h3>
+              <IconButton
                 onClick={closeTransferModal}
-                className="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all duration-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
+                icon={<X className="w-5 h-5" />}
+                label="Close modal"
+                variant="ghost"
+                size="md"
+              />
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <label htmlFor="transferUser" className="block text-sm font-medium text-slate-700 mb-3">
+                <label htmlFor="transferUser" className="block text-sm font-medium text-slate-700 mb-2 sm:mb-3">
                   Transfer to:
                 </label>
                 <select
                   id="transferUser"
                   value={selectedTransferUser}
                   onChange={(e) => setSelectedTransferUser(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white"
+                  className="w-full min-h-[44px] px-3 sm:px-4 py-2 sm:py-3 border border-slate-200 rounded-lg sm:rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white text-sm sm:text-base"
                   required
                 >
                   <option value="">Select a team member</option>
@@ -496,7 +506,7 @@ export default function MyTasks() {
               </div>
 
               <div>
-                <label htmlFor="transferReason" className="block text-sm font-medium text-slate-700 mb-3">
+                <label htmlFor="transferReason" className="block text-sm font-medium text-slate-700 mb-2 sm:mb-3">
                   Reason for transfer (optional):
                 </label>
                 <textarea
@@ -504,37 +514,33 @@ export default function MyTasks() {
                   value={transferReason}
                   onChange={(e) => setTransferReason(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-200 rounded-lg sm:rounded-xl focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200 bg-white resize-none text-sm sm:text-base"
                   placeholder="Why are you transferring this task?"
                 />
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
-              <button
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8">
+              <Button
                 onClick={closeTransferModal}
                 disabled={transferSubmitting}
-                className="flex-1 px-6 py-3 text-slate-700 bg-white/70 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-white/50"
+                variant="secondary"
+                size="lg"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={submitTransfer}
                 disabled={!selectedTransferUser || transferSubmitting}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center justify-center gap-2"
+                loading={transferSubmitting}
+                variant="primary"
+                size="lg"
+                className="flex-1"
               >
-                {transferSubmitting ? (
-                  <>
-                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Users className="w-4 h-4" />
-                    <span>Submit Transfer</span>
-                  </>
-                )}
-              </button>
+                <Users className="w-4 h-4 mr-2" />
+                Submit Transfer
+              </Button>
             </div>
           </div>
         </div>

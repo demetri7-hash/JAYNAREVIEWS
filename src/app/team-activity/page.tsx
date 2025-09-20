@@ -306,47 +306,47 @@ export default function TeamActivity() {
     <>
       <Navigation currentPage="home" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
 
-        <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-100">
-          <div className="flex items-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg shadow-purple-500/25">
-              <Users className="w-8 h-8 text-white" />
+        <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in-up animation-delay-100">
+          <div className="flex flex-col sm:flex-row sm:items-center mb-6 sm:mb-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-0 sm:mr-6 shadow-lg shadow-purple-500/25">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold gradient-text brand-title mb-2">Team Activity Dashboard</h1>
-              <p className="text-slate-600 brand-subtitle text-lg">THE PASS Team Performance Overview</p>
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold gradient-text brand-title mb-2">Team Activity Dashboard</h1>
+              <p className="text-slate-600 brand-subtitle text-base sm:text-lg">THE PASS Team Performance Overview</p>
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 animate-fade-in-up animation-delay-200">
+            <div className="bg-red-50 border border-red-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 animate-fade-in-up animation-delay-200">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mr-4">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                 </div>
-                <div className="text-red-700 font-medium">{error}</div>
+                <div className="text-red-700 font-medium text-sm sm:text-base">{error}</div>
               </div>
             </div>
           )}
 
           {/* Manager Updates Box */}
-          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-200">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
-                  <Bell className="w-6 h-6 text-white" />
+          <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in-up animation-delay-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+              <div className="flex items-center mb-4 sm:mb-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center mr-3 sm:mr-4 shadow-lg shadow-blue-500/25">
+                  <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 brand-header">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 brand-header">
                     {getText(staticTranslations.managerUpdates.en, staticTranslations.managerUpdates.es, staticTranslations.managerUpdates.tr)}
                   </h3>
-                  <p className="text-slate-600 brand-subtitle">Unread notifications and announcements</p>
+                  <p className="text-slate-600 brand-subtitle text-sm sm:text-base">Unread notifications and announcements</p>
                 </div>
               </div>
               <button
                 onClick={() => router.push('/update-history')}
-                className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline"
+                className="min-h-[44px] px-4 py-2 sm:px-6 text-sm sm:text-base text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg sm:rounded-xl transition-colors font-medium"
               >
                 Full Update History
               </button>
@@ -361,7 +361,7 @@ export default function TeamActivity() {
                   <p className="text-slate-500 brand-subtitle">No unread updates</p>
                   <button
                     onClick={() => router.push('/update-history')}
-                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline mt-2"
+                    className="min-h-[44px] px-4 py-2 text-sm sm:text-base text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors font-medium w-full sm:w-auto"
                   >
                     View update history
                   </button>
@@ -438,23 +438,23 @@ export default function TeamActivity() {
                   
                   {/* Pagination controls */}
                   {updatesPagination.totalPages > 1 && (
-                    <div className="flex items-center justify-center space-x-4 pt-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
                       <button
                         onClick={() => goToPage(updatesPagination.page - 1)}
                         disabled={updatesPagination.page === 1}
-                        className="flex items-center px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="min-h-[44px] flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto justify-center"
                       >
                         ← Prev
                       </button>
                       
-                      <span className="text-sm text-slate-600">
+                      <span className="text-sm text-slate-600 order-first sm:order-none">
                         {updatesPagination.page} of {updatesPagination.totalPages}
                       </span>
                       
                       <button
                         onClick={() => goToPage(updatesPagination.page + 1)}
                         disabled={updatesPagination.page === updatesPagination.totalPages}
-                        className="flex items-center px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="min-h-[44px] flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto justify-center"
                       >
                         Next →
                       </button>
@@ -467,29 +467,29 @@ export default function TeamActivity() {
 
           {/* Enhanced Team Stats Overview */}
           {teamStats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Activity className="w-6 h-6 text-white" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+              <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200 group">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 group-hover:scale-110 transition-transform duration-200 mx-auto sm:mx-0">
+                    <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-blue-600 brand-subtitle">Total Tasks</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalTasks}</p>
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-blue-600 brand-subtitle">Total Tasks</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">{teamStats.totalTasks}</p>
                     <p className="text-xs text-slate-500 mt-1">All time</p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <CheckCircle className="w-6 h-6 text-white" />
+              <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300 group">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 group-hover:scale-110 transition-transform duration-200 mx-auto sm:mx-0">
+                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-green-600 brand-subtitle">Completed Today</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.completedToday}</p>
-                    <div className="flex items-center mt-1">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-green-600 brand-subtitle">Completed Today</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">{teamStats.completedToday}</p>
+                    <div className="flex items-center justify-center sm:justify-start mt-1">
                       <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
                       <p className="text-xs text-green-600">+12% vs yesterday</p>
                     </div>
@@ -497,41 +497,41 @@ export default function TeamActivity() {
                 </div>
               </div>
 
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Clock className="w-6 h-6 text-white" />
+              <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400 group">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 group-hover:scale-110 transition-transform duration-200 mx-auto sm:mx-0">
+                    <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gold-600 brand-subtitle">Pending</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.pendingTasks}</p>
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-gold-600 brand-subtitle">Pending</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">{teamStats.pendingTasks}</p>
                     <p className="text-xs text-slate-500 mt-1">In progress</p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-500 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <AlertTriangle className="w-6 h-6 text-white" />
+              <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-500 group">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 group-hover:scale-110 transition-transform duration-200 mx-auto sm:mx-0">
+                    <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-red-600 brand-subtitle">Overdue</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.overdueTasks}</p>
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-red-600 brand-subtitle">Overdue</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">{teamStats.overdueTasks}</p>
                     <p className="text-xs text-slate-500 mt-1">Needs attention</p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass rounded-2xl p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-600 group">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-200">
-                    <Users className="w-6 h-6 text-white" />
+              <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-600 group col-span-2 sm:col-span-1">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 group-hover:scale-110 transition-transform duration-200 mx-auto sm:mx-0">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-purple-600 brand-subtitle">Team Members</p>
-                    <p className="text-2xl font-bold text-slate-900 brand-header">{teamStats.totalUsers}</p>
-                    <div className="flex items-center mt-1">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-purple-600 brand-subtitle">Team Members</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900 brand-header">{teamStats.totalUsers}</p>
+                    <div className="flex items-center justify-center sm:justify-start mt-1">
                       <Target className="w-3 h-3 text-purple-600 mr-1" />
                       <p className="text-xs text-purple-600">Active today</p>
                     </div>
@@ -542,40 +542,40 @@ export default function TeamActivity() {
           )}
 
           {/* Achievements & Gamification */}
-          <div className="glass rounded-3xl p-8 mb-8 animate-fade-in-up animation-delay-800">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-gold-500/25">
-                <Trophy className="w-6 h-6 text-white" />
+          <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in-up animation-delay-800">
+            <div className="flex items-center mb-4 sm:mb-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg sm:rounded-xl flex items-center justify-center mr-3 sm:mr-4 shadow-lg shadow-gold-500/25">
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 brand-header">Team Achievements</h3>
-                <p className="text-slate-600 brand-subtitle">Recent milestones and badges earned</p>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 brand-header">Team Achievements</h3>
+                <p className="text-slate-600 brand-subtitle text-sm sm:text-base">Recent milestones and badges earned</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {achievements.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <div className="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                    <Trophy className="w-8 h-8 text-slate-400" />
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                    <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" />
                   </div>
-                  <h4 className="text-lg font-semibold text-slate-900 brand-header mb-2">No Achievements Yet</h4>
-                  <p className="text-slate-600 brand-subtitle">Complete tasks to unlock team achievements!</p>
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 brand-header mb-2">No Achievements Yet</h4>
+                  <p className="text-slate-600 brand-subtitle text-sm sm:text-base">Complete tasks to unlock team achievements!</p>
                 </div>
               ) : (
                 achievements.map((achievement, index) => (
                   <div 
                     key={achievement.id} 
-                    className="glass rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                    className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg transition-all duration-300 animate-fade-in-up"
                     style={{ animationDelay: `${900 + index * 100}ms` }}
                   >
-                    <div className="text-3xl mb-4">{achievement.icon}</div>
-                    <h4 className="font-bold text-slate-900 brand-header mb-2">{achievement.name}</h4>
-                    <p className="text-sm text-slate-600 brand-subtitle mb-4">{achievement.description}</p>
+                    <div className="text-2xl sm:text-3xl mb-3 sm:mb-4">{achievement.icon}</div>
+                    <h4 className="font-bold text-slate-900 brand-header mb-2 text-sm sm:text-base">{achievement.name}</h4>
+                    <p className="text-xs sm:text-sm text-slate-600 brand-subtitle mb-3 sm:mb-4">{achievement.description}</p>
                     {achievement.earnedBy.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-xs font-semibold text-gold-600 uppercase tracking-wide">Earned by:</p>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1 justify-center">
                           {achievement.earnedBy.slice(0, 3).map((name, index) => (
                             <span key={index} className="px-2 py-1 bg-gold-100 text-gold-700 rounded-full text-xs font-medium">
                               {name}
@@ -595,67 +595,67 @@ export default function TeamActivity() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Recent Completions with Enhanced Visuals */}
-            <div className="glass rounded-3xl p-8 animate-fade-in-up animation-delay-900">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
-                  <TrendingUp className="w-5 h-5 text-white" />
+            <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 animate-fade-in-up animation-delay-900">
+              <div className="flex items-center mb-4 sm:mb-6">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl flex items-center justify-center mr-3">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-slate-900 brand-header">Recent Completions</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 brand-header">Recent Completions</h3>
                   <div className="flex items-center">
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                       Live Feed
                     </span>
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentCompletions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle className="w-6 h-6 text-slate-400" />
+                  <div className="text-center py-6 sm:py-8">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
                     </div>
-                    <p className="text-slate-500 brand-subtitle">No recent completions</p>
+                    <p className="text-slate-500 brand-subtitle text-sm sm:text-base">No recent completions</p>
                   </div>
                 ) : (
                   recentCompletions.map((completion, index) => (
                     <div
                       key={completion.id}
-                      className="glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                      className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
                       style={{ animationDelay: `${1000 + index * 100}ms` }}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-slate-900 brand-header mb-2">{completion.task_title}</h4>
-                          <div className="flex items-center mb-2 text-sm text-slate-600">
-                            <User className="w-4 h-4 mr-2" />
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                        <div className="flex-1 mb-3 sm:mb-0">
+                          <h4 className="font-semibold text-slate-900 brand-header mb-2 text-sm sm:text-base">{completion.task_title}</h4>
+                          <div className="flex items-center mb-2 text-xs sm:text-sm text-slate-600">
+                            <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                             <span className="brand-subtitle">{completion.completed_by_name}</span>
-                            <Star className="w-4 h-4 ml-3 text-gold-500" />
+                            <Star className="w-3 h-3 sm:w-4 sm:h-4 ml-2 sm:ml-3 text-gold-500" />
                           </div>
-                          <div className="flex items-center mb-3 text-sm text-slate-600">
-                            <Calendar className="w-4 h-4 mr-2" />
+                          <div className="flex items-center mb-3 text-xs sm:text-sm text-slate-600">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                             <span className="brand-subtitle">{formatDate(completion.completed_at)}</span>
                           </div>
                           {completion.notes && (
-                            <div className="mt-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200">
-                              <span className="font-medium text-slate-700">Note: </span>
-                              <span className="text-slate-600 brand-subtitle">{completion.notes}</span>
+                            <div className="mt-3 p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg sm:rounded-xl border border-slate-200">
+                              <span className="font-medium text-slate-700 text-xs sm:text-sm">Note: </span>
+                              <span className="text-slate-600 brand-subtitle text-xs sm:text-sm">{completion.notes}</span>
                             </div>
                           )}
                         </div>
-                        <div className="ml-6 flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                        <div className="flex items-center justify-center sm:justify-start sm:ml-6 space-x-2 sm:space-x-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                           </div>
                           {completion.has_photo && (
-                            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                              <span className="text-lg">📷</span>
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                              <span className="text-sm sm:text-lg">📷</span>
                             </div>
                           )}
-                          <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          <div className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                             +10 XP
                           </div>
                         </div>
@@ -667,23 +667,23 @@ export default function TeamActivity() {
             </div>
 
             {/* User Performance with Gamification */}
-            <div className="glass rounded-3xl p-8 animate-fade-in-up animation-delay-1000">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-                  <Users className="w-5 h-5 text-white" />
+            <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 animate-fade-in-up animation-delay-1000">
+              <div className="flex items-center mb-4 sm:mb-6">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center mr-3">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 brand-header">Team Performance Leaderboard</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 brand-header">Team Performance Leaderboard</h3>
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {userActivity.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Users className="w-6 h-6 text-slate-400" />
+                  <div className="text-center py-6 sm:py-8">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <Users className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
                     </div>
-                    <p className="text-slate-500 brand-subtitle">No team activity data</p>
+                    <p className="text-slate-500 brand-subtitle text-sm sm:text-base">No team activity data</p>
                   </div>
                 ) : (
                   userActivity
@@ -695,69 +695,69 @@ export default function TeamActivity() {
                       return (
                         <div
                           key={user.user_id}
-                          className={`glass rounded-2xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up ${
+                          className={`glass rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up ${
                             isTopPerformer 
                               ? 'ring-2 ring-gold-200 bg-gradient-to-br from-gold-50 to-gold-100' 
                               : ''
                           }`}
                           style={{ animationDelay: `${1100 + index * 100}ms` }}
                         >
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4">
+                            <div className="flex items-center mb-2 sm:mb-0">
                               {isTopPerformer && (
-                                <div className="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center mr-3">
-                                  <Trophy className="w-4 h-4 text-white" />
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gold-500 rounded-md sm:rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                                 </div>
                               )}
-                              <h4 className="font-bold text-slate-900 brand-header">{user.user_name}</h4>
+                              <h4 className="font-bold text-slate-900 brand-header text-sm sm:text-base">{user.user_name}</h4>
                               {streak && (
-                                <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-100 to-red-100 ${streak.color} flex items-center`}>
-                                  {streak.emoji} {streak.text}
+                                <span className={`ml-2 sm:ml-3 px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-100 to-red-100 ${streak.color} flex items-center`}>
+                                  {streak.emoji} <span className="hidden sm:inline ml-1">{streak.text}</span>
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center space-x-3">
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPerformanceColor(user.completion_rate)}`}>
+                            <div className="flex items-center justify-between sm:justify-start space-x-2 sm:space-x-3">
+                              <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getPerformanceColor(user.completion_rate)}`}>
                                 {user.completion_rate}% Complete
                               </span>
                               {index < 3 && (
-                                <span className="text-2xl">
+                                <span className="text-lg sm:text-2xl">
                                   {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                                 </span>
                               )}
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-6 mb-4">
+                          <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-3 sm:mb-4">
                             <div className="text-center">
-                              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <span className="text-lg font-bold text-green-600">{user.completed_today}</span>
+                              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+                                <span className="text-sm sm:text-lg font-bold text-green-600">{user.completed_today}</span>
                               </div>
-                              <p className="text-sm text-slate-600 brand-subtitle">Today</p>
+                              <p className="text-xs sm:text-sm text-slate-600 brand-subtitle">Today</p>
                             </div>
                             <div className="text-center">
-                              <div className="w-12 h-12 bg-gold-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <span className="text-lg font-bold text-gold-600">{user.pending_tasks}</span>
+                              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gold-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+                                <span className="text-sm sm:text-lg font-bold text-gold-600">{user.pending_tasks}</span>
                               </div>
-                              <p className="text-sm text-slate-600 brand-subtitle">Pending</p>
+                              <p className="text-xs sm:text-sm text-slate-600 brand-subtitle">Pending</p>
                             </div>
                             <div className="text-center">
-                              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <span className="text-lg font-bold text-red-600">{user.overdue_tasks}</span>
+                              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+                                <span className="text-sm sm:text-lg font-bold text-red-600">{user.overdue_tasks}</span>
                               </div>
-                              <p className="text-sm text-slate-600 brand-subtitle">Overdue</p>
+                              <p className="text-xs sm:text-sm text-slate-600 brand-subtitle">Overdue</p>
                             </div>
                           </div>
                           
                           {/* Enhanced Progress Bar */}
                           <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
+                            <div className="flex justify-between text-xs sm:text-sm">
                               <span className="text-slate-600 brand-subtitle">Completion Rate</span>
                               <span className="font-semibold text-slate-900">{user.completion_rate}%</span>
                             </div>
-                            <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                            <div className="w-full bg-slate-200 rounded-full h-2 sm:h-3 overflow-hidden">
                               <div 
-                                className={`h-3 rounded-full transition-all duration-500 ${
+                                className={`h-2 sm:h-3 rounded-full transition-all duration-500 ${
                                   user.completion_rate >= 80 ? 'bg-gradient-to-r from-green-400 to-green-500' :
                                   user.completion_rate >= 60 ? 'bg-gradient-to-r from-gold-400 to-gold-500' : 'bg-gradient-to-r from-red-400 to-red-500'
                                 }`}
@@ -777,29 +777,31 @@ export default function TeamActivity() {
 
       {/* Update Details Popup Modal */}
       {selectedUpdate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="glass max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl animate-scale-in">
-            <div className="p-8">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 animate-fade-in">
+          <div className="glass max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-3xl animate-scale-in">
+            <div className="p-4 sm:p-6 lg:p-8">
               {/* Header with close button */}
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mr-4">
+              <div className="flex items-start justify-between mb-4 sm:mb-6">
+                <div className="flex items-center flex-1 mr-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg sm:rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
                     {getUpdateIcon(selectedUpdate.type)}
                   </div>
-                  <div>
-                    <h3 className={`text-xl font-bold brand-header ${
+                  <div className="min-w-0 flex-1">
+                    <h3 className={`text-lg sm:text-xl font-bold brand-header ${
                       selectedUpdate.requires_acknowledgment ? 'text-red-800' : 'text-slate-900'
-                    }`}>
+                    } break-words`}>
                       {getText(selectedUpdate.title_en || selectedUpdate.title, selectedUpdate.title_es, selectedUpdate.title_tr)}
                     </h3>
-                    <div className="flex items-center text-sm text-slate-500 mt-1">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{formatDate(selectedUpdate.timestamp)}</span>
-                      <span className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(selectedUpdate.priority)}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-slate-500 mt-1 space-y-1 sm:space-y-0 sm:space-x-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                        <span>{formatDate(selectedUpdate.timestamp)}</span>
+                      </div>
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getUpdatePriorityColor(selectedUpdate.priority)} self-start`}>
                         {selectedUpdate.priority.toUpperCase()}
                       </span>
                       {selectedUpdate.requires_acknowledgment && (
-                        <span className="ml-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200">
+                        <span className="px-2 sm:px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200 self-start">
                           🚨 SIGNATURE REQUIRED
                         </span>
                       )}
@@ -808,19 +810,19 @@ export default function TeamActivity() {
                 </div>
                 <button
                   onClick={() => setSelectedUpdate(null)}
-                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
 
               {/* Photo display if exists */}
               {selectedUpdate.photo_url && (
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <img 
                     src={selectedUpdate.photo_url} 
                     alt="Update photo" 
-                    className="w-full max-h-80 object-contain rounded-xl bg-slate-50 shadow-md"
+                    className="w-full max-h-60 sm:max-h-80 object-contain rounded-lg sm:rounded-xl bg-slate-50 shadow-md"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -829,17 +831,17 @@ export default function TeamActivity() {
               )}
 
               {/* Full message content */}
-              <div className="prose prose-slate max-w-none mb-6">
-                <p className="text-slate-700 brand-subtitle leading-relaxed whitespace-pre-wrap">
+              <div className="prose prose-slate max-w-none mb-4 sm:mb-6">
+                <p className="text-slate-700 brand-subtitle leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
                   {getText(selectedUpdate.message_en || selectedUpdate.message, selectedUpdate.message_es, selectedUpdate.message_tr)}
                 </p>
               </div>
 
               {/* Action buttons */}
-              <div className="flex items-center justify-between pt-6 border-t border-slate-200">
-                <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 sm:pt-6 border-t border-slate-200 space-y-3 sm:space-y-0">
+                <div className="flex items-center space-x-3 sm:space-x-4">
                   {selectedUpdate.requires_acknowledgment ? (
-                    <button className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium">
+                    <button className="min-h-[44px] px-4 sm:px-6 py-2 sm:py-3 bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors font-medium text-sm sm:text-base w-full sm:w-auto">
                       Sign & Acknowledge
                     </button>
                   ) : (
@@ -849,7 +851,7 @@ export default function TeamActivity() {
                 {!selectedUpdate.requires_acknowledgment && (
                   <button
                     onClick={() => markUpdateAsUnread(selectedUpdate.id)}
-                    className="text-sm text-slate-500 hover:text-slate-700 transition-colors underline"
+                    className="min-h-[44px] px-3 py-2 text-sm text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors w-full sm:w-auto"
                   >
                     Mark as unread
                   </button>

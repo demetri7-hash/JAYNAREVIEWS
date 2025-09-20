@@ -268,6 +268,66 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
     }
   };
 
+  const handleUpdateWorkflow = async () => {
+    if (!editingWorkflow) return;
+    
+    try {
+      // Update the workflow
+      const workflowResponse = await fetch('/api/workflows', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingWorkflow.id,
+          ...formData
+        })
+      });
+
+      if (!workflowResponse.ok) {
+        const errorData = await workflowResponse.json();
+        throw new Error(errorData.error || 'Failed to update workflow');
+      }
+
+      // Handle workflow tasks updates
+      // First, remove all existing workflow tasks for this workflow
+      const deleteResponse = await fetch(`/api/workflow-tasks?workflow_id=${editingWorkflow.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!deleteResponse.ok) {
+        console.warn('Failed to delete existing workflow tasks');
+      }
+
+      // Then add the new tasks
+      if (workflowTasks.length > 0) {
+        for (const workflowTask of workflowTasks) {
+          const taskResponse = await fetch('/api/workflow-tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              workflow_id: editingWorkflow.id,
+              task_id: workflowTask.task_id,
+              order_index: workflowTask.order_index,
+              is_required: workflowTask.is_required
+            })
+          });
+
+          if (!taskResponse.ok) {
+            console.error('Failed to add task to workflow:', workflowTask.task?.title);
+          }
+        }
+      }
+      
+      onMessage({ type: 'success', text: 'Workflow updated successfully' });
+      setShowCreateForm(false);
+      setEditingWorkflow(null);
+      resetForm();
+      fetchWorkflows();
+    } catch (error) {
+      console.error('Error updating workflow:', error);
+      onMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to update workflow' });
+    }
+  };
+
   const handleCreateTask = async () => {
     try {
       const response = await fetch('/api/tasks', {
@@ -765,6 +825,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
             <button
               onClick={() => {
                 setShowCreateForm(false);
+                setEditingWorkflow(null);
                 resetForm();
               }}
               className="px-4 py-2 text-gray-600 hover:text-gray-800"
@@ -772,7 +833,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
               Cancel
             </button>
             <button
-              onClick={handleCreateWorkflow}
+              onClick={editingWorkflow ? handleUpdateWorkflow : handleCreateWorkflow}
               disabled={!formData.name.trim()}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -842,7 +903,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
 
               <div className="flex items-center text-sm text-gray-600">
                 <Settings className="h-4 w-4 mr-2" />
-                {workflow.tasks?.length || 0} task{(workflow.tasks?.length || 0) !== 1 ? 's' : ''}
+                {workflow.task_count || 0} task{(workflow.task_count || 0) !== 1 ? 's' : ''}
               </div>
             </div>
 

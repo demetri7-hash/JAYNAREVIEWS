@@ -117,19 +117,25 @@ export async function DELETE(request: NextRequest) {
 
     const url = new URL(request.url);
     const workflowTaskId = url.searchParams.get('id');
+    const workflowId = url.searchParams.get('workflow_id');
 
-    if (!workflowTaskId) {
-      return NextResponse.json({ error: 'Workflow task ID required' }, { status: 400 });
+    if (!workflowTaskId && !workflowId) {
+      return NextResponse.json({ error: 'Workflow task ID or workflow ID required' }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('workflow_tasks')
-      .delete()
-      .eq('id', workflowTaskId);
+    let deleteQuery = supabaseAdmin.from('workflow_tasks').delete();
+
+    if (workflowTaskId) {
+      deleteQuery = deleteQuery.eq('id', workflowTaskId);
+    } else if (workflowId) {
+      deleteQuery = deleteQuery.eq('workflow_id', workflowId);
+    }
+
+    const { error } = await deleteQuery;
 
     if (error) {
-      console.error('Error deleting workflow task:', error);
-      return NextResponse.json({ error: 'Failed to delete workflow task' }, { status: 500 });
+      console.error('Error deleting workflow task(s):', error);
+      return NextResponse.json({ error: 'Failed to delete workflow task(s)' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

@@ -24,10 +24,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Get all workflows with task counts - use simpler query to avoid join issues
+    // Get all workflows with task counts
     const { data: workflows, error } = await supabase
       .from('workflows')
-      .select('*')
+      .select(`
+        *,
+        workflow_tasks(count)
+      `)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -35,7 +38,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch workflows' }, { status: 500 });
     }
 
-    return NextResponse.json({ workflows });
+    // Transform the data to include task_count
+    const workflowsWithCounts = workflows?.map(workflow => ({
+      ...workflow,
+      task_count: workflow.workflow_tasks?.[0]?.count || 0
+    })) || [];
+
+    return NextResponse.json({ workflows: workflowsWithCounts });
 
   } catch (error) {
     console.error('Workflows API error:', error);
@@ -135,6 +144,80 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Create workflow API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const supabase = supabaseAdmin;
+    
+    // Check if user has manager permissions
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, role')
+      .eq('email', session.user.email)
+      .single();
+
+    if (!profile || !['manager', 'admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { id, ...updateData } = body;
+    
+    if (!id) {
+      return NextResponse.json({ 
+        error: 'Workflow ID is required for updates' 
+      }, { status: 400 });
+    }
+
+    if (!updateData.name) {
+      return NextResponse.json({ 
+        error: 'Missing required fields: name is required' 
+      }, { status: 400 });
+    }
+
+    // Update the workflow
+    const { data: workflow, error: workflowError } = await supabase
+      .from('workflows')
+      .update({
+        name: updateData.name,
+        description: updateData.description || null,
+        departments: updateData.departments || [],
+        roles: updateData.roles || [],
+        assigned_users: updateData.assigned_users || [],
+        is_repeatable: updateData.is_repeatable || false,
+        recurrence_type: updateData.recurrence_type || null,
+        due_date: updateData.due_date || null,
+        due_time: updateData.due_time || null,
+        is_active: updateData.is_active !== undefined ? updateData.is_active : true,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (workflowError) {
+      console.error('Error updating workflow:', workflowError);
+      return NextResponse.json({ 
+        error: 'Failed to update workflow', 
+        details: workflowError.message 
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({ 
+      workflow,
+      message: 'Workflow updated successfully' 
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Update workflow API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

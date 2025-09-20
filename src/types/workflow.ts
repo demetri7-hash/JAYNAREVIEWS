@@ -17,6 +17,9 @@ export interface Workflow {
   created_at: string;
   updated_at: string;
   
+  // Task count for display purposes
+  task_count?: number;
+  
   // Populated through joins
   tasks?: WorkflowTask[];
   creator?: {

@@ -716,6 +716,198 @@ export const staticTranslations = {
     en: 'Require staff to upload photos when completing this task',
     es: 'Requerir que el personal suba fotos al completar esta tarea',
     tr: 'Bu görevi tamamlarken personelin fotoğraf yüklemesini gerektir'
+  },
+
+  // Workflow Management translations (unique ones only)
+  workflows: {
+    en: 'Workflows',
+    es: 'Flujos de Trabajo',
+    tr: 'İş Akışları'
+  },
+  workflowManagement: {
+    en: 'Workflow Management',
+    es: 'Gestión de Flujos de Trabajo', 
+    tr: 'İş Akışı Yönetimi'
+  },
+  createWorkflow: {
+    en: 'Create Workflow',
+    es: 'Crear Flujo de Trabajo',
+    tr: 'İş Akışı Oluştur'
+  },
+  workflowName: {
+    en: 'Workflow Name',
+    es: 'Nombre del Flujo de Trabajo',
+    tr: 'İş Akışı Adı'
+  },
+  enterWorkflowName: {
+    en: 'Enter workflow name',
+    es: 'Ingrese el nombre del flujo de trabajo',
+    tr: 'İş akışı adını girin'
+  },
+  describeWorkflow: {
+    en: 'Describe what this workflow accomplishes',
+    es: 'Describa lo que logra este flujo de trabajo',
+    tr: 'Bu iş akışının ne yaptığını açıklayın'
+  },
+  repeatable: {
+    en: 'Repeatable',
+    es: 'Repetible',
+    tr: 'Tekrarlanabilir'
+  },
+  recurrenceType: {
+    en: 'Recurrence Type',
+    es: 'Tipo de Recurrencia',
+    tr: 'Tekrar Tipi'
+  },
+  inProgress: {
+    en: 'In Progress',
+    es: 'En Progreso',
+    tr: 'Devam Ediyor'
+  },
+  completedStatus: {
+    en: 'Completed',
+    es: 'Completado',
+    tr: 'Tamamlandı'
+  },
+  continueWorkflow: {
+    en: 'Continue',
+    es: 'Continuar',
+    tr: 'Devam Et'
+  },
+  viewDetails: {
+    en: 'View Details',
+    es: 'Ver Detalles',
+    tr: 'Detayları Gör'
+  },
+  startWorkflow: {
+    en: 'Start Workflow',
+    es: 'Iniciar Flujo de Trabajo',
+    tr: 'İş Akışını Başlat'
+  },
+  markComplete: {
+    en: 'Mark Complete',
+    es: 'Marcar como Completado',
+    tr: 'Tamamlandı Olarak İşaretle'
+  },
+  completeWithDetails: {
+    en: 'Complete with Details',
+    es: 'Completar con Detalles',
+    tr: 'Detaylarla Tamamla'
+  },
+  progress: {
+    en: 'Progress',
+    es: 'Progreso',
+    tr: 'İlerleme'
+  },
+  tasksWord: {
+    en: 'tasks',
+    es: 'tareas',
+    tr: 'görev'
+  },
+  tasksCompleted: {
+    en: 'tasks completed',
+    es: 'tareas completadas',
+    tr: 'görev tamamlandı'
+  },
+  overallProgress: {
+    en: 'Overall Progress',
+    es: 'Progreso General',
+    tr: 'Genel İlerleme'
+  },
+  nextTask: {
+    en: 'Next Task:',
+    es: 'Siguiente Tarea:',
+    tr: 'Sonraki Görev:'
+  },
+  currentTask: {
+    en: 'Current Task',
+    es: 'Tarea Actual',
+    tr: 'Mevcut Görev'
+  },
+  allTasks: {
+    en: 'All Tasks',
+    es: 'Todas las Tareas',
+    tr: 'Tüm Görevler'
+  },
+  noWorkflowsAssigned: {
+    en: 'No workflows assigned',
+    es: 'No hay flujos de trabajo asignados',
+    tr: 'Atanmış iş akışı yok'
+  },
+  noWorkflowsMessage: {
+    en: 'You do not have any workflows assigned at the moment.',
+    es: 'No tienes flujos de trabajo asignados en este momento.',
+    tr: 'Şu anda size atanmış herhangi bir iş akışı bulunmamaktadır.'
+  },
+  readyToStart: {
+    en: 'Ready to Start?',
+    es: '¿Listo para Comenzar?',
+    tr: 'Başlamaya Hazır mısın?'
+  },
+  readyToStartMessage: {
+    en: 'Click the button below to begin this workflow.',
+    es: 'Haga clic en el botón de abajo para comenzar este flujo de trabajo.',
+    tr: 'Bu iş akışını başlatmak için aşağıdaki düğmeye tıklayın.'
+  },
+  workflowCompleted: {
+    en: 'Workflow Completed!',
+    es: '¡Flujo de Trabajo Completado!',
+    tr: 'İş Akışı Tamamlandı!'
+  },
+  workflowCompletedMessage: {
+    en: 'Great job! You have successfully completed all tasks in this workflow.',
+    es: '¡Buen trabajo! Has completado exitosamente todas las tareas en este flujo de trabajo.',
+    tr: 'Harika iş! Bu iş akışındaki tüm görevleri başarıyla tamamladınız.'
+  },
+  completedOn: {
+    en: 'Completed on',
+    es: 'Completado el',
+    tr: 'Tamamlanma tarihi'
+  },
+  assigned: {
+    en: 'Assigned',
+    es: 'Asignado',
+    tr: 'Atandı'
+  },
+  started: {
+    en: 'Started',
+    es: 'Iniciado', 
+    tr: 'Başlatıldı'
+  },
+  previousTask: {
+    en: 'Previous Task',
+    es: 'Tarea Anterior',
+    tr: 'Önceki Görev'
+  },
+  nextTaskNav: {
+    en: 'Next Task',
+    es: 'Siguiente Tarea',
+    tr: 'Sonraki Görev'
+  },
+  backToMyTasks: {
+    en: 'Back to My Tasks',
+    es: 'Volver a Mis Tareas',
+    tr: 'Görevlerime Dön'
+  },
+  workflowNotFound: {
+    en: 'Workflow Not Found',
+    es: 'Flujo de Trabajo No Encontrado',
+    tr: 'İş Akışı Bulunamadı'
+  },
+  workflowNotFoundMessage: {
+    en: 'The workflow you are looking for could not be found.',
+    es: 'El flujo de trabajo que busca no se pudo encontrar.',
+    tr: 'Aradığınız iş akışı bulunamadı.'
+  },
+  loadingWorkflow: {
+    en: 'Loading workflow...',
+    es: 'Cargando flujo de trabajo...',
+    tr: 'İş akışı yükleniyor...'
+  },
+  failedToLoadWorkflows: {
+    en: 'Failed to fetch workflows',
+    es: 'Error al obtener flujos de trabajo',
+    tr: 'İş akışları yüklenemedi'
   }
 };
 

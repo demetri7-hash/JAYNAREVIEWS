@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { MyWorkflowsProps } from '@/types/workflow';
+import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 
 interface WorkflowAssignmentWithProgress {
   id: string;
@@ -51,6 +53,8 @@ export default function MyWorkflowCards({ userId: _userId, userRole: _userRole }
   const [assignments, setAssignments] = useState<WorkflowAssignmentWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all');
+  const router = useRouter();
+  const { language } = useLanguage();
 
   useEffect(() => {
     fetchMyWorkflows();
@@ -310,7 +314,7 @@ export default function MyWorkflowCards({ userId: _userId, userRole: _userRole }
                         variant="outline"
                         onClick={() => {
                           // Navigate to workflow details/task completion page
-                          window.location.href = `/workflows/${assignment.workflow_id}?assignment=${assignment.id}`;
+                          router.push(`/workflows/${assignment.workflow_id}?assignment=${assignment.id}`);
                         }}
                       >
                         {assignment.status === 'completed' ? 'View Details' : 'Continue'}

@@ -54,8 +54,14 @@ export default function EnhancedUserManagement({ users, setUsers }: EnhancedUser
   useEffect(() => {
     loadAllUserOverrides();
     loadToastEmployees();
-    loadToastMatchings();
   }, [users]);
+
+  // Load Toast matchings after Toast employees are loaded
+  useEffect(() => {
+    if (toastEmployees.length > 0) {
+      loadToastMatchings();
+    }
+  }, [toastEmployees]);
 
   const loadAllUserOverrides = async () => {
     const overrides: Record<string, Department[]> = {};
@@ -310,7 +316,8 @@ export default function EnhancedUserManagement({ users, setUsers }: EnhancedUser
         {filteredUsers.map(user => {
           const isArchived = user.employee_status === 'archived';
           const toastEmployee = toastMatchings[user.id];
-          const hasToastMatch = !!toastEmployee;
+          const hasToastMatch = !!user.toast_employee_id; // Check database value first
+          const toastEmployeeLoadedFromAPI = !!toastEmployee; // Check if we have details from API
           
           return (
             <Card key={user.id} className={`${savedUser === user.id ? "ring-2 ring-green-500 transition-all duration-500" : ""} ${isArchived ? "bg-gray-50 border-gray-300" : ""}`}>
@@ -333,8 +340,17 @@ export default function EnhancedUserManagement({ users, setUsers }: EnhancedUser
                         <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           <div>
-                            <span className="font-medium">Linked to TOAST: {toastEmployee.name}</span>
-                            {toastEmployee.jobTitle && <span className="text-green-600 ml-1">({toastEmployee.jobTitle})</span>}
+                            {toastEmployeeLoadedFromAPI ? (
+                              <>
+                                <span className="font-medium">Linked to TOAST: {toastEmployee.name}</span>
+                                {toastEmployee.jobTitle && <span className="text-green-600 ml-1">({toastEmployee.jobTitle})</span>}
+                              </>
+                            ) : (
+                              <>
+                                <span className="font-medium">Linked to TOAST ID: {user.toast_employee_id}</span>
+                                <span className="text-green-600 ml-1">(Details loading...)</span>
+                              </>
+                            )}
                           </div>
                         </div>
                       ) : (

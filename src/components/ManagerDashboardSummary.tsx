@@ -15,6 +15,41 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+// API Response Types
+interface UserActivity {
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  completed_today: number;
+  pending_tasks: number;
+  overdue_tasks: number;
+  completion_rate: number;
+}
+
+interface RecentCompletion {
+  id: string;
+  task_title: string;
+  completed_by_name: string;
+  completed_at: string;
+  notes: string | null;
+  has_photo: boolean;
+}
+
+interface TeamActivityStats {
+  totalTasks: number;
+  completedToday: number;
+  pendingTasks: number;
+  overdueTasks: number;
+  totalUsers: number;
+}
+
+interface TeamActivityResponse {
+  success: boolean;
+  stats: TeamActivityStats;
+  recentCompletions: RecentCompletion[];
+  userActivity: UserActivity[];
+}
+
 interface ManagerStats {
   totalEmployees: number;
   activeEmployees: number;
@@ -83,7 +118,7 @@ export default function ManagerDashboardSummary() {
       // Use the existing team-activity API for manager statistics
       const teamActivityResponse = await fetch('/api/team-activity');
       if (teamActivityResponse.ok) {
-        const teamData = await teamActivityResponse.json();
+        const teamData: TeamActivityResponse = await teamActivityResponse.json();
         if (teamData.success) {
           // Map team activity data to manager stats format
           setStats({
@@ -96,13 +131,13 @@ export default function ManagerDashboardSummary() {
             weeklyCompletionRate: teamData.stats.completedToday > 0 ? 
               Math.round((teamData.stats.completedToday / teamData.stats.totalTasks) * 100) : 0,
             departmentEfficiency: teamData.userActivity.length > 0 ?
-              Math.round(teamData.userActivity.reduce((sum: number, user: any) => sum + user.completion_rate, 0) / teamData.userActivity.length) : 0
+              Math.round(teamData.userActivity.reduce((sum: number, user: UserActivity) => sum + user.completion_rate, 0) / teamData.userActivity.length) : 0
           });
 
           // Use recent completions as recent activity
-          setRecentActivity(teamData.recentCompletions.slice(0, 5).map((completion: any) => ({
+          setRecentActivity(teamData.recentCompletions.slice(0, 5).map((completion: RecentCompletion) => ({
             id: completion.id,
-            type: 'task_completed',
+            type: 'task_completed' as const,
             description: `${completion.completed_by_name} completed "${completion.task_title}"`,
             timestamp: completion.completed_at,
             user: completion.completed_by_name

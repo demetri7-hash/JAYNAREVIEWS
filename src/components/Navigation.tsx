@@ -90,43 +90,13 @@ export function Navigation({ currentPage }: NavigationProps) {
     }
   ]
 
-  // Additional navigation items for managers
+  // Manager-only navigation items
   const managerNavItems = [
     {
       icon: Settings,
       label: 'Manager Dashboard',
       path: '/manager-dashboard',
       id: 'manager-dashboard'
-    },
-    {
-      icon: ClipboardList,
-      label: 'Create Task',
-      path: '/create-task',
-      id: 'create-task'
-    },
-    {
-      icon: UserCog,
-      label: 'Employee Management',
-      path: '/employee-management',
-      id: 'employee-management'
-    },
-    {
-      icon: ArrowRightLeft,
-      label: 'Pending Transfers',
-      path: '/pending-transfers',
-      id: 'pending-transfers'
-    },
-    {
-      icon: BarChart3,
-      label: 'Weekly Reports',
-      path: '/weekly-reports',
-      id: 'weekly-reports'
-    },
-    {
-      icon: Bell,
-      label: 'Update History',
-      path: '/update-history',
-      id: 'update-history'
     }
   ]
 

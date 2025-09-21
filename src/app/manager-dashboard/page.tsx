@@ -12,6 +12,10 @@ import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
 import { WorkflowManagementTab } from '@/components/WorkflowManagementTab';
+import TaskTransfersTab from '@/components/TaskTransfersTab';
+import EmployeeManagementTab from '@/components/EmployeeManagementTab';
+import WeeklyReportsTab from '@/components/WeeklyReportsTab';
+import TaskCreationTab from '@/components/TaskCreationTab';
 
 interface TaskWithAssignee extends ChecklistItem {
   assignee?: {
@@ -37,7 +41,7 @@ export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { getText } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates' | 'workflows'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'roles' | 'updates' | 'workflows' | 'transfers' | 'employee-mgmt' | 'reports' | 'task-creation'>('tasks');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -360,6 +364,46 @@ export default function ManagerDashboard() {
                   >
                     Workflow Management
                   </button>
+                  <button
+                    onClick={() => setActiveTab('transfers')}
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      activeTab === 'transfers'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    Task Transfers
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('employee-mgmt')}
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      activeTab === 'employee-mgmt'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    Employee Management
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('reports')}
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      activeTab === 'reports'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    Weekly Reports
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('task-creation')}
+                    className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      activeTab === 'task-creation'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    Create Tasks
+                  </button>
                 </>
               )}
             </nav>
@@ -633,6 +677,26 @@ export default function ManagerDashboard() {
         {/* Workflow Management Tab */}
         {activeTab === 'workflows' && userRole === 'manager' && (
           <WorkflowManagementTab onMessage={handleMessage} />
+        )}
+
+        {/* Task Transfers Tab */}
+        {activeTab === 'transfers' && userRole === 'manager' && (
+          <TaskTransfersTab />
+        )}
+
+        {/* Employee Management Tab */}
+        {activeTab === 'employee-mgmt' && userRole === 'manager' && (
+          <EmployeeManagementTab />
+        )}
+
+        {/* Weekly Reports Tab */}
+        {activeTab === 'reports' && userRole === 'manager' && (
+          <WeeklyReportsTab />
+        )}
+
+        {/* Task Creation Tab */}
+        {activeTab === 'task-creation' && userRole === 'manager' && (
+          <TaskCreationTab />
         )}
       </div>
     </div>

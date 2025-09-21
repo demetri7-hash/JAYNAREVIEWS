@@ -97,6 +97,36 @@ export function Navigation({ currentPage }: NavigationProps) {
       label: 'Manager Dashboard',
       path: '/manager-dashboard',
       id: 'manager-dashboard'
+    },
+    {
+      icon: Workflow,
+      label: 'Workflows',
+      path: '/manager/workflows',
+      id: 'manager-workflows'
+    },
+    {
+      icon: UserCog,
+      label: 'Employee Management',
+      path: '/manager/employee-management',
+      id: 'manager-employees'
+    },
+    {
+      icon: ArrowRightLeft,
+      label: 'Task Transfers',
+      path: '/manager/task-transfers',
+      id: 'manager-transfers'
+    },
+    {
+      icon: BarChart3,
+      label: 'Reports',
+      path: '/manager/reports',
+      id: 'manager-reports'
+    },
+    {
+      icon: ClipboardList,
+      label: 'Create Tasks',
+      path: '/manager/create-tasks',
+      id: 'manager-create-tasks'
     }
   ]
 

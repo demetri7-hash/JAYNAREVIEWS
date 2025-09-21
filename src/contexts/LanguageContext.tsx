@@ -257,14 +257,14 @@ export const staticTranslations = {
     tr: 'Kullanıcı güncellenirken hata oluştu. Lütfen tekrar deneyin.'
   },
   myTasks: {
-    en: 'My Tasks',
-    es: 'Mis Tareas',
-    tr: 'Görevlerim'
+    en: 'My Workflows',
+    es: 'Mis Flujos de Trabajo',
+    tr: 'İş Akışlarım'
   },
   viewCompleteAssignedTasks: {
-    en: 'View and complete your assigned tasks',
-    es: 'Ver y completar tus tareas asignadas',
-    tr: 'Atanan görevlerinizi görün ve tamamlayın'
+    en: 'View and complete your assigned workflows',
+    es: 'Ver y completar tus flujos de trabajo asignados',
+    tr: 'Atanan iş akışlarınızı görün ve tamamlayın'
   },
   pendingTasks: {
     en: 'Pending',
@@ -277,9 +277,9 @@ export const staticTranslations = {
     tr: 'Bugün tamamlanan'
   },
   viewMyTasks: {
-    en: 'View My Tasks',
-    es: 'Ver Mis Tareas',
-    tr: 'Görevlerimi Gör'
+    en: 'View My Workflows',
+    es: 'Ver Mis Flujos de Trabajo',
+    tr: 'İş Akışlarımı Gör'
   },
   createTask: {
     en: 'Create Task',
@@ -604,7 +604,7 @@ export const staticTranslations = {
     tr: 'Beklenmeyen bir hata oluştu'
   },
 
-  // My Tasks Page translations
+  // Workflows Page translations
   all: {
     en: 'All',
     es: 'Todos',
@@ -885,9 +885,9 @@ export const staticTranslations = {
     tr: 'Sonraki Görev'
   },
   backToMyTasks: {
-    en: 'Back to My Tasks',
-    es: 'Volver a Mis Tareas',
-    tr: 'Görevlerime Dön'
+    en: 'Back to Workflows',
+    es: 'Volver a Flujos de Trabajo',
+    tr: 'İş Akışlarına Dön'
   },
   workflowNotFound: {
     en: 'Workflow Not Found',

@@ -71,6 +71,18 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
+    // Filter out completed workflows from previous days
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+    
+    // For completed workflows, only show those completed today
+    if (status === 'completed') {
+      query = query.gte('completed_at', startOfToday);
+    } else if (!status || status === 'all') {
+      // For 'all' status, include completed workflows only if they were completed today
+      // We'll filter this in post-processing since we can't do complex OR queries easily
+    }
+
     const { data: assignments, error } = await query;
 
     if (error) {
@@ -78,8 +90,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch workflows' }, { status: 500 });
     }
 
+    // Filter out completed workflows from previous days when status is 'all'
+    let filteredAssignments = assignments || [];
+    if (!status || status === 'all') {
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      
+      filteredAssignments = assignments?.filter(assignment => {
+        // Keep non-completed workflows
+        if (assignment.status !== 'completed') {
+          return true;
+        }
+        // For completed workflows, only keep those completed today
+        return assignment.completed_at && assignment.completed_at >= startOfToday;
+      }) || [];
+    }
+
     // Calculate completion progress for each assignment
-    const enrichedAssignments = assignments?.map(assignment => {
+    const enrichedAssignments = filteredAssignments?.map(assignment => {
       // The workflow relationship returns an array, so we take the first item
       const workflowData = Array.isArray(assignment.workflow) ? assignment.workflow[0] : assignment.workflow;
       const completions = assignment.workflow_task_completions || [];

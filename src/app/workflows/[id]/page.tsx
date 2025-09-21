@@ -164,14 +164,14 @@ export default function WorkflowExecutionPage() {
   if (error || !assignment) {
     return (
       <>
-        <Navigation currentPage="my-tasks" />
+        <Navigation currentPage="workflows" />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="glass rounded-2xl p-8 text-center">
               <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-slate-900 mb-2">{staticTranslations.workflowNotFound[language]}</h1>
               <p className="text-slate-600 mb-6">{error || staticTranslations.workflowNotFoundMessage[language]}</p>
-              <Button onClick={() => router.push('/my-tasks')}>
+              <Button onClick={() => router.push('/workflows')}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {staticTranslations.backToMyTasks[language]}
               </Button>
@@ -188,7 +188,7 @@ export default function WorkflowExecutionPage() {
 
   return (
     <>
-      <Navigation currentPage="my-tasks" />
+      <Navigation currentPage="workflows" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 md:ml-64">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -196,7 +196,7 @@ export default function WorkflowExecutionPage() {
             <div className="flex items-center justify-between mb-4">
               <Button 
                 variant="ghost" 
-                onClick={() => router.push('/my-tasks')}
+                onClick={() => router.push('/workflows')}
                 className="text-slate-600 hover:text-slate-900"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />

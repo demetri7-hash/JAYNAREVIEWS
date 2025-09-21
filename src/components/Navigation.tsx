@@ -77,10 +77,16 @@ export function Navigation({ currentPage }: NavigationProps) {
       id: 'home'
     },
     {
+      icon: Workflow,
+      label: 'My Workflows',
+      path: '/workflows',
+      id: 'workflows'
+    },
+    {
       icon: CheckSquare,
-      label: 'My Tasks',
-      path: '/my-tasks',
-      id: 'my-tasks'
+      label: 'Finished Workflows',
+      path: '/finished-workflows',
+      id: 'finished-workflows'
     }
   ]
 
@@ -91,12 +97,6 @@ export function Navigation({ currentPage }: NavigationProps) {
       label: 'Manager Dashboard',
       path: '/manager-dashboard',
       id: 'manager-dashboard'
-    },
-    {
-      icon: Workflow,
-      label: 'Workflows',
-      path: '/workflows',
-      id: 'workflows'
     },
     {
       icon: ClipboardList,

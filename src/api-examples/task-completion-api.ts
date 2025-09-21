@@ -40,7 +40,15 @@ export async function POST(
     }
 
     // Process photo uploads
-    const uploadedPhotos = []
+    const uploadedPhotos: Array<{
+      id: string
+      filename: string
+      stored_filename: string
+      file_path: string
+      file_size: number
+      mime_type: string
+    }> = []
+    
     for (const photo of photos) {
       if (photo.size > 0) {
         const bytes = await photo.arrayBuffer()
@@ -64,7 +72,9 @@ export async function POST(
           mime_type: photo.type
         })
 
-        uploadedPhotos.push(photoRecord)
+        if (photoRecord) {
+          uploadedPhotos.push(photoRecord)
+        }
       }
     }
 
@@ -91,9 +101,15 @@ export async function POST(
 }
 
 // Database helper functions (implement based on your database)
-async function getTaskById(id: string) {
+async function getTaskById(id: string): Promise<{
+  id: string
+  status: string
+  requires_photo: boolean
+  requires_notes: boolean
+} | null> {
   // Implementation depends on your database
   // Should return task with requires_photo and requires_notes fields
+  return null // Placeholder
 }
 
 async function createTaskPhoto(photoData: {
@@ -103,22 +119,42 @@ async function createTaskPhoto(photoData: {
   file_path: string
   file_size: number
   mime_type: string
-}) {
+}): Promise<{
+  id: string
+  filename: string
+  stored_filename: string
+  file_path: string
+  file_size: number
+  mime_type: string
+} | null> {
   // Implementation depends on your database
   // Should store photo metadata and return photo record
+  return {
+    id: 'photo-id',
+    ...photoData
+  }
 }
 
 async function completeTask(completionData: {
   task_id: string
   completed_by: string
   notes: string | null
-  photos: any[]
-}) {
+  photos: Array<{
+    id: string
+    filename: string
+    stored_filename: string
+    file_path: string
+    file_size: number
+    mime_type: string
+  }>
+}): Promise<any> {
   // Implementation depends on your database
   // Should mark task as completed and store completion data
+  return { id: 'completion-id', ...completionData }
 }
 
-function getCurrentUserId() {
+function getCurrentUserId(): string {
   // Get user ID from session/auth
   // Implementation depends on your auth system
+  return 'user-id-placeholder'
 }

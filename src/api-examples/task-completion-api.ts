@@ -147,7 +147,20 @@ async function completeTask(completionData: {
     file_size: number
     mime_type: string
   }>
-}): Promise<any> {
+}): Promise<{ 
+  id: string
+  task_id: string
+  completed_by: string
+  notes: string | null
+  photos: Array<{
+    id: string
+    filename: string
+    stored_filename: string
+    file_path: string
+    file_size: number
+    mime_type: string
+  }>
+}> {
   // Implementation depends on your database
   // Should mark task as completed and store completion data
   return { id: 'completion-id', ...completionData }

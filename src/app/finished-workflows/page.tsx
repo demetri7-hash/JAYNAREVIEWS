@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { 
   Clock, 
   User, 
@@ -11,12 +12,11 @@ import {
   ChevronLeft, 
   ChevronRight,
   Eye,
-  Filter,
   Search
 } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,7 +57,12 @@ interface TaskCompletion {
   completed_at: string;
   edited_by?: string;
   edited_at?: string;
-  edit_history?: any[];
+  edit_history?: {
+    edited_by: string;
+    edited_at: string;
+    previous_notes: string;
+    new_notes: string;
+  }[];
   task: {
     id: string;
     title: string;
@@ -97,33 +102,7 @@ export default function FinishedWorkflowsPage() {
     hasMore: false
   });
 
-  useEffect(() => {
-    if (status === 'loading') return;
-
-    if (!session) {
-      router.push('/');
-      return;
-    }
-
-    // Fetch user role
-    fetch('/api/me')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.user?.role) {
-          setUserRole(data.user.role);
-        }
-      })
-      .catch(() => setUserRole(null))
-      .finally(() => fetchFinishedWorkflows());
-  }, [session, status]);
-
-  useEffect(() => {
-    if (userRole !== null) {
-      fetchFinishedWorkflows(1);
-    }
-  }, [selectedDate, searchTerm]);
-
-  const fetchFinishedWorkflows = async (page = 1) => {
+  const fetchFinishedWorkflows = useCallback(async (page = 1) => {
     try {
       setLoading(true);
       
@@ -166,7 +145,33 @@ export default function FinishedWorkflowsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, searchTerm]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    if (!session) {
+      router.push('/');
+      return;
+    }
+
+    // Fetch user role
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.user?.role) {
+          setUserRole(data.user.role);
+        }
+      })
+      .catch(() => setUserRole(null))
+      .finally(() => fetchFinishedWorkflows());
+  }, [session, status, fetchFinishedWorkflows, router]);
+
+  useEffect(() => {
+    if (userRole !== null) {
+      fetchFinishedWorkflows(1);
+    }
+  }, [selectedDate, searchTerm, userRole, fetchFinishedWorkflows]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -610,9 +615,11 @@ function WorkflowDetailModal({ assignment, userRole, onClose, onUpdate }: Workfl
                       <h5 className="font-medium text-slate-900 mb-2">Photo</h5>
                       {completion.photo_url ? (
                         <div className="bg-slate-50 p-3 rounded-lg">
-                          <img 
+                          <Image 
                             src={completion.photo_url} 
                             alt="Task completion photo"
+                            width={400}
+                            height={200}
                             className="w-full h-48 object-cover rounded-lg"
                           />
                         </div>

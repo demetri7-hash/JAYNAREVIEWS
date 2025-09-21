@@ -101,7 +101,7 @@ export async function POST(
 }
 
 // Database helper functions (implement based on your database)
-async function getTaskById(id: string): Promise<{
+async function getTaskById(_id: string): Promise<{
   id: string
   status: string
   requires_photo: boolean

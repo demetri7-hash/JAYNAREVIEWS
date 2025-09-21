@@ -6,16 +6,13 @@ import {
   CheckCircle, 
   Clock, 
   AlertTriangle, 
-  TrendingUp, 
   Activity, 
   Target, 
   Calendar,
   FileText,
-  ArrowUpRight,
   Star
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
 
 interface ManagerStats {
   totalEmployees: number;
@@ -55,7 +52,6 @@ interface ManagerUpdate {
 }
 
 export default function ManagerDashboardSummary() {
-  const { getText } = useLanguage();
   const [stats, setStats] = useState<ManagerStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);

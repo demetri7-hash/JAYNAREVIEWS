@@ -12,7 +12,6 @@ import EmployeeManagementTab from '@/components/EmployeeManagementTab';
 export default function EmployeeManagement() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const userRole = session?.user?.role as UserRole;
 
@@ -28,11 +27,6 @@ export default function EmployeeManagement() {
       return;
     }
   }, [session, status, userRole, router]);
-
-  const handleMessage = (msg: { type: 'success' | 'error'; text: string }) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(null), 5000);
-  };
 
   if (status === 'loading') {
     return (
@@ -67,17 +61,6 @@ export default function EmployeeManagement() {
           </div>
           <LanguageToggleCompact />
         </div>
-
-        {/* Messages */}
-        {message && (
-          <div className={`${
-            message.type === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-700' 
-              : 'bg-red-50 border border-red-200 text-red-700'
-          } px-4 py-3 rounded-xl mb-6`}>
-            {message.text}
-          </div>
-        )}
 
         {/* Employee Management Component */}
         <div className="animate-fade-in-up">

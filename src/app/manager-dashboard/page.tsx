@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { ChecklistItem, UserRole, Department, isManagerRole, getDepartmentPermissions } from '@/types';
+import { ChecklistItem, UserRole, isManagerRole } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useLanguage, staticTranslations } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import ManagerDashboardSummary from '@/components/ManagerDashboardSummary';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
@@ -51,7 +51,6 @@ const managerTools = [
 export default function ManagerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { getText } = useLanguage();
   const [activeTool, setActiveTool] = useState<ManagerTool>('summary');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -112,17 +111,6 @@ export default function ManagerDashboard() {
       setError(`Failed to load ${tool} data. Please try again.`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleMessage = (message: { type: 'success' | 'error'; text: string }) => {
-    if (message.type === 'success') {
-      setSuccessMessage(message.text);
-      setError(null);
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } else {
-      setError(message.text);
-      setSuccessMessage(null);
     }
   };
 

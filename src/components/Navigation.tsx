@@ -7,17 +7,12 @@ import {
   Menu, 
   X, 
   Home, 
-  Users, 
   Settings, 
-  LogOut, 
   CheckSquare, 
   BarChart3, 
   UserCog,
   ClipboardList,
-  Bell,
   ArrowRightLeft,
-  Calendar,
-  FileText,
   Workflow
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -38,7 +33,6 @@ interface NavigationProps {
 export function Navigation({ currentPage }: NavigationProps) {
   const router = useRouter()
   const { data: session } = useSession()
-  const { getText } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
 

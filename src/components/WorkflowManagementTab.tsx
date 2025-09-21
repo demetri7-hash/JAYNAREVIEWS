@@ -524,9 +524,9 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
           Create Workflow
         </button>
       </div>
@@ -965,8 +965,9 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
           <p className="text-gray-600 mb-4">Create your first workflow to automate team tasks</p>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold flex items-center gap-2"
           >
+            <Plus className="h-5 w-5" />
             Create First Workflow
           </button>
         </div>

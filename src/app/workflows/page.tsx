@@ -176,9 +176,10 @@ export default function WorkflowsPage() {
             {userRole === 'manager' || userRole === 'admin' ? (
               <Button
                 onClick={() => setShowCreator(true)}
-                className="flex items-center gap-2"
+                size="lg"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold px-6 py-3 rounded-lg border-0"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-5 w-5" />
                 New Workflow
               </Button>
             ) : null}

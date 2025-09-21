@@ -187,11 +187,10 @@ export function Navigation({ currentPage }: NavigationProps) {
             <LanguageToggleCompact />
             <Button
               onClick={handleSignOut}
-              variant="destructive"
-              className="w-full justify-start"
-              size="md"
+              variant="ghost"
+              className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
+              size="sm"
             >
-              <LogOut className="w-5 h-5 mr-3" />
               Sign Out
             </Button>
           </div>
@@ -256,11 +255,10 @@ export function Navigation({ currentPage }: NavigationProps) {
                 <LanguageToggleCompact />
                 <Button
                   onClick={handleSignOut}
-                  variant="destructive"
-                  className="w-full justify-start"
-                  size="lg"
+                  variant="ghost"
+                  className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
+                  size="sm"
                 >
-                  <LogOut className="w-5 h-5 mr-3" />
                   Sign Out
                 </Button>
               </div>

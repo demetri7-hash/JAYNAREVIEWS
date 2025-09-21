@@ -216,7 +216,7 @@ export default function WorkflowCreator({
 
   return (
     <Dialog open={true} onOpenChange={() => onCancel?.()}>
-      <DialogContent className="w-full max-w-lg sm:max-w-xl lg:max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+      <DialogContent className="w-full max-w-lg sm:max-w-xl lg:max-w-4xl max-h-[90vh] overflow-y-auto mx-4 bg-white border border-gray-300 shadow-lg z-50">{/* Fixed: Added solid white background and border to make modal visible */}
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">
             {existingWorkflow ? 'Edit Workflow' : 'Create New Workflow'}

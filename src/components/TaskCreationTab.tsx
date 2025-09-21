@@ -1,66 +1,58 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Calendar, Clock, Users, MapPin, AlertCircle, CheckCircle } from 'lucide-react'
+import { Plus, AlertCircle, CheckCircle, Camera, FileText } from 'lucide-react'
 
-interface User {
+interface Workflow {
   id: string
   name: string
+  description: string
   department: string
-  role: string
 }
 
 interface TaskTemplate {
   id: string
   title: string
   description: string
-  department: string
   estimated_duration: number
   priority: 'low' | 'medium' | 'high'
+  requires_photo: boolean
+  requires_notes: boolean
 }
 
 interface NewTask {
   title: string
   description: string
-  assigned_to: string
-  department: string
   location: string
   priority: 'low' | 'medium' | 'high'
-  due_date: string
   estimated_duration: number
   instructions: string
   template_id?: string
+  workflow_id?: string
+  requires_photo: boolean
+  requires_notes: boolean
 }
 
 export default function TaskCreationTab() {
-  const [users, setUsers] = useState<User[]>([])
+  const [workflows, setWorkflows] = useState<Workflow[]>([])
   const [templates, setTemplates] = useState<TaskTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [bulkMode, setBulkMode] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null)
 
   const [newTask, setNewTask] = useState<NewTask>({
     title: '',
     description: '',
-    assigned_to: '',
-    department: '',
     location: '',
     priority: 'medium',
-    due_date: '',
     estimated_duration: 30,
-    instructions: ''
+    instructions: '',
+    requires_photo: false,
+    requires_notes: false
   })
 
-  const [bulkTasks, setBulkTasks] = useState<Partial<NewTask>[]>([{
-    assigned_to: '',
-    due_date: '',
-    instructions: ''
-  }])
-
-  const departments = ['Kitchen', 'Front of House', 'Management', 'Cleaning', 'Prep']
   const locations = ['Main Kitchen', 'Prep Area', 'Dining Room', 'Bar', 'Storage', 'Office', 'Exterior']
 
   useEffect(() => {
@@ -70,21 +62,21 @@ export default function TaskCreationTab() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [usersRes, templatesRes] = await Promise.all([
-        fetch('/api/users'),
+      const [workflowsRes, templatesRes] = await Promise.all([
+        fetch('/api/workflows'),
         fetch('/api/task-templates')
       ])
 
-      if (!usersRes.ok || !templatesRes.ok) {
+      if (!workflowsRes.ok || !templatesRes.ok) {
         throw new Error('Failed to fetch data')
       }
 
-      const [usersData, templatesData] = await Promise.all([
-        usersRes.json(),
+      const [workflowsData, templatesData] = await Promise.all([
+        workflowsRes.json(),
         templatesRes.json()
       ])
 
-      setUsers(usersData.users || [])
+      setWorkflows(workflowsData.workflows || [])
       setTemplates(templatesData.templates || [])
     } catch (err) {
       setError('Failed to load data')
@@ -100,9 +92,10 @@ export default function TaskCreationTab() {
       ...prev,
       title: template.title,
       description: template.description,
-      department: template.department,
       priority: template.priority,
       estimated_duration: template.estimated_duration,
+      requires_photo: template.requires_photo,
+      requires_notes: template.requires_notes,
       template_id: template.id
     }))
   }
@@ -130,73 +123,18 @@ export default function TaskCreationTab() {
     }
   }
 
-  const createBulkTasks = async () => {
-    try {
-      setSubmitting(true)
-      setError(null)
-
-      const tasksToCreate = bulkTasks.map(task => ({
-        ...newTask,
-        ...task
-      }))
-
-      const response = await fetch('/api/tasks/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tasks: tasksToCreate })
-      })
-
-      if (!response.ok) throw new Error('Failed to create tasks')
-
-      setSuccess(`${bulkTasks.length} tasks created successfully!`)
-      resetBulkForm()
-    } catch (err) {
-      setError('Failed to create bulk tasks')
-      console.error('Error creating bulk tasks:', err)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   const resetForm = () => {
     setNewTask({
       title: '',
       description: '',
-      assigned_to: '',
-      department: '',
       location: '',
       priority: 'medium',
-      due_date: '',
       estimated_duration: 30,
-      instructions: ''
+      instructions: '',
+      requires_photo: false,
+      requires_notes: false
     })
     setSelectedTemplate(null)
-  }
-
-  const resetBulkForm = () => {
-    setBulkTasks([{
-      assigned_to: '',
-      due_date: '',
-      instructions: ''
-    }])
-  }
-
-  const addBulkTask = () => {
-    setBulkTasks(prev => [...prev, {
-      assigned_to: '',
-      due_date: '',
-      instructions: ''
-    }])
-  }
-
-  const removeBulkTask = (index: number) => {
-    setBulkTasks(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const updateBulkTask = (index: number, field: string, value: string) => {
-    setBulkTasks(prev => prev.map((task, i) => 
-      i === index ? { ...task, [field]: value } : task
-    ))
   }
 
   useEffect(() => {
@@ -218,18 +156,6 @@ export default function TaskCreationTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-slate-900">Create Tasks</h2>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setBulkMode(!bulkMode)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              bulkMode 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-            }`}
-          >
-            {bulkMode ? 'Single Task' : 'Bulk Create'}
-          </button>
-        </div>
       </div>
 
       {error && (
@@ -261,8 +187,8 @@ export default function TaskCreationTab() {
               >
                 <h4 className="font-medium text-slate-900 mb-2">{template.title}</h4>
                 <p className="text-sm text-slate-600 mb-3">{template.description}</p>
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>{template.department}</span>
+                <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
+                  <span>{template.estimated_duration} min</span>
                   <span className={`px-2 py-1 rounded-full ${
                     template.priority === 'high' ? 'bg-red-100 text-red-800' :
                     template.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
@@ -271,187 +197,86 @@ export default function TaskCreationTab() {
                     {template.priority}
                   </span>
                 </div>
+                <div className="flex gap-2 text-xs">
+                  {template.requires_photo && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                      <Camera className="h-3 w-3" />
+                      Photo Required
+                    </span>
+                  )}
+                  {template.requires_notes && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded">
+                      <FileText className="h-3 w-3" />
+                      Notes Required
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Single Task Creation */}
-      {!bulkMode && (
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">Create New Task</h3>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Task Title</label>
-                <input
-                  type="text"
-                  value={newTask.title}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                  placeholder="Enter task title"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                <textarea
-                  value={newTask.description}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 h-24"
-                  placeholder="Describe the task"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Department</label>
-                  <select
-                    value={newTask.department}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, department: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Location</label>
-                  <select
-                    value={newTask.location}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                  >
-                    <option value="">Select Location</option>
-                    {locations.map(loc => (
-                      <option key={loc} value={loc}>{loc}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+      {/* Task Creation Form */}
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-6">Create New Task</h3>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Task Title</label>
+              <input
+                type="text"
+                value={newTask.title}
+                onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                placeholder="Enter task title"
+              />
             </div>
 
-            <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+              <textarea
+                value={newTask.description}
+                onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 h-24"
+                placeholder="Describe the task"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Assign To</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Workflow (Optional)</label>
                 <select
-                  value={newTask.assigned_to}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, assigned_to: e.target.value }))}
+                  value={newTask.workflow_id || ''}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, workflow_id: e.target.value || undefined }))}
                   className="w-full border border-slate-300 rounded-lg px-3 py-2"
                 >
-                  <option value="">Select Employee</option>
-                  {users.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} - {user.department}
-                    </option>
+                  <option value="">No Workflow</option>
+                  {workflows.map(workflow => (
+                    <option key={workflow.id} value={workflow.id}>{workflow.name}</option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-                  <select
-                    value={newTask.priority}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, priority: e.target.value as 'low' | 'medium' | 'high' }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Duration (minutes)</label>
-                  <input
-                    type="number"
-                    value={newTask.estimated_duration}
-                    onChange={(e) => setNewTask(prev => ({ ...prev, estimated_duration: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                    min="1"
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Due Date</label>
-                <input
-                  type="datetime-local"
-                  value={newTask.due_date}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, due_date: e.target.value }))}
+                <label className="block text-sm font-medium text-slate-700 mb-2">Location</label>
+                <select
+                  value={newTask.location}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, location: e.target.value }))}
                   className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Special Instructions</label>
-                <textarea
-                  value={newTask.instructions}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, instructions: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 h-20"
-                  placeholder="Any special instructions or notes"
-                />
+                >
+                  <option value="">Select Location</option>
+                  {locations.map(loc => (
+                    <option key={loc} value={loc}>{loc}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
-            <button
-              onClick={resetForm}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              Reset
-            </button>
-            <button
-              onClick={createTask}
-              disabled={submitting || !newTask.title || !newTask.assigned_to}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              {submitting ? 'Creating...' : 'Create Task'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Task Creation */}
-      {bulkMode && (
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">Bulk Task Creation</h3>
-          
-          {/* Common Task Details */}
-          <div className="mb-6 p-4 bg-slate-50 rounded-lg">
-            <h4 className="font-medium text-slate-900 mb-4">Common Task Details</h4>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Task Title</label>
-                <input
-                  type="text"
-                  value={newTask.title}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                  placeholder="Common title for all tasks"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Department</label>
-                <select
-                  value={newTask.department}
-                  onChange={(e) => setNewTask(prev => ({ ...prev, department: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                >
-                  <option value="">Select Department</option>
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-              </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
                 <select
@@ -464,90 +289,80 @@ export default function TaskCreationTab() {
                   <option value="high">High</option>
                 </select>
               </div>
-            </div>
-          </div>
 
-          {/* Individual Task Assignments */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-medium text-slate-900">Individual Assignments</h4>
-              <button
-                onClick={addBulkTask}
-                className="flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Add Assignment
-              </button>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Duration (minutes)</label>
+                <input
+                  type="number"
+                  value={newTask.estimated_duration}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, estimated_duration: parseInt(e.target.value) || 0 }))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                  min="1"
+                />
+              </div>
             </div>
 
-            {bulkTasks.map((task, index) => (
-              <div key={index} className="p-4 border border-slate-200 rounded-lg">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Assign To</label>
-                    <select
-                      value={task.assigned_to || ''}
-                      onChange={(e) => updateBulkTask(index, 'assigned_to', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="">Select Employee</option>
-                      {users.map(user => (
-                        <option key={user.id} value={user.id}>
-                          {user.name} - {user.department}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Due Date</label>
-                    <input
-                      type="datetime-local"
-                      value={task.due_date || ''}
-                      onChange={(e) => updateBulkTask(index, 'due_date', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Special Instructions</label>
-                    <input
-                      type="text"
-                      value={task.instructions || ''}
-                      onChange={(e) => updateBulkTask(index, 'instructions', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2"
-                      placeholder="Task-specific notes"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      onClick={() => removeBulkTask(index)}
-                      className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Special Instructions</label>
+              <textarea
+                value={newTask.instructions}
+                onChange={(e) => setNewTask(prev => ({ ...prev, instructions: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 h-24"
+                placeholder="Any special instructions or notes"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-3">Completion Requirements</label>
+              <div className="space-y-3 p-3 bg-slate-50 rounded-lg border">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="requires_photo"
+                    checked={newTask.requires_photo}
+                    onChange={(e) => setNewTask(prev => ({ ...prev, requires_photo: e.target.checked }))}
+                    className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label htmlFor="requires_photo" className="ml-3 flex items-center gap-2 text-sm text-slate-700">
+                    <Camera className="h-4 w-4 text-blue-500" />
+                    Require photo upload when completing this task
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="requires_notes"
+                    checked={newTask.requires_notes}
+                    onChange={(e) => setNewTask(prev => ({ ...prev, requires_notes: e.target.checked }))}
+                    className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label htmlFor="requires_notes" className="ml-3 flex items-center gap-2 text-sm text-slate-700">
+                    <FileText className="h-4 w-4 text-purple-500" />
+                    Require completion notes when finishing this task
+                  </label>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="flex justify-end gap-3 mt-6">
-            <button
-              onClick={resetBulkForm}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              Reset
-            </button>
-            <button
-              onClick={createBulkTasks}
-              disabled={submitting || !newTask.title || bulkTasks.some(task => !task.assigned_to)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              {submitting ? 'Creating...' : `Create ${bulkTasks.length} Tasks`}
-            </button>
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            onClick={resetForm}
+            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            Reset
+          </button>
+          <button
+            onClick={createTask}
+            disabled={submitting || !newTask.title}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            {submitting ? 'Creating...' : 'Create Task'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

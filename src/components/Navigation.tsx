@@ -100,7 +100,7 @@ export function Navigation({ currentPage }: NavigationProps) {
     },
     {
       icon: UserCog,
-      label: 'Employee Management',
+      label: 'User Management',
       path: '/manager/employee-management',
       id: 'manager-employees'
     },

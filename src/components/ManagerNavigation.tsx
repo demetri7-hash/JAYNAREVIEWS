@@ -61,7 +61,7 @@ const toolsConfig = [
     id: 'users' as ManagerTool, 
     label: 'User Management', 
     icon: Users,
-    path: '/manager-dashboard?tool=users'
+    path: '/manager/employee-management'
   },
   { 
     id: 'roles' as ManagerTool, 
@@ -95,7 +95,7 @@ const toolsConfig = [
   },
   { 
     id: 'employee-management' as ManagerTool, 
-    label: 'Employee Management', 
+    label: 'User Management', 
     icon: UserCheck,
     path: '/manager/employee-management'
   },

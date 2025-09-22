@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import ManagerDashboardSummary from '@/components/ManagerDashboardSummary';
-import EnhancedUserManagement from '@/components/EnhancedUserManagement';
+import UnifiedUserManagement from '@/components/UnifiedUserManagement';
 import ManagerUpdatesComponent from '@/components/ManagerUpdatesComponent';
 import TaskManagementSimple from '@/components/TaskManagementSimple';
 import RoleConfigurationComponent from '@/components/RoleConfigurationComponent';
@@ -27,17 +27,6 @@ interface TaskWithAssignee extends ChecklistItem {
   };
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  employee_status?: string;
-  toast_employee_id?: string;
-  archived_at?: string;
-  archived_by?: string;
-}
-
 const managerTools = [
   { id: 'summary', label: 'Dashboard Summary', icon: BarChart3, description: 'Overview of today\'s progress and metrics' },
   { id: 'tasks', label: 'Task Management', icon: ClipboardList, description: 'Manage and assign tasks' },
@@ -46,7 +35,7 @@ const managerTools = [
   { id: 'updates', label: 'Manager Updates', icon: Megaphone, description: 'Send updates and announcements' },
   { id: 'workflows', label: 'Workflow Management', icon: Workflow, description: 'Create and manage workflows' },
   { id: 'transfers', label: 'Task Transfers', icon: ArrowLeftRight, description: 'Handle task transfers between staff' },
-  { id: 'employee-mgmt', label: 'Employee Management', icon: UserCog, description: 'Advanced employee management' },
+  { id: 'employee-mgmt', label: 'User Management', icon: UserCog, description: 'Comprehensive user and permission management' },
   { id: 'reports', label: 'Weekly Reports', icon: BarChart3, description: 'Generate and view reports' },
   { id: 'task-creation', label: 'Create Tasks', icon: Plus, description: 'Create new tasks and workflows' }
 ];
@@ -56,7 +45,6 @@ export default function ManagerDashboard() {
   const router = useRouter();
   const [activeTool, setActiveTool] = useState<ManagerTool>('summary');
   const [tasks, setTasks] = useState<TaskWithAssignee[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -81,7 +69,7 @@ export default function ManagerDashboard() {
     if (!session?.user?.email || !userRole) return;
     
     // Only fetch heavy data when specific tabs are accessed
-    if (activeTool === 'tasks' || activeTool === 'users' || activeTool === 'roles') {
+    if (activeTool === 'tasks') {
       fetchDataForTool(activeTool);
     }
   }, [session?.user?.email, userRole, activeTool]);
@@ -98,15 +86,6 @@ export default function ManagerDashboard() {
         }
         const tasksData = await tasksResponse.json();
         setTasks(tasksData.tasks || []);
-      }
-      
-      if (tool === 'users' || tool === 'roles') {
-        const usersResponse = await fetch('/api/manager/users');
-        if (!usersResponse.ok) {
-          throw new Error(`Users API failed: ${usersResponse.status}`);
-        }
-        const usersData = await usersResponse.json();
-        setUsers(usersData.users || []);
       }
       
     } catch (error) {
@@ -129,6 +108,7 @@ export default function ManagerDashboard() {
         router.push('/manager/task-transfers');
         break;
       case 'employee-mgmt':
+      case 'users':
         router.push('/manager/employee-management');
         break;
       case 'reports':
@@ -164,10 +144,7 @@ export default function ManagerDashboard() {
                 <p className="mt-2 text-gray-600">Loading users...</p>
               </div>
             ) : (
-              <EnhancedUserManagement 
-                users={users} 
-                setUsers={setUsers}
-              />
+              <UnifiedUserManagement />
             )}
           </div>
         );

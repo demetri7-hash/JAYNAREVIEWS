@@ -5,9 +5,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { UserRole, isManagerRole } from '@/types';
 import ManagerNavigation from '@/components/ManagerNavigation';
-import EmployeeManagementTab from '@/components/EmployeeManagementTab';
+import UnifiedUserManagement from '@/components/UnifiedUserManagement';
 
-export default function EmployeeManagement() {
+export default function UnifiedUserManagementPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -43,13 +43,13 @@ export default function EmployeeManagement() {
         {/* Navigation */}
         <ManagerNavigation 
           currentTool="employee-management"
-          title="Employee Management"
-          subtitle="Manage employee roles, permissions, and performance"
+          title="User Management"
+          subtitle="Comprehensive user account, role, and permission management"
         />
 
-        {/* Employee Management Component */}
+        {/* Unified User Management Component */}
         <div className="animate-fade-in-up">
-          <EmployeeManagementTab />
+          <UnifiedUserManagement />
         </div>
       </div>
     </div>

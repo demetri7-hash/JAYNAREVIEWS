@@ -3,10 +3,8 @@
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import { UserRole, isManagerRole } from '@/types';
-import { Button } from '@/components/ui/button';
-import { LanguageToggleCompact } from '@/components/LanguageToggle';
+import ManagerNavigation from '@/components/ManagerNavigation';
 import WeeklyReportsTab from '@/components/WeeklyReportsTab';
 
 export default function WeeklyReports() {
@@ -42,25 +40,12 @@ export default function WeeklyReports() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push('/manager-dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">Weekly Reports</h1>
-              <p className="text-slate-600">Generate and analyze weekly performance reports</p>
-            </div>
-          </div>
-          <LanguageToggleCompact />
-        </div>
+        {/* Navigation */}
+        <ManagerNavigation 
+          currentTool="reports"
+          title="Reports & Analytics"
+          subtitle="View and generate comprehensive reports and analytics"
+        />
 
         {/* Weekly Reports Component */}
         <div className="animate-fade-in-up">

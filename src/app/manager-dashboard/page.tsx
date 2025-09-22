@@ -10,6 +10,8 @@ import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import ManagerDashboardSummary from '@/components/ManagerDashboardSummary';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
 import ManagerUpdatesComponent from '@/components/ManagerUpdatesComponent';
+import TaskManagementComponent from '@/components/TaskManagementComponent';
+import RoleConfigurationComponent from '@/components/RoleConfigurationComponent';
 import { Settings, Users, Workflow, ArrowLeftRight, UserCog, BarChart3, Plus, ClipboardList, Megaphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -151,28 +153,7 @@ export default function ManagerDashboard() {
         return <ManagerDashboardSummary />;
       
       case 'tasks':
-        return (
-          <div className="space-y-6">
-            {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading tasks...</p>
-              </div>
-            ) : (
-              <Card className="glass border-white/20">
-                <CardHeader>
-                  <CardTitle>Task Management</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600">
-                    Task management interface will be implemented here.
-                    Currently showing {tasks.length} tasks.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        );
+        return <TaskManagementComponent />;
       
       case 'users':
         return (
@@ -192,16 +173,7 @@ export default function ManagerDashboard() {
         );
       
       case 'roles':
-        return (
-          <Card className="glass border-white/20">
-            <CardHeader>
-              <CardTitle>Role Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600">Role configuration interface will be implemented here.</p>
-            </CardContent>
-          </Card>
-        );
+        return <RoleConfigurationComponent />;
       
       case 'updates':
         return <ManagerUpdatesComponent />;

@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import { UserRole, isManagerRole } from '@/types';
-import { Button } from '@/components/ui/button';
-import { LanguageToggleCompact } from '@/components/LanguageToggle';
+import ManagerNavigation from '@/components/ManagerNavigation';
 import EmployeeManagementTab from '@/components/EmployeeManagementTab';
 
 export default function EmployeeManagement() {
@@ -42,25 +40,12 @@ export default function EmployeeManagement() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push('/manager-dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">Employee Management</h1>
-              <p className="text-slate-600">Advanced employee management and administration</p>
-            </div>
-          </div>
-          <LanguageToggleCompact />
-        </div>
+        {/* Navigation */}
+        <ManagerNavigation 
+          currentTool="employee-management"
+          title="Employee Management"
+          subtitle="Manage employee roles, permissions, and performance"
+        />
 
         {/* Employee Management Component */}
         <div className="animate-fade-in-up">

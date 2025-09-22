@@ -239,7 +239,7 @@ export default function TaskEditModal({ isOpen, onClose, task, onSave }: TaskEdi
             <div>Created: {new Date(task.created_at).toLocaleString()}</div>
             <div>Last Updated: {new Date(task.updated_at).toLocaleString()}</div>
             <div className="mt-1 font-medium">
-              Note: Changes will update this task everywhere it's used in workflows
+              Note: Changes will update this task everywhere it&apos;s used in workflows
             </div>
           </div>
         </div>

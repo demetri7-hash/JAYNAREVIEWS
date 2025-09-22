@@ -10,12 +10,20 @@ export async function PUT(
   request: NextRequest, 
   { params }: { params: Promise<{ id: string }> }
 ) {
+  console.log('=== PUT /api/manager/tasks/[id] - START ===');
+  
   try {
     const { id } = await params;
-    const body = await request.json();
+    console.log('Task ID:', id);
     
-    console.log('PUT /api/manager/tasks/[id] - ID:', id);
-    console.log('PUT /api/manager/tasks/[id] - Body:', body);
+    let body;
+    try {
+      body = await request.json();
+      console.log('Request body:', JSON.stringify(body, null, 2));
+    } catch (jsonError) {
+      console.error('JSON parsing error:', jsonError);
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
     
     const {
       title,
@@ -25,6 +33,15 @@ export async function PUT(
       requires_notes,
       archived
     } = body;
+
+    console.log('Extracted fields:', {
+      title,
+      description,
+      departments,
+      requires_photo,
+      requires_notes,
+      archived
+    });
 
     // Validation
     if (!title?.trim()) {
@@ -82,21 +99,28 @@ export async function PUT(
 
       if (error) {
         console.error('Supabase error updating task:', error);
-        return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        return NextResponse.json({ 
+          error: 'Failed to update task',
+          details: error.message || 'Database error'
+        }, { status: 500 });
       }
 
       if (!updatedTask) {
+        console.log('No task returned after update');
         return NextResponse.json({ error: 'Task not found' }, { status: 404 });
       }
 
+      console.log('Task updated successfully:', updatedTask);
       return NextResponse.json(updatedTask);
 
     } catch (tableError: unknown) {
       const errorMessage = tableError instanceof Error ? tableError.message : 'Unknown error';
-      console.log('Tasks table may not exist:', errorMessage);
+      console.log('Database operation failed:', errorMessage);
+      console.log('Full error:', tableError);
       
       // Return a mock updated task for development
-      return NextResponse.json({
+      const mockTask = {
         id: id,
         title: title.trim(),
         description: description?.trim() || '',
@@ -106,12 +130,21 @@ export async function PUT(
         archived: Boolean(archived),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      });
+      };
+      
+      console.log('Returning mock task:', mockTask);
+      return NextResponse.json(mockTask);
     }
 
   } catch (error) {
-    console.error('Update task error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('=== PUT /api/manager/tasks/[id] - GLOBAL ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 

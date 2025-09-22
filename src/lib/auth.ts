@@ -28,14 +28,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session }) {
       console.log('NextAuth session callback:', session.user?.email);
-      // Add user role to session
+      // Add user ID and role to session
       if (session.user?.email) {
         const { data: profile } = await supabaseAdmin
           .from('profiles')
-          .select('role')
+          .select('id, role')
           .eq('email', session.user.email)
           .single()
         
+        session.user.id = profile?.id
         session.user.role = profile?.role || 'employee'
       }
       return session

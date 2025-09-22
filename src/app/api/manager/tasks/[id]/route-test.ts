@@ -8,10 +8,6 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     
-    console.log('=== SIMPLE TEST ===');
-    console.log('ID:', id);
-    console.log('Body:', body);
-    
     // Just return a mock success for testing
     return NextResponse.json({
       id: id,

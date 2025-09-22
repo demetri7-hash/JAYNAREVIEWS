@@ -104,7 +104,7 @@ export const SelectContent = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'absolute top-full left-0 z-50 w-full rounded-md border bg-white text-gray-900 shadow-lg ring-1 ring-black ring-opacity-5',
+        'absolute top-full left-0 z-[9999] w-full rounded-md border bg-white text-gray-900 shadow-2xl ring-1 ring-black ring-opacity-5 fixed',
         className
       )}
       {...props}

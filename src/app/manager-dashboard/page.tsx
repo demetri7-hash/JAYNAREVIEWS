@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import ManagerDashboardSummary from '@/components/ManagerDashboardSummary';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
+import ManagerUpdatesComponent from '@/components/ManagerUpdatesComponent';
 import { Settings, Users, Workflow, ArrowLeftRight, UserCog, BarChart3, Plus, ClipboardList, Megaphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -203,16 +204,7 @@ export default function ManagerDashboard() {
         );
       
       case 'updates':
-        return (
-          <Card className="glass border-white/20">
-            <CardHeader>
-              <CardTitle>Manager Updates</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600">Manager updates interface will be implemented here.</p>
-            </CardContent>
-          </Card>
-        );
+        return <ManagerUpdatesComponent />;
       
       case 'workflows':
       case 'transfers':
@@ -280,7 +272,7 @@ export default function ManagerDashboard() {
                     </div>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-white border border-slate-200 shadow-lg">
+                <SelectContent className="z-[9999] bg-white border border-slate-200 shadow-xl fixed">
                   {managerTools.map((tool) => {
                     const IconComponent = tool.icon;
                     return (

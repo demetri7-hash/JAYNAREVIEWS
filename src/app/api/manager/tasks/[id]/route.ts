@@ -7,11 +7,11 @@ const supabase = createClient(
 );
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const taskId = params.id;
+    const { id } = await params;
     const body = await request.json();
     
     const {
@@ -45,7 +45,7 @@ export async function PUT(
           archived: Boolean(archived),
           updated_at: new Date().toISOString()
         })
-        .eq('id', taskId)
+        .eq('id', id)
         .select()
         .single();
 
@@ -66,7 +66,7 @@ export async function PUT(
       
       // Return a mock updated task for development
       return NextResponse.json({
-        id: taskId,
+        id: id,
         title: title.trim(),
         description: description?.trim() || '',
         departments,
@@ -85,18 +85,18 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const taskId = params.id;
+    const { id } = await params;
 
     // Try to delete the task
     try {
       const { error } = await supabase
         .from('tasks')
         .delete()
-        .eq('id', taskId);
+        .eq('id', id);
 
       if (error) {
         console.error('Supabase error deleting task:', error);
@@ -109,8 +109,10 @@ export async function DELETE(
       const errorMessage = tableError instanceof Error ? tableError.message : 'Unknown error';
       console.log('Tasks table may not exist:', errorMessage);
       
-      // Return success for development
-      return NextResponse.json({ success: true, message: 'Task deleted successfully' });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Task delete functionality not yet available' 
+      });
     }
 
   } catch (error) {

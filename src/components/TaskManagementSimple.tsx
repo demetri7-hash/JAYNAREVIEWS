@@ -8,11 +8,14 @@ import {
   CheckSquare,
   Square,
   MoreHorizontal,
-  RefreshCw
+  RefreshCw,
+  Trash2,
+  Copy
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import TaskEditModal from './TaskEditModal';
 
 interface Task {
   id: string;
@@ -32,10 +35,22 @@ export default function TaskManagementSimple() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showArchived, setShowArchived] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  // Close dropdown menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    if (openMenuId) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openMenuId]);
 
   const fetchTasks = async () => {
     try {
@@ -89,6 +104,55 @@ export default function TaskManagementSimple() {
     } else {
       setSelectedTasks(new Set(visibleTasks.map(task => task.id)));
     }
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveTask = (updatedTask: Task) => {
+    setTasks(prev => prev.map(task => 
+      task.id === updatedTask.id ? updatedTask : task
+    ));
+    setIsEditModalOpen(false);
+    setEditingTask(null);
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/manager/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete task');
+      }
+
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+      setOpenMenuId(null);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      alert('Failed to delete task. Please try again.');
+    }
+  };
+
+  const handleDuplicateTask = (task: Task) => {
+    // Open edit modal with duplicated task data (no ID so it creates new)
+    const duplicatedTask = {
+      ...task,
+      id: '', // Will be assigned by backend
+      title: `${task.title} (Copy)`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    setEditingTask(duplicatedTask);
+    setIsEditModalOpen(true);
+    setOpenMenuId(null);
   };
 
   const filteredTasks = tasks.filter(task => {
@@ -282,12 +346,53 @@ export default function TaskManagementSimple() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditTask(task)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
+                    <div className="relative">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setOpenMenuId(openMenuId === task.id ? null : task.id)}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                      
+                      {openMenuId === task.id && (
+                        <div className="absolute right-0 top-8 z-50 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1">
+                          <button
+                            onClick={() => handleDuplicateTask(task)}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                          >
+                            <Copy className="h-4 w-4" />
+                            Duplicate Task
+                          </button>
+                          <button
+                            onClick={() => {
+                              const updatedTask = { ...task, archived: !task.archived };
+                              handleSaveTask(updatedTask);
+                              setOpenMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+                          >
+                            <Archive className="h-4 w-4" />
+                            {task.archived ? 'Unarchive' : 'Archive'}
+                          </button>
+                          <hr className="my-1" />
+                          <button
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete Task
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -295,6 +400,17 @@ export default function TaskManagementSimple() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Modal */}
+      <TaskEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingTask(null);
+        }}
+        task={editingTask}
+        onSave={handleSaveTask}
+      />
     </div>
   );
 }

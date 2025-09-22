@@ -44,7 +44,8 @@ export async function GET() {
           description,
           requires_notes,
           requires_photo,
-          created_at
+          created_at,
+          departments
         ),
         assignee:assigned_to(
           id,
@@ -60,26 +61,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch assignments' }, { status: 500 });
     }
 
+    // Also fetch unassigned tasks
+    const { data: unassignedTasks, error: unassignedError } = await supabase
+      .from('tasks')
+      .select('*')
+      .not('id', 'in', `(${(assignments || []).map(a => a.task_id).join(',') || 'null'})`)
+      .order('created_at', { ascending: false });
+
+    if (unassignedError) {
+      console.error('Error fetching unassigned tasks:', unassignedError);
+    }
+
     // Convert assignments to match the expected task format for the frontend
     const tasksWithAssignees = (assignments || []).map(assignment => {
-      // Determine departments based on task title/content or default to general
-      const taskTitle = assignment.task?.title?.toLowerCase() || '';
-      let departments: Department[] = [];
-      
-      if (taskTitle.includes('prep') || taskTitle.includes('cook') || taskTitle.includes('kitchen')) {
-        departments = ['BOH', 'PREP'];
-      } else if (taskTitle.includes('clean') || taskTitle.includes('sanitize')) {
-        departments = ['CLEAN'];
-      } else if (taskTitle.includes('front') || taskTitle.includes('service') || taskTitle.includes('host')) {
-        departments = ['FOH'];
-      } else if (taskTitle.includes('open') || taskTitle.includes('morning')) {
-        departments = ['AM'];
-      } else if (taskTitle.includes('close') || taskTitle.includes('closing')) {
-        departments = ['PM'];
-      } else {
-        // Default to BOH for general tasks
-        departments = ['BOH'];
-      }
+      // Get departments from the task data
+      const departments = assignment.task?.departments || ['BOH'];
 
       return {
         id: assignment.id,
@@ -91,14 +87,34 @@ export async function GET() {
         assigned_to: assignment.assigned_to,
         created_at: assignment.created_at,
         updated_at: assignment.created_at,
-        assignee: assignment.assignee
+        assignee: assignment.assignee,
+        task_id: assignment.task_id
       };
     });
 
+    // Convert unassigned tasks to the expected format
+    const unassignedTasksFormatted = (unassignedTasks || []).map(task => ({
+      id: `unassigned-${task.id}`,
+      task: task.title,
+      completed: false,
+      notes: task.description || '',
+      due_date: null,
+      departments: task.departments || ['BOH'],
+      assigned_to: null,
+      created_at: task.created_at,
+      updated_at: task.updated_at,
+      assignee: null,
+      task_id: task.id,
+      unassigned: true
+    }));
+
+    // Combine assigned and unassigned tasks
+    const allTasks = [...tasksWithAssignees, ...unassignedTasksFormatted];
+
     // Apply proper department filtering based on manager's role and permissions
     const userPermissions = ROLE_PERMISSIONS[profile.role as UserRole] || [];
-    const filteredTasks = tasksWithAssignees.filter(task => 
-      task.departments.some(dept => userPermissions.includes(dept))
+    const filteredTasks = allTasks.filter(task => 
+      task.departments.some((dept: Department) => userPermissions.includes(dept))
     );
     
     return NextResponse.json(filteredTasks);

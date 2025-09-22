@@ -31,6 +31,11 @@ interface NewTask {
   workflow_id?: string
   requires_photo: boolean
   requires_notes: boolean
+  frequency: string
+  due_date: string
+  due_time: string
+  departments: string[]
+  assignees?: string[]
 }
 
 export default function TaskCreationTab() {
@@ -50,7 +55,12 @@ export default function TaskCreationTab() {
     estimated_duration: 30,
     instructions: '',
     requires_photo: false,
-    requires_notes: false
+    requires_notes: false,
+    frequency: 'once',
+    due_date: new Date().toISOString().split('T')[0], // Today's date
+    due_time: '09:00',
+    departments: [],
+    assignees: []
   })
 
   const locations = ['Main Kitchen', 'Prep Area', 'Dining Room', 'Bar', 'Storage', 'Office', 'Exterior']
@@ -105,18 +115,37 @@ export default function TaskCreationTab() {
       setSubmitting(true)
       setError(null)
 
+      // Validate required fields
+      if (!newTask.title) {
+        setError('Task title is required')
+        return
+      }
+      
+      if (!newTask.due_date || !newTask.due_time) {
+        setError('Due date and time are required')
+        return
+      }
+      
+      if (!newTask.departments || newTask.departments.length === 0) {
+        setError('At least one department must be selected')
+        return
+      }
+
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTask)
       })
 
-      if (!response.ok) throw new Error('Failed to create task')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create task')
+      }
 
       setSuccess('Task created successfully!')
       resetForm()
     } catch (err) {
-      setError('Failed to create task')
+      setError(err instanceof Error ? err.message : 'Failed to create task')
       console.error('Error creating task:', err)
     } finally {
       setSubmitting(false)
@@ -132,7 +161,12 @@ export default function TaskCreationTab() {
       estimated_duration: 30,
       instructions: '',
       requires_photo: false,
-      requires_notes: false
+      requires_notes: false,
+      frequency: 'once',
+      due_date: new Date().toISOString().split('T')[0],
+      due_time: '09:00',
+      departments: [],
+      assignees: []
     })
     setSelectedTemplate(null)
   }
@@ -299,6 +333,65 @@ export default function TaskCreationTab() {
                   className="w-full border border-slate-300 rounded-lg px-3 py-2"
                   min="1"
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Frequency</label>
+                <select
+                  value={newTask.frequency}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, frequency: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                >
+                  <option value="once">One Time</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Due Date</label>
+                <input
+                  type="date"
+                  value={newTask.due_date}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, due_date: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Due Time</label>
+                <input
+                  type="time"
+                  value={newTask.due_time}
+                  onChange={(e) => setNewTask(prev => ({ ...prev, due_time: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Departments</label>
+                <select
+                  multiple
+                  value={newTask.departments}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, option => option.value);
+                    setNewTask(prev => ({ ...prev, departments: selected }));
+                  }}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 h-24"
+                >
+                  <option value="BOH">Back of House</option>
+                  <option value="FOH">Front of House</option>
+                  <option value="PREP">Prep</option>
+                  <option value="CLEAN">Cleaning</option>
+                  <option value="AM">Morning Shift</option>
+                  <option value="PM">Evening Shift</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
               </div>
             </div>
 

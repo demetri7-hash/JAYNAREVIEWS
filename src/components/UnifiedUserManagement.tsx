@@ -6,19 +6,14 @@ import {
   Users, 
   Plus, 
   Search, 
-  Edit, 
-  Trash2, 
   Shield, 
   UserCheck, 
   UserX,
-  Filter,
-  Pencil,
   Archive,
   RotateCcw,
   Link,
   CheckCircle,
   Settings,
-  MoreHorizontal,
   Eye,
   EyeOff
 } from 'lucide-react'
@@ -236,7 +231,7 @@ export default function UnifiedUserManagement() {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to add user')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Failed to add user')
     } finally {
       setActionLoading(null)
@@ -706,7 +701,7 @@ export default function UnifiedUserManagement() {
                 </label>
                 <select
                   value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as any })}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as 'staff' | 'manager' | 'admin' })}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                 >
                   <option value="staff">Staff</option>

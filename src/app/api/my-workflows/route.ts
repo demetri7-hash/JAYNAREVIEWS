@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         workflow_id,
-        user_id,
+        assigned_to,
         status,
         assigned_at,
         started_at,
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
           )
         )
       `)
-      .eq('user_id', session.user.id)
+      .eq('assigned_to', session.user.id)
       .limit(limit)
       .order('assigned_at', { ascending: false });
 
@@ -171,9 +171,9 @@ export async function POST(request: NextRequest) {
     // Verify the assignment belongs to the current user
     const { data: assignment, error: fetchError } = await supabase
       .from('workflow_assignments')
-      .select('id, user_id, status')
+      .select('id, assigned_to, status')
       .eq('id', body.assignment_id)
-      .eq('user_id', session.user.id)
+      .eq('assigned_to', session.user.id)
       .single();
 
     if (fetchError || !assignment) {
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
         started_at: new Date().toISOString()
       })
       .eq('id', body.assignment_id)
-      .eq('user_id', session.user.id)
+      .eq('assigned_to', session.user.id)
       .select()
       .single();
 

@@ -26,12 +26,12 @@ export async function POST(request: NextRequest) {
       .from('workflow_assignments')
       .select(`
         id,
-        user_id,
+        assigned_to,
         workflow_id,
         status
       `)
       .eq('id', body.workflow_assignment_id)
-      .eq('user_id', session.user.id)
+      .eq('assigned_to', session.user.id)
       .single();
 
     if (assignmentError || !assignment) {

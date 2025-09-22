@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         workflow_id,
-        user_id,
+        assigned_to,
         status,
         assigned_at,
         started_at,
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           due_date,
           due_time
         ),
-        user:user_id(
+        user:assigned_to(
           id,
           name,
           email

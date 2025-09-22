@@ -67,6 +67,7 @@ export default function TaskTransfersTab() {
       const response = await fetch(`/api/pending-transfers/${transferId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ action, reason })
       })
 

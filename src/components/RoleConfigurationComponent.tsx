@@ -78,6 +78,7 @@ export default function RoleConfigurationComponent() {
       const response = await fetch('/api/manager/role-permissions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ role, departments: rolePermissions[role] }),
       });
 

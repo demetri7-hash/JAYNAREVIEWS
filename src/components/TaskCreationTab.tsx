@@ -134,6 +134,7 @@ export default function TaskCreationTab() {
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(newTask)
       })
 

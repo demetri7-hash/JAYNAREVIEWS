@@ -101,6 +101,7 @@ export default function WorkflowExecutionPage() {
       const response = await fetch('/api/workflow-tasks/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           assignment_id: assignmentId,
           task_id: taskId,
@@ -131,6 +132,7 @@ export default function WorkflowExecutionPage() {
       const response = await fetch('/api/my-workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ assignment_id: assignmentId })
       });
 

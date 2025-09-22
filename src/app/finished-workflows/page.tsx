@@ -449,6 +449,7 @@ function WorkflowDetailModal({ assignment, userRole, onClose, onUpdate }: Workfl
       const response = await fetch('/api/task-completions/edit', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           completion_id: taskCompletionId,
           notes: newNotes

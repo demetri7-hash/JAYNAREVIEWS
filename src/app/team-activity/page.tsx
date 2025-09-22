@@ -207,6 +207,7 @@ export default function TeamActivity() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ updateId }),
       })
 
@@ -222,7 +223,8 @@ export default function TeamActivity() {
   const markUpdateAsUnread = async (updateId: string) => {
     try {
       const response = await fetch(`/api/manager/updates/read-status?updateId=${updateId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       })
 
       if (response.ok) {

@@ -85,6 +85,7 @@ export default function TaskManagementComponent() {
       const response = await fetch('/api/manager/reassign-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ taskId, assigneeId: newAssigneeId }),
       });
 

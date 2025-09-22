@@ -102,6 +102,7 @@ export default function PendingTransfers() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           transferId,
           action,

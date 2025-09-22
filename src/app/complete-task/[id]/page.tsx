@@ -95,6 +95,7 @@ export default function CompleteTask() {
 
       const response = await fetch('/api/upload-photo', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 
@@ -147,6 +148,7 @@ export default function CompleteTask() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           notes: notes.trim() || null,
           photo_url: photoUrl,

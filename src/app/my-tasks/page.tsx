@@ -144,6 +144,7 @@ export default function MyTasks() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           assignmentId: transferAssignmentId,
           toUserId: selectedTransferUser,

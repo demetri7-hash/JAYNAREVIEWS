@@ -64,7 +64,8 @@ export default function WeeklyReportsTab() {
       if (dateRange.end) params.append('end_date', dateRange.end)
 
       const response = await fetch(`/api/weekly-reports/generate?${params}`, {
-        method: 'POST'
+        method: 'POST',
+        credentials: 'include'
       })
 
       if (!response.ok) throw new Error('Failed to generate report')

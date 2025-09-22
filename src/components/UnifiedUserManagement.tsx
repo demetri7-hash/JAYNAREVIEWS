@@ -145,6 +145,7 @@ export default function UnifiedUserManagement() {
       const response = await fetch('/api/employee-management', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           action,
           userId,
@@ -213,6 +214,7 @@ export default function UnifiedUserManagement() {
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(newUser)
       })
 

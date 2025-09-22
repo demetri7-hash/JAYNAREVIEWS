@@ -185,7 +185,9 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
   const fetchWorkflows = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/workflows');
+      const response = await fetch('/api/workflows', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Failed to fetch workflows');
       const data = await response.json();
       setWorkflows(data.workflows || []);
@@ -199,7 +201,9 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
 
   const fetchAvailableTasks = async () => {
     try {
-      const response = await fetch('/api/tasks');
+      const response = await fetch('/api/tasks', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
       setAvailableTasks(data.tasks || []);
@@ -211,7 +215,9 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
 
   const fetchAvailableUsers = async () => {
     try {
-      const response = await fetch('/api/manager/users');
+      const response = await fetch('/api/manager/users', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       setAvailableUsers(data || []);
@@ -226,6 +232,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       // First create the workflow
       const workflowResponse = await fetch('/api/workflows', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
@@ -244,6 +251,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
           const taskResponse = await fetch('/api/workflow-tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               workflow_id: workflowId,
               task_id: workflowTask.task_id,
@@ -275,6 +283,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       // Update the workflow
       const workflowResponse = await fetch('/api/workflows', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editingWorkflow.id,
@@ -290,7 +299,8 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       // Handle workflow tasks updates
       // First, remove all existing workflow tasks for this workflow
       const deleteResponse = await fetch(`/api/workflow-tasks?workflow_id=${editingWorkflow.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (!deleteResponse.ok) {
@@ -303,6 +313,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
           const taskResponse = await fetch('/api/workflow-tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               workflow_id: editingWorkflow.id,
               task_id: workflowTask.task_id,
@@ -333,6 +344,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           ...newTask,
           frequency: 'once', // Default for workflow tasks
@@ -430,10 +442,17 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
 
     try {
       const response = await fetch(`/api/workflows/${workflowId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to delete workflow');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete workflow');
+      }
       
       onMessage({ type: 'success', text: 'Workflow deleted successfully' });
       fetchWorkflows();
@@ -486,6 +505,7 @@ export function WorkflowManagementTab({ onMessage }: WorkflowManagementTabProps)
       const response = await fetch('/api/workflow-scheduling', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(assignmentData)
       });
 

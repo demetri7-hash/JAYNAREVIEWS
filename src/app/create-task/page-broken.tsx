@@ -133,6 +133,7 @@ export default function CreateTask() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...formData,
           assignees: selectedUsers,

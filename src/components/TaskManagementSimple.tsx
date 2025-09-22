@@ -74,6 +74,7 @@ export default function TaskManagementSimple() {
       const response = await fetch('/api/manager/tasks/bulk-archive', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ taskIds })
       });
 
@@ -126,7 +127,8 @@ export default function TaskManagementSimple() {
 
     try {
       const response = await fetch(`/api/manager/tasks/${taskId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (!response.ok) {

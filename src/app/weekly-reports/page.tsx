@@ -97,6 +97,7 @@ export default function WeeklyReports() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ overwrite: forceOverwrite })
       })
       const result = await response.json()

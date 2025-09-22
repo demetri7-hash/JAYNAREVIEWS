@@ -67,6 +67,7 @@ export default function ManagerUpdatesComponent() {
       const response = await fetch('/api/manager/updates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           title: newUpdate.title,
           message: newUpdate.message,

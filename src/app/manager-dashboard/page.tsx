@@ -254,41 +254,43 @@ export default function ManagerDashboard() {
         </div>
 
         {/* Tool Selector */}
-        <div className="glass rounded-2xl p-6 mb-8 border border-white/20">
+        <div className="glass rounded-2xl p-6 mb-8 border border-white/20 relative z-[100000]">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative z-[100001]">
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Select Management Tool
               </label>
-              <Select value={activeTool} onValueChange={(value) => handleToolSelection(value as ManagerTool)}>
-                <SelectTrigger className="w-full md:w-80">
-                  <SelectValue placeholder="Choose a management tool">
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        const IconComponent = getCurrentTool().icon;
-                        return <IconComponent className="h-4 w-4" />;
-                      })()}
-                      {getCurrentTool().label}
-                    </div>
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent className="z-[9999] bg-white border border-slate-200 shadow-xl fixed">
-                  {managerTools.map((tool) => {
-                    const IconComponent = tool.icon;
-                    return (
-                      <SelectItem key={tool.id} value={tool.id}>
-                        <div className="flex items-center gap-2">
-                          <IconComponent className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">{tool.label}</div>
-                            <div className="text-xs text-slate-500">{tool.description}</div>
+              <div className="relative z-[100002]">
+                <Select value={activeTool} onValueChange={(value) => handleToolSelection(value as ManagerTool)}>
+                  <SelectTrigger className="w-full md:w-80">
+                    <SelectValue placeholder="Choose a management tool">
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const IconComponent = getCurrentTool().icon;
+                          return <IconComponent className="h-4 w-4" />;
+                        })()}
+                        {getCurrentTool().label}
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="z-[100003] bg-white border border-slate-200 shadow-xl">
+                    {managerTools.map((tool) => {
+                      const IconComponent = tool.icon;
+                      return (
+                        <SelectItem key={tool.id} value={tool.id}>
+                          <div className="flex items-center gap-2">
+                            <IconComponent className="h-4 w-4" />
+                            <div>
+                              <div className="font-medium">{tool.label}</div>
+                              <div className="text-xs text-slate-500">{tool.description}</div>
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             <div className="text-sm text-slate-600">

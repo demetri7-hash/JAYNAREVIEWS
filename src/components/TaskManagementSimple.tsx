@@ -5,7 +5,6 @@ import {
   Search, 
   Archive, 
   Edit, 
-  Trash2, 
   CheckSquare,
   Square,
   MoreHorizontal,

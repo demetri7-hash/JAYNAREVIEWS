@@ -31,8 +31,9 @@ export async function POST(request: NextRequest) {
         message: `${taskIds.length} tasks archived successfully` 
       });
 
-    } catch (tableError: any) {
-      console.log('Tasks table may not exist:', tableError.message);
+    } catch (tableError: unknown) {
+      const errorMessage = tableError instanceof Error ? tableError.message : 'Unknown error';
+      console.log('Tasks table may not exist:', errorMessage);
       return NextResponse.json({ 
         success: false, 
         message: 'Tasks functionality not yet available' 

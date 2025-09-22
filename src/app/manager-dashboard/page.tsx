@@ -280,7 +280,7 @@ export default function ManagerDashboard() {
                     </div>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-white border border-slate-200 shadow-lg">
                   {managerTools.map((tool) => {
                     const IconComponent = tool.icon;
                     return (

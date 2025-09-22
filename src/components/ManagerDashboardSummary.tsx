@@ -1,16 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
   Users, 
   CheckCircle, 
   Clock, 
   AlertTriangle, 
-  Activity, 
-  Target, 
-  Calendar,
+  Activity,
+  Target,
   FileText,
+  Calendar,
   Star
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -100,7 +99,6 @@ interface ManagerUpdate {
 }
 
 export default function ManagerDashboardSummary() {
-  const router = useRouter();
   const [stats, setStats] = useState<ManagerStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
@@ -391,45 +389,6 @@ export default function ManagerDashboardSummary() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card className="glass border-white/20">
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button 
-              onClick={() => router.push('/manager/employee-management')}
-              className="flex items-center gap-2 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all duration-200"
-            >
-              <Users className="h-5 w-5" />
-              <span className="text-sm font-medium">Manage Employees</span>
-            </button>
-            <button 
-              onClick={() => router.push('/manager/workflows')}
-              className="flex items-center gap-2 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transition-all duration-200"
-            >
-              <Target className="h-5 w-5" />
-              <span className="text-sm font-medium">Create Workflow</span>
-            </button>
-            <button 
-              onClick={() => router.push('/manager/reports')}
-              className="flex items-center gap-2 p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-200"
-            >
-              <FileText className="h-5 w-5" />
-              <span className="text-sm font-medium">Generate Report</span>
-            </button>
-            <button 
-              onClick={() => router.push('/manager/create-tasks')}
-              className="flex items-center gap-2 p-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:shadow-lg transition-all duration-200"
-            >
-              <Calendar className="h-5 w-5" />
-              <span className="text-sm font-medium">Create Tasks</span>
-            </button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

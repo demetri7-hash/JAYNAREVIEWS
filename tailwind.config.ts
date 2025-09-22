@@ -55,8 +55,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Aptos', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Aptos', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],

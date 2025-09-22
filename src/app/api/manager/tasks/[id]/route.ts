@@ -14,6 +14,9 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     
+    console.log('PUT /api/manager/tasks/[id] - ID:', id);
+    console.log('PUT /api/manager/tasks/[id] - Body:', body);
+    
     const {
       title,
       description,
@@ -25,12 +28,16 @@ export async function PUT(
 
     // Validation
     if (!title?.trim()) {
+      console.log('Validation failed: title missing');
       return NextResponse.json({ error: 'Task title is required' }, { status: 400 });
     }
 
     if (!departments || departments.length === 0) {
+      console.log('Validation failed: departments missing');
       return NextResponse.json({ error: 'At least one department is required' }, { status: 400 });
     }
+
+    console.log('Validation passed, attempting update...');
 
     // Try to update the task
     try {

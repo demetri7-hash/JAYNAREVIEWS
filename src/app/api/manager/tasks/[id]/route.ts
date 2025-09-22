@@ -19,10 +19,18 @@ export async function PUT(
     console.log('ID:', id);
     console.log('Body:', body);
     
-    // Test Supabase connection WITHOUT doing any database operations
+    // Test Supabase connection WITH a simple database query
     console.log('Supabase client exists:', !!supabaseAdmin);
     console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing');
     console.log('Supabase Service Key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing');
+    
+    // Test with a simple database read first
+    const { data: testData, error: testError } = await supabaseAdmin
+      .from('checklist_items')
+      .select('id')
+      .limit(1);
+    
+    console.log('Database test result:', { data: testData, error: testError });
     
     // Just return a mock success for testing
     return NextResponse.json({
@@ -36,7 +44,9 @@ export async function PUT(
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       auth_test: session?.user?.email || 'No auth',
-      supabase_test: 'Supabase imported successfully'
+      supabase_test: 'Database test completed',
+      db_test_result: testData ? 'Success' : 'Failed',
+      db_error: testError?.message || 'None'
     });
 
   } catch (error) {

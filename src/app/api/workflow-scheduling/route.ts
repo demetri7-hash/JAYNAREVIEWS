@@ -42,30 +42,40 @@ export async function POST(request: NextRequest) {
 
     const assignments = [];
     const startDate = start_date ? new Date(start_date) : new Date();
-    const endDate = end_date ? new Date(end_date) : null;
 
     for (const userId of user_ids) {
-      if (workflow.is_repeatable) {
-        // Create recurring assignments
-        const recurringAssignments = generateRecurringAssignments({
-          workflow,
-          userId,
-          assignedBy: profile.id,
-          startDate,
-          endDate
-        });
-        assignments.push(...recurringAssignments);
-      } else {
-        // Create a single assignment
-        const dueDate = workflow.due_date || startDate.toISOString().split('T')[0];
-        assignments.push({
-          workflow_id,
-          assigned_to: userId,
-          assigned_by: profile.id,
-          due_date: dueDate,
-          status: 'pending'
-        });
+      // Check if assignment already exists for this user/workflow/date
+      const dueDate = workflow.due_date || startDate.toISOString().split('T')[0];
+      
+      const { data: existingAssignment } = await supabaseAdmin
+        .from('workflow_assignments')
+        .select('id')
+        .eq('workflow_id', workflow_id)
+        .eq('assigned_to', userId)
+        .eq('due_date', dueDate)
+        .single();
+
+      if (existingAssignment) {
+        console.log(`Assignment already exists for user ${userId} on ${dueDate}, skipping...`);
+        continue;
       }
+
+      // Create a single assignment if it doesn't exist
+      assignments.push({
+        workflow_id,
+        assigned_to: userId,
+        assigned_by: profile.id,
+        due_date: dueDate,
+        status: 'pending'
+      });
+    }
+
+    // If no new assignments to create
+    if (assignments.length === 0) {
+      return NextResponse.json({ 
+        assignments: [],
+        message: 'No new assignments created - all users already have this workflow assigned for the specified date'
+      });
     }
 
     // Insert all assignments

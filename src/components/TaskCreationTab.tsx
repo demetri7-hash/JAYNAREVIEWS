@@ -375,23 +375,41 @@ export default function TaskCreationTab() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Departments</label>
-                <select
-                  multiple
-                  value={newTask.departments}
-                  onChange={(e) => {
-                    const selected = Array.from(e.target.selectedOptions, option => option.value);
-                    setNewTask(prev => ({ ...prev, departments: selected }));
-                  }}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 h-24"
-                >
-                  <option value="BOH">Back of House</option>
-                  <option value="FOH">Front of House</option>
-                  <option value="PREP">Prep</option>
-                  <option value="CLEAN">Cleaning</option>
-                  <option value="AM">Morning Shift</option>
-                  <option value="PM">Evening Shift</option>
-                </select>
-                <p className="text-xs text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-300">
+                  {[
+                    { value: 'BOH', label: 'Back of House' },
+                    { value: 'FOH', label: 'Front of House' },
+                    { value: 'PREP', label: 'Prep' },
+                    { value: 'CLEAN', label: 'Cleaning' },
+                    { value: 'AM', label: 'Morning Shift' },
+                    { value: 'PM', label: 'Evening Shift' }
+                  ].map(dept => (
+                    <div key={dept.value} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`dept-${dept.value}`}
+                        checked={newTask.departments.includes(dept.value)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setNewTask(prev => ({ 
+                              ...prev, 
+                              departments: [...prev.departments, dept.value] 
+                            }));
+                          } else {
+                            setNewTask(prev => ({ 
+                              ...prev, 
+                              departments: prev.departments.filter(d => d !== dept.value) 
+                            }));
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <label htmlFor={`dept-${dept.value}`} className="ml-3 text-sm text-slate-700">
+                        {dept.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

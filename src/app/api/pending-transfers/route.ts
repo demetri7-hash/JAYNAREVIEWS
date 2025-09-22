@@ -35,12 +35,15 @@ export async function GET() {
 
     if (testError) {
       console.log('task_transfers table does not exist:', testError.message);
-      // Return empty result instead of error
-      return NextResponse.json({ transfers: [] });
+      // Return empty result instead of error for missing table
+      if (testError.message.includes('does not exist') || testError.code === '42P01') {
+        return NextResponse.json({ transfers: [] });
+      }
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     // Try a simpler query first to avoid join issues
-    let query = supabase
+    const { data: transfers, error: transfersError } = await supabase
       .from('task_transfers')
       .select(`
         id,
@@ -53,33 +56,20 @@ export async function GET() {
         transferee_responded_at,
         manager_responded_at
       `)
-
-    // Filter based on user role and involvement
-    if (currentUser.role === 'manager') {
-      // Managers see all transfers that need their approval or are in their oversight
-      query = query.or(`status.eq.pending_manager,and(status.eq.pending_transferee,to_user_id.eq.${currentUser.id})`)
-    } else {
-      // Staff see transfers assigned to them that need their approval
-      query = query.eq('to_user_id', currentUser.id).eq('status', 'pending_transferee')
-    }
-
-    const { data: transfers, error: transfersError } = await query
-      .order('requested_at', { ascending: false })
+      .or(currentUser.role === 'manager' 
+        ? `status.eq.pending_manager,and(status.eq.pending_transferee,to_user_id.eq.${currentUser.id})`
+        : `from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`
+      );
 
     if (transfersError) {
-      console.error('Error fetching transfers:', transfersError)
-      return NextResponse.json({ 
-        error: 'Failed to fetch transfer requests' 
-      }, { status: 500 })
+      console.error('Error fetching transfers:', transfersError);
+      return NextResponse.json({ error: 'Failed to fetch transfers' }, { status: 500 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      transfers: transfers || []
-    })
+    return NextResponse.json({ transfers: transfers || [] });
 
   } catch (error) {
-    console.error('Pending transfers fetch error:', error)
+    console.error('Pending transfers API error:', error)
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 })

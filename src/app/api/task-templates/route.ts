@@ -31,6 +31,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching task templates:', error);
+      // If table doesn't exist, return empty array instead of error
+      if (error.message.includes('does not exist') || error.code === '42P01') {
+        return NextResponse.json({ templates: [] });
+      }
       return NextResponse.json({ error: 'Failed to fetch task templates' }, { status: 500 });
     }
 

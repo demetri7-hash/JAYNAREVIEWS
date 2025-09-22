@@ -62,15 +62,40 @@ export async function GET() {
     }
 
     // Also fetch unassigned tasks
-    const { data: unassignedTasks, error: unassignedError } = await supabase
-      .from('tasks')
-      .select('*')
-      .not('id', 'in', `(${(assignments || []).map(a => a.task_id).join(',') || 'null'})`)
-      .order('created_at', { ascending: false });
+    let unassignedTasks = [];
+    let unassignedError = null;
+    
+    try {
+      const assignedTaskIds = (assignments || []).map(a => a.task_id).filter(Boolean);
+      
+      if (assignedTaskIds.length > 0) {
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .not('id', 'in', `(${assignedTaskIds.join(',')})`)
+          .order('created_at', { ascending: false });
+        unassignedTasks = data || [];
+        unassignedError = error;
+      } else {
+        // If no assignments, get all tasks
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .order('created_at', { ascending: false });
+        unassignedTasks = data || [];
+        unassignedError = error;
+      }
+    } catch (error) {
+      console.error('Error fetching unassigned tasks:', error);
+      unassignedError = error;
+    }
 
     if (unassignedError) {
       console.error('Error fetching unassigned tasks:', unassignedError);
     }
+
+    console.log('Debug - Assignments found:', assignments?.length || 0);
+    console.log('Debug - Unassigned tasks found:', unassignedTasks?.length || 0);
 
     // Convert assignments to match the expected task format for the frontend
     const tasksWithAssignees = (assignments || []).map(assignment => {

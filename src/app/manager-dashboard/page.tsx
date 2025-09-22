@@ -10,7 +10,7 @@ import { LanguageToggleCompact } from '@/components/LanguageToggle';
 import ManagerDashboardSummary from '@/components/ManagerDashboardSummary';
 import EnhancedUserManagement from '@/components/EnhancedUserManagement';
 import ManagerUpdatesComponent from '@/components/ManagerUpdatesComponent';
-import TaskManagementComponent from '@/components/TaskManagementComponent';
+import TaskManagementSimple from '@/components/TaskManagementSimple';
 import RoleConfigurationComponent from '@/components/RoleConfigurationComponent';
 import { Settings, Users, Workflow, ArrowLeftRight, UserCog, BarChart3, Plus, ClipboardList, Megaphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -153,7 +153,7 @@ export default function ManagerDashboard() {
         return <ManagerDashboardSummary />;
       
       case 'tasks':
-        return <TaskManagementComponent />;
+        return <TaskManagementSimple />;
       
       case 'users':
         return (

@@ -56,17 +56,29 @@ export async function GET() {
         transferee_responded_at,
         manager_responded_at
       `)
-      .or(currentUser.role === 'manager' 
-        ? `status.eq.pending_manager,and(status.eq.pending_transferee,to_user_id.eq.${currentUser.id})`
-        : `from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`
-      );
+      .order('requested_at', { ascending: false });
 
     if (transfersError) {
       console.error('Error fetching transfers:', transfersError);
       return NextResponse.json({ error: 'Failed to fetch transfers' }, { status: 500 });
     }
 
-    return NextResponse.json({ transfers: transfers || [] });
+    // Filter based on user role in code instead of complex SQL
+    let filteredTransfers = transfers || [];
+    if (currentUser.role === 'manager') {
+      // Managers see all transfers that need their approval
+      filteredTransfers = filteredTransfers.filter(t => 
+        t.status === 'pending_manager' || 
+        (t.status === 'pending_transferee' && t.to_user_id === currentUser.id)
+      );
+    } else {
+      // Staff see transfers where they are involved
+      filteredTransfers = filteredTransfers.filter(t => 
+        t.from_user_id === currentUser.id || t.to_user_id === currentUser.id
+      );
+    }
+
+    return NextResponse.json({ transfers: filteredTransfers });
 
   } catch (error) {
     console.error('Pending transfers API error:', error)

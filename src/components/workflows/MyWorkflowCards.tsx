@@ -62,7 +62,9 @@ export default function MyWorkflowCards({ userId: _userId, userRole: _userRole }
 
   const fetchMyWorkflows = async () => {
     try {
-      const response = await fetch(`/api/my-workflows?status=${filter}&limit=50`);
+      const response = await fetch(`/api/my-workflows?status=${filter}&limit=50`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         setAssignments(data.assignments || []);
@@ -79,6 +81,7 @@ export default function MyWorkflowCards({ userId: _userId, userRole: _userRole }
       const response = await fetch('/api/my-workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ assignment_id: assignmentId })
       });
 

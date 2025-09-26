@@ -85,6 +85,12 @@ export async function GET(request: NextRequest) {
 
     const { data: assignments, error } = await query;
 
+    console.log('=== MY WORKFLOWS DEBUG ===');
+    console.log('User ID:', session.user.id);
+    console.log('Status filter:', status);
+    console.log('Raw assignments from DB:', assignments?.length || 0);
+    console.log('First assignment sample:', assignments?.[0] ? JSON.stringify(assignments[0], null, 2) : 'None');
+
     if (error) {
       console.error('Error fetching user workflows:', error);
       return NextResponse.json({ error: 'Failed to fetch workflows' }, { status: 500 });
@@ -96,14 +102,23 @@ export async function GET(request: NextRequest) {
       const today = new Date();
       const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
       
+      console.log('Filtering assignments for status=all');
+      console.log('Total assignments before filter:', assignments?.length || 0);
+      console.log('Start of today:', startOfToday);
+      
       filteredAssignments = assignments?.filter(assignment => {
         // Keep non-completed workflows
         if (assignment.status !== 'completed') {
+          console.log(`Keeping non-completed workflow: ${assignment.id} (status: ${assignment.status})`);
           return true;
         }
         // For completed workflows, only keep those completed today
-        return assignment.completed_at && assignment.completed_at >= startOfToday;
+        const keepCompleted = assignment.completed_at && assignment.completed_at >= startOfToday;
+        console.log(`Completed workflow ${assignment.id}: completed_at=${assignment.completed_at}, keeping=${keepCompleted}`);
+        return keepCompleted;
       }) || [];
+      
+      console.log('Total assignments after filter:', filteredAssignments.length);
     }
 
     // Calculate completion progress for each assignment
@@ -139,6 +154,9 @@ export async function GET(request: NextRequest) {
         } : null
       };
     }) || [];
+
+    console.log('Final response assignments count:', enrichedAssignments.length);
+    console.log('=== END DEBUG ===');
 
     return NextResponse.json({ 
       assignments: enrichedAssignments,

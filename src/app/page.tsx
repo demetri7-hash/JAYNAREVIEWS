@@ -2,22 +2,30 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 
 export default function Home() {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [loading, setLoading] = useState(true)
   const [teamStats, setTeamStats] = useState<any>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (status === 'loading') return // Still loading session
+
+    if (status === 'unauthenticated') {
+      // Redirect to NextAuth's default sign-in page
+      signIn('google', { callbackUrl: window.location.origin })
+      return
+    }
+
     if (session?.user?.email) {
       fetchTeamActivity()
     }
-  }, [session])
+  }, [session, status])
 
   const fetchTeamActivity = async () => {
     try {
@@ -37,6 +45,28 @@ export default function Home() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-ocean-50 flex items-center justify-center">
+        <div className="text-center animate-fade-in-up">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Redirecting to sign in...</p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

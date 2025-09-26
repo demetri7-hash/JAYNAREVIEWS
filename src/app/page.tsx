@@ -3,14 +3,28 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
-import { Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity } from 'lucide-react'
+import { Users, CheckCircle, Clock, AlertTriangle, Activity } from 'lucide-react'
 import Navigation from '@/components/Navigation'
+
+interface TeamStats {
+  totalTasks: number
+  completedToday: number
+  pendingTasks: number
+  overdueTasks: number
+  totalUsers: number
+  averageCompletionTime: number
+  topPerformers: Array<{
+    name: string
+    completedTasks: number
+    averageRating: number
+  }>
+}
 
 export default function Home() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(true)
-  const [teamStats, setTeamStats] = useState<any>(null)
+  const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
